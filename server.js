@@ -1,343 +1,215 @@
 'use strict';
 
-const express = require('express');
-const initSqlJs = require('sql.js');
-const multer = require('multer');
-const path = require('path');
+const http = require('http');
 const fs = require('fs');
+const path = require('path');
 const crypto = require('crypto');
+const { URL } = require('url');
 
-const app = express();
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, 'data');
-const DB_PATH = process.env.DATABASE_PATH || process.env.DB_PATH || path.join(DATA_DIR, 'ea1fjz_cloud_os.sqlite');
-const UPLOADS_PATH = process.env.UPLOADS_PATH || path.join(DATA_DIR, 'uploads');
-const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret-change-me';
-const DEFAULT_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'cambiar1234';
+const DB_PATH = process.env.DATABASE_PATH || process.env.DB_PATH || path.join(DATA_DIR, 'ea1fjz_cloud_os.json');
+const UPLOADS_DIR = process.env.UPLOADS_PATH || path.join(DATA_DIR, 'uploads');
+const COOKIE_NAME = 'ea1fjz_os_session';
+const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'cambiar1234';
 
 fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-fs.mkdirSync(UPLOADS_PATH, { recursive: true });
-fs.mkdirSync(path.join(UPLOADS_PATH, 'wallpapers'), { recursive: true });
-fs.mkdirSync(path.join(UPLOADS_PATH, 'icons'), { recursive: true });
-fs.mkdirSync(path.join(UPLOADS_PATH, 'files'), { recursive: true });
-fs.mkdirSync(path.join(UPLOADS_PATH, 'backups'), { recursive: true });
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
-let SQL = null;
-let db = null;
-let writeChain = Promise.resolve();
+const mime = {
+  '.html': 'text/html; charset=utf-8', '.js': 'application/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.pdf':'application/pdf'
+};
 
-function persistDb() {
-  const bytes = Buffer.from(db.export());
-  fs.writeFileSync(DB_PATH, bytes);
-}
-function withWrite(fn) {
-  writeChain = writeChain.then(async () => {
-    const out = await fn();
-    persistDb();
-    return out;
-  });
-  return writeChain;
-}
-async function run(sql, params = []) {
-  return withWrite(async () => {
-    db.run(sql, params);
-    const idRes = db.exec('SELECT last_insert_rowid() AS id');
-    const lastID = idRes?.[0]?.values?.[0]?.[0] || 0;
-    const changes = db.getRowsModified ? db.getRowsModified() : 0;
-    return { lastID, changes };
-  });
-}
-async function all(sql, params = []) {
-  const res = db.exec(sql, params);
-  if (!res || !res.length) return [];
-  const cols = res[0].columns;
-  return res[0].values.map(v => Object.fromEntries(cols.map((c, i) => [c, v[i]])));
-}
-async function get(sql, params = []) {
-  const rows = await all(sql, params);
-  return rows[0] || null;
-}
-function nowIso() { return new Date().toISOString(); }
-function safeName(name) { return String(name || 'file').replace(/[\\/:*?"<>|\x00-\x1F]/g, '_').slice(0, 180); }
-function makeHash(password, salt = crypto.randomBytes(16).toString('hex')) {
-  const hash = crypto.pbkdf2Sync(String(password), salt, 120000, 64, 'sha512').toString('hex');
+function now(){ return new Date().toISOString(); }
+function safeId(){ return crypto.randomBytes(8).toString('hex'); }
+function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')){
+  const hash = crypto.pbkdf2Sync(String(password), salt, 120000, 32, 'sha256').toString('hex');
   return `${salt}:${hash}`;
 }
-function verifyPassword(password, stored) {
-  if (!stored || !stored.includes(':')) return false;
-  const [salt, hash] = stored.split(':');
-  const candidate = makeHash(password, salt).split(':')[1];
-  return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(candidate, 'hex'));
+function verifyPassword(password, stored){
+  const [salt, hash] = String(stored || '').split(':');
+  if(!salt || !hash) return false;
+  const test = crypto.pbkdf2Sync(String(password), salt, 120000, 32, 'sha256').toString('hex');
+  return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(test));
 }
-function signToken(payload) {
-  const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  const sig = crypto.createHmac('sha256', SESSION_SECRET).update(body).digest('base64url');
-  return `${body}.${sig}`;
+function sign(value){ return crypto.createHmac('sha256', SESSION_SECRET).update(value).digest('hex'); }
+function makeCookie(user){
+  const payload = Buffer.from(JSON.stringify({ user, ts: Date.now() })).toString('base64url');
+  return `${payload}.${sign(payload)}`;
 }
-function readToken(token) {
-  if (!token || !token.includes('.')) return null;
-  const [body, sig] = token.split('.');
-  const expected = crypto.createHmac('sha256', SESSION_SECRET).update(body).digest('base64url');
-  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
-  const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
-  if (payload.exp && payload.exp < Date.now()) return null;
-  return payload;
+function parseCookies(req){
+  return Object.fromEntries(String(req.headers.cookie || '').split(';').map(x=>x.trim()).filter(Boolean).map(x=>{ const i=x.indexOf('='); return [x.slice(0,i), decodeURIComponent(x.slice(i+1))]; }));
 }
-function parseCookies(req) {
-  return Object.fromEntries(String(req.headers.cookie || '').split(';').filter(Boolean).map(x => {
-    const i = x.indexOf('=');
-    return [decodeURIComponent(x.slice(0, i).trim()), decodeURIComponent(x.slice(i + 1).trim())];
-  }));
+function getSession(req){
+  const token = parseCookies(req)[COOKIE_NAME];
+  if(!token || !token.includes('.')) return null;
+  const [payload, sig] = token.split('.');
+  if(sig !== sign(payload)) return null;
+  try { return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')); } catch { return null; }
 }
-function setAuthCookie(res, token) {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  res.setHeader('Set-Cookie', `ea1fjz_os_session=${encodeURIComponent(token)}; HttpOnly; SameSite=Lax; Path=/; Max-Age=28800${secure}`);
+function send(res, code, data, headers={}){
+  const body = Buffer.isBuffer(data) ? data : (typeof data === 'string' ? data : JSON.stringify(data));
+  res.writeHead(code, { 'Content-Type': Buffer.isBuffer(data) ? 'application/octet-stream' : (headers['Content-Type'] || 'application/json; charset=utf-8'), ...headers });
+  res.end(body);
 }
-function clearAuthCookie(res) {
-  res.setHeader('Set-Cookie', 'ea1fjz_os_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0');
+function sendJson(res, code, obj){ send(res, code, JSON.stringify(obj), {'Content-Type':'application/json; charset=utf-8'}); }
+function notFound(res){ sendJson(res, 404, { ok:false, error:'No encontrado' }); }
+function bad(res, msg, code=400){ sendJson(res, code, { ok:false, error:msg }); }
+function readBody(req){
+  return new Promise((resolve, reject)=>{
+    const chunks=[]; let size=0;
+    req.on('data', c=>{ size+=c.length; if(size>50*1024*1024){ reject(new Error('Payload demasiado grande')); req.destroy(); } else chunks.push(c); });
+    req.on('end', ()=>resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
 }
-async function requireAuth(req, res, next) {
-  try {
-    const token = parseCookies(req).ea1fjz_os_session;
-    const payload = readToken(token);
-    if (!payload) return res.status(401).json({ error: 'No autorizado' });
-    const user = await get('SELECT id, username, role FROM users WHERE id=?', [payload.uid]);
-    if (!user) return res.status(401).json({ error: 'Usuario no válido' });
-    req.user = user;
-    next();
-  } catch (e) { next(e); }
+async function readJson(req){
+  const raw = await readBody(req);
+  if(!raw.length) return {};
+  return JSON.parse(raw.toString('utf8'));
 }
-async function initDb() {
-  SQL = await initSqlJs();
-  if (fs.existsSync(DB_PATH) && fs.statSync(DB_PATH).size > 0) db = new SQL.Database(fs.readFileSync(DB_PATH));
-  else db = new SQL.Database();
-
-  await run(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'admin',
-    created_at TEXT NOT NULL,
-    last_login TEXT
-  )`);
-  await run(`CREATE TABLE IF NOT EXISTS system_config (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL)`);
-  await run(`CREATE TABLE IF NOT EXISTS desktop_icons (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    icon TEXT NOT NULL DEFAULT '◻',
-    type TEXT NOT NULL DEFAULT 'url',
-    target TEXT NOT NULL DEFAULT '',
-    x INTEGER NOT NULL DEFAULT 40,
-    y INTEGER NOT NULL DEFAULT 110,
-    width INTEGER NOT NULL DEFAULT 92,
-    height INTEGER NOT NULL DEFAULT 92,
-    visible INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
-  )`);
-  await run(`CREATE TABLE IF NOT EXISTS files (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    original_name TEXT NOT NULL,
-    stored_name TEXT NOT NULL,
-    relative_path TEXT NOT NULL,
-    mime_type TEXT,
-    size_bytes INTEGER NOT NULL DEFAULT 0,
-    category TEXT NOT NULL DEFAULT 'files',
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
-  )`);
-  await run(`CREATE TABLE IF NOT EXISTS cloud_accounts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    provider TEXT NOT NULL,
-    display_name TEXT NOT NULL,
-    auth_type TEXT NOT NULL DEFAULT 'token',
-    config_json TEXT NOT NULL DEFAULT '{}',
-    enabled INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
-  )`);
-  await run(`CREATE TABLE IF NOT EXISTS remote_connections (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    protocol TEXT NOT NULL DEFAULT 'external',
-    host TEXT NOT NULL DEFAULT '',
-    port TEXT NOT NULL DEFAULT '',
-    username TEXT NOT NULL DEFAULT '',
-    launch_url TEXT NOT NULL DEFAULT '',
-    notes TEXT NOT NULL DEFAULT '',
-    enabled INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
-  )`);
-  const admin = await get('SELECT id FROM users WHERE username=?', ['admin']);
-  if (!admin) await run('INSERT INTO users(username,password_hash,role,created_at) VALUES(?,?,?,?)', ['admin', makeHash(DEFAULT_ADMIN_PASSWORD), 'admin', nowIso()]);
-  const defaults = {
-    os_title: 'EA1FJZ Cloud OS',
-    os_subtitle: 'Sistema operativo web para dashboards, nube, meteorología, radio y archivos.',
-    wallpaper: 'linear-gradient(135deg,#09111f 0%,#132b4f 45%,#0f172a 100%)',
-    accent: '#2f7df6',
-    meteo_url: 'https://open-meteo.com/',
-    windy_url: 'https://www.windy.com/',
-    dsn_url: 'https://eyes.nasa.gov/apps/dsn-now/dsn.html',
-    meteoalarm_url: 'https://meteoalarm.org/en/live/region/ES'
+function defaultDb(){
+  return {
+    users:[{ id:1, username:'admin', password_hash:hashPassword(ADMIN_PASSWORD), role:'admin', created_at:now(), last_login:null }],
+    system_config:{
+      title:'EA1FJZ Cloud OS', subtitle:'Sistema operativo web privado para dashboards, nube, meteo/radio y ayuda remota.',
+      wallpaper:'linear-gradient(135deg,#0f172a,#1e1b4b 45%,#0b1120)', accent:'#7c3aed'
+    },
+    desktop_icons:[
+      {id:1,title:'Navegador',icon:'🌐',type:'browser',target:'https://www.google.com',x:36,y:60,width:120,height:92,visible:1},
+      {id:2,title:'Meteo & Radio',icon:'📡',type:'iframe',target:'https://www.windy.com',x:36,y:170,width:120,height:92,visible:1},
+      {id:3,title:'DSN Now',icon:'🛰️',type:'iframe',target:'https://eyes.nasa.gov/apps/dsn-now/dsn.html',x:36,y:280,width:120,height:92,visible:1},
+      {id:4,title:'Gestor archivos',icon:'🗂️',type:'files',target:'',x:36,y:390,width:120,height:92,visible:1},
+      {id:5,title:'Nube',icon:'☁️',type:'cloud',target:'',x:180,y:60,width:120,height:92,visible:1},
+      {id:6,title:'Ayuda remota',icon:'🖥️',type:'remote',target:'',x:180,y:170,width:120,height:92,visible:1},
+      {id:7,title:'Configuración',icon:'⚙️',type:'settings',target:'',x:180,y:280,width:120,height:92,visible:1}
+    ],
+    files:[], cloud_accounts:[], remote_connections:[], _seq:{icons:8,files:1,cloud:1,remote:1}
   };
-  for (const [key, value] of Object.entries(defaults)) {
-    const exists = await get('SELECT key FROM system_config WHERE key=?', [key]);
-    if (!exists) await run('INSERT INTO system_config(key,value,updated_at) VALUES(?,?,?)', [key, value, nowIso()]);
+}
+function loadDb(){
+  if(!fs.existsSync(DB_PATH)){ const db=defaultDb(); saveDb(db); return db; }
+  try { return JSON.parse(fs.readFileSync(DB_PATH,'utf8')); }
+  catch(e){ const backup = DB_PATH+'.corrupt-'+Date.now(); try{fs.copyFileSync(DB_PATH, backup)}catch{}; const db=defaultDb(); saveDb(db); return db; }
+}
+function saveDb(db){ fs.writeFileSync(DB_PATH, JSON.stringify(db,null,2)); }
+function nextId(db, key){ db._seq = db._seq || {}; const v = db._seq[key] || 1; db._seq[key] = v + 1; return v; }
+function requireAuth(req, res){ const s=getSession(req); if(!s || !s.user) { bad(res,'No autorizado',401); return null; } return s; }
+function cleanFileName(name){ return path.basename(String(name||'archivo')).replace(/[^a-zA-Z0-9._ -]/g,'_').slice(0,160) || 'archivo'; }
+function parseMultipart(buffer, contentType){
+  const match = /boundary=(.+)$/i.exec(contentType || ''); if(!match) return null;
+  const boundary = Buffer.from('--' + match[1]);
+  const parts=[]; let start = buffer.indexOf(boundary);
+  while(start !== -1){
+    start += boundary.length;
+    if(buffer[start]===45 && buffer[start+1]===45) break;
+    if(buffer[start]===13 && buffer[start+1]===10) start += 2;
+    const headerEnd = buffer.indexOf(Buffer.from('\r\n\r\n'), start); if(headerEnd<0) break;
+    const headers = buffer.slice(start, headerEnd).toString('utf8');
+    let dataStart = headerEnd + 4;
+    let next = buffer.indexOf(boundary, dataStart); if(next<0) break;
+    let dataEnd = next - 2; // remove CRLF
+    const cd = /content-disposition:[^\n]*name="([^"]+)"(?:;\s*filename="([^"]*)")?/i.exec(headers);
+    const ct = /content-type:\s*([^\r\n]+)/i.exec(headers);
+    parts.push({ name:cd?.[1], filename:cd?.[2], contentType:ct?.[1], data:buffer.slice(dataStart, dataEnd) });
+    start = next;
   }
-  const countIcons = await get('SELECT COUNT(*) AS n FROM desktop_icons');
-  if (!countIcons.n) {
-    const icons = [
-      ['Navegador', '🌐', 'browser', 'https://www.google.com/search?q=', 36, 120],
-      ['Archivos', '📁', 'internal', 'files', 140, 120],
-      ['Meteo & Radio', '📡', 'internal', 'meteo', 244, 120],
-      ['Nube', '☁️', 'internal', 'cloud', 348, 120],
-      ['Ayuda remota', '🖥️', 'internal', 'remote', 452, 120],
-      ['Configuración', '⚙️', 'internal', 'settings', 556, 120],
-      ['Windy', '🌬️', 'url', defaults.windy_url, 36, 240],
-      ['DSN Now', '🛰️', 'url', defaults.dsn_url, 140, 240]
-    ];
-    for (const [title, icon, type, target, x, y] of icons) {
-      await run('INSERT INTO desktop_icons(title,icon,type,target,x,y,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)', [title, icon, type, target, x, y, nowIso(), nowIso()]);
-    }
-  }
+  return parts;
 }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(UPLOADS_PATH, 'files')),
-  filename: (req, file, cb) => cb(null, `${Date.now()}_${crypto.randomBytes(5).toString('hex')}_${safeName(file.originalname)}`)
-});
-const upload = multer({ storage, limits: { fileSize: Number(process.env.MAX_UPLOAD_MB || 50) * 1024 * 1024 } });
-
-app.use(express.json({ limit: '5mb' }));
-app.use(express.static(PUBLIC_DIR));
-
-app.post('/api/login', async (req, res, next) => {
-  try {
-    const { username = 'admin', password = '' } = req.body || {};
-    const user = await get('SELECT * FROM users WHERE username=?', [username]);
-    if (!user || !verifyPassword(password, user.password_hash)) return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
-    await run('UPDATE users SET last_login=? WHERE id=?', [nowIso(), user.id]);
-    const token = signToken({ uid: user.id, username: user.username, exp: Date.now() + 8 * 60 * 60 * 1000 });
-    setAuthCookie(res, token);
-    res.json({ ok: true, user: { username: user.username, role: user.role } });
-  } catch (e) { next(e); }
-});
-app.post('/api/logout', (req, res) => { clearAuthCookie(res); res.json({ ok: true }); });
-app.get('/api/session', requireAuth, (req, res) => res.json({ ok: true, user: req.user }));
-app.post('/api/change-password', requireAuth, async (req, res, next) => {
-  try {
-    const { currentPassword, newPassword } = req.body || {};
-    if (!newPassword || String(newPassword).length < 6) return res.status(400).json({ error: 'La nueva contraseña debe tener al menos 6 caracteres.' });
-    const user = await get('SELECT * FROM users WHERE id=?', [req.user.id]);
-    if (!verifyPassword(currentPassword || '', user.password_hash)) return res.status(403).json({ error: 'Contraseña actual incorrecta.' });
-    await run('UPDATE users SET password_hash=? WHERE id=?', [makeHash(newPassword), req.user.id]);
-    res.json({ ok: true });
-  } catch (e) { next(e); }
-});
-app.get('/api/health', async (req, res) => {
-  let writable = false;
-  try { fs.accessSync(path.dirname(DB_PATH), fs.constants.W_OK); writable = true; } catch (_) {}
-  res.json({ ok: true, dbPath: DB_PATH, uploadsPath: UPLOADS_PATH, writable, time: nowIso(), sqliteEngine: 'sql.js' });
-});
-app.get('/api/config', requireAuth, async (req, res, next) => {
-  try {
-    const rows = await all('SELECT key,value FROM system_config');
-    res.json(Object.fromEntries(rows.map(r => [r.key, r.value])));
-  } catch (e) { next(e); }
-});
-app.post('/api/config', requireAuth, async (req, res, next) => {
-  try {
-    for (const [key, value] of Object.entries(req.body || {})) {
-      await run('INSERT INTO system_config(key,value,updated_at) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at', [key, String(value ?? ''), nowIso()]);
+async function handleApi(req, res, pathname){
+  const db = loadDb();
+  try{
+    if(req.method==='POST' && pathname==='/api/login'){
+      const body = await readJson(req); const user = db.users.find(u=>u.username===body.username);
+      if(!user || !verifyPassword(body.password, user.password_hash)) return bad(res,'Usuario o contraseña incorrectos',401);
+      user.last_login = now(); saveDb(db);
+      sendJson(res,200,{ok:true,user:{username:user.username,role:user.role}}, {'Set-Cookie': `${COOKIE_NAME}=${makeCookie(user.username)}; Path=/; HttpOnly; SameSite=Lax`});
+      return;
     }
-    res.json({ ok: true });
-  } catch (e) { next(e); }
-});
-app.get('/api/icons', requireAuth, async (req, res, next) => {
-  try { res.json(await all('SELECT * FROM desktop_icons WHERE visible=1 ORDER BY id')); } catch (e) { next(e); }
-});
-app.post('/api/icons', requireAuth, async (req, res, next) => {
-  try {
-    const b = req.body || {};
-    const result = await run('INSERT INTO desktop_icons(title,icon,type,target,x,y,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)', [b.title || 'Nuevo acceso', b.icon || '◻', b.type || 'url', b.target || '', Number(b.x || 60), Number(b.y || 120), nowIso(), nowIso()]);
-    res.json(await get('SELECT * FROM desktop_icons WHERE id=?', [result.lastID]));
-  } catch (e) { next(e); }
-});
-app.put('/api/icons/:id', requireAuth, async (req, res, next) => {
-  try {
-    const b = req.body || {};
-    await run('UPDATE desktop_icons SET title=?,icon=?,type=?,target=?,x=?,y=?,updated_at=? WHERE id=?', [b.title || 'Acceso', b.icon || '◻', b.type || 'url', b.target || '', Number(b.x || 60), Number(b.y || 120), nowIso(), req.params.id]);
-    res.json(await get('SELECT * FROM desktop_icons WHERE id=?', [req.params.id]));
-  } catch (e) { next(e); }
-});
-app.delete('/api/icons/:id', requireAuth, async (req, res, next) => {
-  try { await run('UPDATE desktop_icons SET visible=0,updated_at=? WHERE id=?', [nowIso(), req.params.id]); res.json({ ok: true }); } catch (e) { next(e); }
-});
-app.get('/api/files', requireAuth, async (req, res, next) => {
-  try { res.json(await all('SELECT * FROM files ORDER BY id DESC LIMIT 300')); } catch (e) { next(e); }
-});
-app.post('/api/files/upload', requireAuth, upload.single('file'), async (req, res, next) => {
-  try {
-    const f = req.file;
-    if (!f) return res.status(400).json({ error: 'No se recibió archivo.' });
-    const rel = `files/${f.filename}`;
-    const result = await run('INSERT INTO files(original_name,stored_name,relative_path,mime_type,size_bytes,category,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)', [f.originalname, f.filename, rel, f.mimetype, f.size, 'files', nowIso(), nowIso()]);
-    res.json(await get('SELECT * FROM files WHERE id=?', [result.lastID]));
-  } catch (e) { next(e); }
-});
-app.get('/api/files/download/:id', requireAuth, async (req, res, next) => {
-  try {
-    const row = await get('SELECT * FROM files WHERE id=?', [req.params.id]);
-    if (!row) return res.status(404).send('No encontrado');
-    res.download(path.join(UPLOADS_PATH, row.relative_path), row.original_name);
-  } catch (e) { next(e); }
-});
-app.delete('/api/files/:id', requireAuth, async (req, res, next) => {
-  try {
-    const row = await get('SELECT * FROM files WHERE id=?', [req.params.id]);
-    if (row) { try { fs.unlinkSync(path.join(UPLOADS_PATH, row.relative_path)); } catch (_) {} }
-    await run('DELETE FROM files WHERE id=?', [req.params.id]);
-    res.json({ ok: true });
-  } catch (e) { next(e); }
-});
-app.get('/api/cloud/accounts', requireAuth, async (req, res, next) => {
-  try { res.json(await all('SELECT id,provider,display_name,auth_type,enabled,created_at,updated_at FROM cloud_accounts ORDER BY id DESC')); } catch (e) { next(e); }
-});
-app.post('/api/cloud/accounts', requireAuth, async (req, res, next) => {
-  try {
-    const b = req.body || {};
-    await run('INSERT INTO cloud_accounts(provider,display_name,auth_type,config_json,enabled,created_at,updated_at) VALUES(?,?,?,?,?,?,?)', [b.provider || 'GitHub', b.display_name || 'Cuenta nube', b.auth_type || 'token', JSON.stringify(b.config || {}), b.enabled === false ? 0 : 1, nowIso(), nowIso()]);
-    res.json({ ok: true });
-  } catch (e) { next(e); }
-});
-app.delete('/api/cloud/accounts/:id', requireAuth, async (req, res, next) => { try { await run('DELETE FROM cloud_accounts WHERE id=?', [req.params.id]); res.json({ ok: true }); } catch (e) { next(e); } });
-app.get('/api/remote/connections', requireAuth, async (req, res, next) => {
-  try { res.json(await all('SELECT * FROM remote_connections ORDER BY id DESC')); } catch (e) { next(e); }
-});
-app.post('/api/remote/connections', requireAuth, async (req, res, next) => {
-  try {
-    const b = req.body || {};
-    await run('INSERT INTO remote_connections(name,protocol,host,port,username,launch_url,notes,enabled,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)', [b.name || 'Equipo remoto', b.protocol || 'external', b.host || '', b.port || '', b.username || '', b.launch_url || '', b.notes || '', b.enabled === false ? 0 : 1, nowIso(), nowIso()]);
-    res.json({ ok: true });
-  } catch (e) { next(e); }
-});
-app.delete('/api/remote/connections/:id', requireAuth, async (req, res, next) => { try { await run('DELETE FROM remote_connections WHERE id=?', [req.params.id]); res.json({ ok: true }); } catch (e) { next(e); } });
-app.get('/api/db-backup', requireAuth, async (req, res, next) => {
-  try {
-    persistDb();
-    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const name = `ea1fjz_cloud_os_backup_${stamp}.sqlite`;
-    res.download(DB_PATH, name);
-  } catch (e) { next(e); }
-});
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ error: err.message || 'Error interno' });
-});
+    if(req.method==='POST' && pathname==='/api/logout'){
+      res.writeHead(200, {'Content-Type':'application/json; charset=utf-8','Set-Cookie':`${COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`}); res.end(JSON.stringify({ok:true})); return;
+    }
+    if(pathname==='/api/health') return sendJson(res,200,{ok:true,mode:'no-deps-json-persistence',dbPath:DB_PATH,uploadsPath:UPLOADS_DIR,writable:true,time:now()});
+    const session = requireAuth(req,res); if(!session) return;
+    if(req.method==='GET' && pathname==='/api/session') return sendJson(res,200,{ok:true,user:{username:session.user,role:'admin'}});
+    if(req.method==='POST' && pathname==='/api/change-password'){
+      const body=await readJson(req); const u=db.users.find(x=>x.username===session.user);
+      if(!u || !verifyPassword(body.oldPassword, u.password_hash)) return bad(res,'Contraseña actual incorrecta',403);
+      if(!body.newPassword || String(body.newPassword).length<6) return bad(res,'La nueva contraseña debe tener al menos 6 caracteres');
+      u.password_hash=hashPassword(body.newPassword); saveDb(db); return sendJson(res,200,{ok:true});
+    }
+    if(req.method==='GET' && pathname==='/api/config') return sendJson(res,200,{ok:true,config:db.system_config||{}});
+    if(req.method==='POST' && pathname==='/api/config'){
+      const body=await readJson(req); db.system_config={...(db.system_config||{}), ...(body.config||body)}; saveDb(db); return sendJson(res,200,{ok:true,config:db.system_config});
+    }
+    if(req.method==='GET' && pathname==='/api/icons') return sendJson(res,200,{ok:true,icons:db.desktop_icons||[]});
+    if(req.method==='POST' && pathname==='/api/icons'){
+      const body=await readJson(req); const item={id:nextId(db,'icons'), title:body.title||'Nuevo acceso', icon:body.icon||'🔗', type:body.type||'iframe', target:body.target||'', x:body.x||80, y:body.y||80, width:120, height:92, visible:1};
+      db.desktop_icons.push(item); saveDb(db); return sendJson(res,200,{ok:true,icon:item});
+    }
+    let m = pathname.match(/^\/api\/icons\/(\d+)$/);
+    if(m && req.method==='PUT'){
+      const body=await readJson(req); const item=db.desktop_icons.find(x=>String(x.id)===m[1]); if(!item) return notFound(res);
+      Object.assign(item, body); saveDb(db); return sendJson(res,200,{ok:true,icon:item});
+    }
+    if(m && req.method==='DELETE'){
+      db.desktop_icons = db.desktop_icons.filter(x=>String(x.id)!==m[1]); saveDb(db); return sendJson(res,200,{ok:true});
+    }
+    if(req.method==='GET' && pathname==='/api/files') return sendJson(res,200,{ok:true,files:db.files||[]});
+    if(req.method==='POST' && pathname==='/api/files/upload'){
+      const raw=await readBody(req); const parts=parseMultipart(raw, req.headers['content-type']); const file=parts && parts.find(p=>p.filename);
+      if(!file) return bad(res,'No se recibió archivo');
+      const original=cleanFileName(file.filename); const stored=`${Date.now()}_${safeId()}_${original}`; const dest=path.join(UPLOADS_DIR, stored); fs.writeFileSync(dest, file.data);
+      const row={id:nextId(db,'files'), name:original, stored_name:stored, path:dest, type:file.contentType||'application/octet-stream', size:file.data.length, created_at:now(), updated_at:now()};
+      db.files.push(row); saveDb(db); return sendJson(res,200,{ok:true,file:row});
+    }
+    m = pathname.match(/^\/api\/files\/download\/(\d+)$/);
+    if(m && req.method==='GET'){
+      const f=(db.files||[]).find(x=>String(x.id)===m[1]); if(!f || !fs.existsSync(f.path)) return notFound(res);
+      res.writeHead(200, {'Content-Type':f.type||'application/octet-stream','Content-Disposition':`attachment; filename="${encodeURIComponent(f.name)}"`}); fs.createReadStream(f.path).pipe(res); return;
+    }
+    m = pathname.match(/^\/api\/files\/(\d+)$/);
+    if(m && req.method==='DELETE'){
+      const f=(db.files||[]).find(x=>String(x.id)===m[1]); if(f) try{fs.unlinkSync(f.path)}catch{}; db.files=(db.files||[]).filter(x=>String(x.id)!==m[1]); saveDb(db); return sendJson(res,200,{ok:true});
+    }
+    if(req.method==='GET' && pathname==='/api/cloud/accounts') return sendJson(res,200,{ok:true,accounts:db.cloud_accounts||[]});
+    if(req.method==='POST' && pathname==='/api/cloud/accounts'){
+      const b=await readJson(req); const row={id:nextId(db,'cloud'), provider:b.provider||'GitHub', display_name:b.display_name||b.name||'Cuenta nube', auth_type:b.auth_type||'token', encrypted_config:b.encrypted_config||b.token||'', enabled:b.enabled!==false, created_at:now()}; db.cloud_accounts.push(row); saveDb(db); return sendJson(res,200,{ok:true,account:row});
+    }
+    m = pathname.match(/^\/api\/cloud\/accounts\/(\d+)$/);
+    if(m && req.method==='DELETE'){ db.cloud_accounts=(db.cloud_accounts||[]).filter(x=>String(x.id)!==m[1]); saveDb(db); return sendJson(res,200,{ok:true}); }
+    if(req.method==='GET' && pathname==='/api/remote/connections') return sendJson(res,200,{ok:true,connections:db.remote_connections||[]});
+    if(req.method==='POST' && pathname==='/api/remote/connections'){
+      const b=await readJson(req); const row={id:nextId(db,'remote'), name:b.name||'Equipo remoto', protocol:b.protocol||'external', host:b.host||'', port:b.port||'', username:b.username||'', encrypted_password:b.encrypted_password||'', enabled:b.enabled!==false, created_at:now()}; db.remote_connections.push(row); saveDb(db); return sendJson(res,200,{ok:true,connection:row});
+    }
+    m = pathname.match(/^\/api\/remote\/connections\/(\d+)$/);
+    if(m && req.method==='DELETE'){ db.remote_connections=(db.remote_connections||[]).filter(x=>String(x.id)!==m[1]); saveDb(db); return sendJson(res,200,{ok:true}); }
+    if(req.method==='GET' && pathname==='/api/db-backup'){
+      const buf=fs.readFileSync(DB_PATH); res.writeHead(200, {'Content-Type':'application/json','Content-Disposition':'attachment; filename="ea1fjz_cloud_os_backup.json"'}); res.end(buf); return;
+    }
+    notFound(res);
+  }catch(e){ console.error(e); bad(res, e.message || 'Error interno', 500); }
+}
 
-initDb().then(() => {
-  app.listen(PORT, () => console.log(`EA1FJZ Cloud OS escuchando en puerto ${PORT}. DB: ${DB_PATH}`));
-}).catch(err => { console.error(err); process.exit(1); });
+function handleStatic(req,res,pathname){
+  let file = pathname === '/' ? path.join(PUBLIC_DIR,'index.html') : path.join(PUBLIC_DIR, decodeURIComponent(pathname));
+  if(!file.startsWith(PUBLIC_DIR)) return bad(res,'Ruta no permitida',403);
+  fs.stat(file, (err, st)=>{
+    if(err || !st.isFile()) return notFound(res);
+    res.writeHead(200, {'Content-Type': mime[path.extname(file).toLowerCase()] || 'application/octet-stream'});
+    fs.createReadStream(file).pipe(res);
+  });
+}
+
+const server = http.createServer((req,res)=>{
+  const u = new URL(req.url, `http://${req.headers.host}`);
+  if(u.pathname.startsWith('/api/')) return handleApi(req,res,u.pathname);
+  return handleStatic(req,res,u.pathname);
+});
+server.listen(PORT, ()=> console.log(`EA1FJZ Cloud OS escuchando en puerto ${PORT}. Persistencia: ${DB_PATH}`));

@@ -1,7 +1,7 @@
 {
   "name": "ea1fjz-cloud-os",
-  "version": "0.1.0",
-  "description": "EA1FJZ Cloud OS - escritorio web con SQLite, archivos persistentes y módulos configurables.",
+  "version": "0.1.1",
+  "description": "EA1FJZ Cloud OS - versión Render sin dependencias externas para arranque robusto.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,9 +11,5 @@
     "node": "20.x",
     "npm": "10.x"
   },
-  "dependencies": {
-    "express": "^4.19.2",
-    "multer": "^2.0.0",
-    "sql.js": "^1.12.0"
-  }
+  "dependencies": {}
 }
