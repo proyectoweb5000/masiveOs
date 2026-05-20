@@ -3,7 +3,7 @@ services:
     name: ea1fjz-cloud-os
     env: node
     plan: starter
-    buildCommand: npm install
+    buildCommand: npm ci
     startCommand: npm start
     disk:
       name: ea1fjz-cloud-os-data
@@ -20,3 +20,5 @@ services:
         generateValue: true
       - key: ADMIN_PASSWORD
         value: cambiar1234
+      - key: NPM_CONFIG_UPDATE_NOTIFIER
+        value: false
