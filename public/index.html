@@ -194,58 +194,124 @@
 
 
 
-    /* ===== Buscador alternativo / SearXNG ===== */
-    .search-engine-box{
+    /* ===== Masive Search interno ===== */
+    .search-pro-wrap{display:grid;grid-template-rows:auto minmax(0,1fr);height:100%;min-height:460px;gap:12px}
+    .search-pro-head{
       border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      border-radius:24px;
+      padding:14px;
+    }
+    .search-pro-box{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center}
+    .search-pro-input{font-size:18px;font-weight:850;padding:14px 16px;border-radius:18px}
+    .search-filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .search-filter{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      border-radius:999px;
+      padding:7px 10px;
+      font-weight:850;
+      font-size:12px;
+    }
+    .search-filter.is-active{background:linear-gradient(135deg,#60a5fa,#7c3aed);border-color:transparent}
+    .search-results{
+      min-height:0;
+      overflow:auto;
+      display:grid;
+      gap:10px;
+      align-content:start;
+    }
+    .search-result{
+      border:1px solid rgba(255,255,255,.13);
       background:rgba(255,255,255,.08);
       border-radius:18px;
       padding:12px;
-      margin-top:12px;
-    }
-    .search-engine-grid{
       display:grid;
-      grid-template-columns:1fr 1.2fr;
-      gap:10px;
-      align-items:end;
-    }
-    .browser-search-hint{
-      margin:0 0 10px;
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.35;
-    }
-    .browser-search-badge{
-      display:inline-flex;
+      grid-template-columns:auto 1fr auto;
+      gap:12px;
       align-items:center;
-      gap:6px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.08);
+    }
+    .search-result-icon{
+      width:42px;height:42px;border-radius:15px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(255,255,255,.12);
+      font-size:24px;
+    }
+    .search-result-title{font-weight:950;margin-bottom:3px}
+    .search-result-sub{color:var(--muted);font-size:12px;line-height:1.35;word-break:break-word}
+    .search-section-title{
       color:#dbeafe;
-      border-radius:999px;
-      padding:5px 9px;
       font-size:11px;
-      font-weight:900;
-      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      font-weight:950;
+      padding:5px 2px 0;
     }
-    .search-test-grid{
+
+    /* ===== Ayuda remota / Quick Assist ===== */
+    .remote-hero{
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:24px;
+      background:
+        radial-gradient(circle at 14% 16%,rgba(96,165,250,.22),transparent 32%),
+        radial-gradient(circle at 84% 18%,rgba(139,92,246,.22),transparent 32%),
+        rgba(255,255,255,.08);
+      padding:16px;
+      margin-bottom:12px;
+    }
+    .quick-assist-card{
+      border:1px solid rgba(96,165,250,.25);
+      background:rgba(96,165,250,.10);
+      border-radius:22px;
+      padding:15px;
+    }
+    .quick-code{
+      font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+      letter-spacing:.22em;
+      font-size:26px;
+      font-weight:950;
+      text-align:center;
+      padding:12px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(2,6,23,.28);
+      margin-top:8px;
+    }
+    .remote-step-list{display:grid;gap:8px;margin-top:10px}
+    .remote-step{
       display:grid;
-      grid-template-columns:1fr auto;
+      grid-template-columns:28px 1fr;
       gap:8px;
-      align-items:center;
-      margin-top:10px;
+      align-items:flex-start;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.4;
     }
-    body.theme-light .search-engine-box{
+    .remote-step b{
+      width:24px;height:24px;border-radius:999px;
+      background:rgba(96,165,250,.18);
+      color:#dbeafe;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+    }
+    body.theme-light .search-filter,
+    body.theme-light .search-pro-head,
+    body.theme-light .search-result,
+    body.theme-light .remote-hero,
+    body.theme-light .quick-assist-card{
       background:rgba(255,255,255,.72);
       border-color:rgba(15,23,42,.12);
+      color:#0f172a;
     }
-    body.theme-light .browser-search-badge{
-      background:rgba(59,130,246,.10);
-      border-color:rgba(15,23,42,.12);
-      color:#1e3a8a;
-    }
+    body.theme-light .search-section-title{color:#1e3a8a}
+    body.theme-light .quick-code{background:rgba(59,130,246,.08);color:#0f172a;border-color:rgba(15,23,42,.12)}
     @media(max-width:850px){
-      .search-engine-grid{grid-template-columns:1fr}
-      .search-test-grid{grid-template-columns:1fr}
+      .search-pro-box{grid-template-columns:1fr}
+      .search-result{grid-template-columns:auto 1fr}
+      .search-result .row{grid-column:1 / -1}
     }
 
     /* ===== Finder / Explorador macOS ===== */
@@ -768,6 +834,7 @@
       <button class="dock-btn" data-module="browser" title="Navegador">🌐</button>
       <button class="dock-btn" data-module="files" title="Archivos">📁</button>
       <button class="dock-btn" data-module="dashboards" title="Dashboards">📊</button>
+      <button class="dock-btn" data-module="search" title="Masive Search">🔎</button>
       <button class="dock-btn" data-module="cloud" title="Nube">☁️</button>
       <button class="dock-btn" data-module="meteo" title="Meteo & Radio">📡</button>
       <button class="dock-btn" data-module="remote" title="Ayuda remota">🖥️</button>
@@ -875,45 +942,6 @@
     }
   }
 
-  function getSearchEngineLabel(){
-    const engine = config.searchEngine || 'searxng';
-    const labels = {
-      searxng: 'SearXNG',
-      searxng_public: 'SearXNG público',
-      duckduckgo_external: 'DuckDuckGo externo',
-      google_external: 'Google externo',
-      custom: 'Buscador personalizado'
-    };
-    return labels[engine] || 'SearXNG';
-  }
-
-  function getSearchUrl(query){
-    const q = encodeURIComponent(query || '');
-    const engine = config.searchEngine || 'searxng';
-    const base = (config.searchBaseUrl || 'https://search.inetol.net').replace(/\/+$/,'');
-
-    if(engine === 'duckduckgo_external') return 'https://duckduckgo.com/?q=' + q;
-    if(engine === 'google_external') return 'https://www.google.com/search?q=' + q;
-    if(engine === 'custom'){
-      const tpl = config.searchCustomTemplate || (base + '/search?q={q}');
-      return tpl.includes('{q}') ? tpl.replace('{q}', q) : tpl + q;
-    }
-
-    return base + '/search?q=' + q;
-  }
-
-  function normalizeBrowserInput(value){
-    const v = String(value || '').trim();
-    if(!v) return '';
-    if(/^https?:\/\//i.test(v) || v.startsWith('/')) return v;
-    if(v.includes('.') && !/\s/.test(v)) return 'https://' + v;
-    return getSearchUrl(v);
-  }
-
-  function isExternalSearchEngine(){
-    return ['duckduckgo_external','google_external'].includes(config.searchEngine || '');
-  }
-
   async function checkHealth(){
     try{
       const h = await api('/api/health');
@@ -1003,6 +1031,7 @@
       browser: ['Navegador','🌐'],
       files: ['Archivos','📁'],
       dashboards: ['Dashboards','📊'],
+      search: ['Masive Search','🔎'],
       cloud: ['Centro de nube','☁️'],
       meteo: ['Meteo & Radio','📡'],
       remote: ['Ayuda remota','🖥️'],
@@ -1014,6 +1043,7 @@
     if(module === 'browser') renderBrowser(win.body, 'https://www.google.com');
     if(module === 'files') renderFiles(win.body);
     if(module === 'dashboards') renderDashboards(win.body);
+    if(module === 'search') renderSearch(win.body);
     if(module === 'cloud') renderCloud(win.body);
     if(module === 'meteo') renderMeteo(win.body);
     if(module === 'remote') renderRemote(win.body);
@@ -1097,33 +1127,22 @@
     handle.addEventListener('pointerup', () => resizing=false);
   }
 
-  function renderBrowser(root, url=null){
-    const initial = url || getSearchUrl('Masive OS');
+  function renderBrowser(root, url='https://www.google.com'){
     root.innerHTML = `
-      <div class="browser-search-badge">🔎 Buscador: <span class="browser-engine-name">${escapeHtml(getSearchEngineLabel())}</span></div>
-      <p class="browser-search-hint">Escribe una URL o una búsqueda. Para iframe se recomienda SearXNG. Google y DuckDuckGo se abrirán mejor en pestaña externa si bloquean iframe.</p>
       <div class="browser-bar">
-        <input class="input browser-url" value="${escapeAttr(initial)}" placeholder="Buscar o escribir URL..." />
+        <input class="input browser-url" value="${escapeAttr(url)}" placeholder="https://..." />
         <button class="secondary browser-go">Ir</button>
         <button class="secondary browser-external">Abrir externo</button>
       </div>
-      <iframe class="browser-frame" src="${escapeAttr(initial)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
-      <div class="note" style="margin-top:10px">Si una web bloquea la ventana interna, usa “Abrir externo”. Para un buscador realmente embebible lo ideal será usar una instancia SearXNG propia.</div>
+      <iframe class="browser-frame" src="${escapeAttr(url)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+      <div class="note" style="margin-top:10px">Algunas webs bloquean la apertura dentro de ventanas internas. En ese caso usa “Abrir externo”.</div>
     `;
     const input = $('.browser-url', root);
     const frame = $('.browser-frame', root);
-    const go = () => {
-      const finalUrl = normalizeBrowserInput(input.value);
-      input.value = finalUrl;
-      if(isExternalSearchEngine()){
-        window.open(finalUrl, '_blank', 'noopener,noreferrer');
-      }else{
-        frame.src = finalUrl;
-      }
-    };
-    $('.browser-go', root).addEventListener('click', go);
-    input.addEventListener('keydown', e => { if(e.key === 'Enter') go(); });
-    $('.browser-external', root).addEventListener('click', () => window.open(normalizeBrowserInput(input.value), '_blank', 'noopener,noreferrer'));
+    const normalize = v => /^https?:\/\//i.test(v) ? v : 'https://' + v;
+    $('.browser-go', root).addEventListener('click', () => frame.src = normalize(input.value.trim()));
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') $('.browser-go', root).click(); });
+    $('.browser-external', root).addEventListener('click', () => window.open(normalize(input.value.trim()), '_blank', 'noopener,noreferrer'));
   }
 
   async function renderFiles(root){
@@ -1148,6 +1167,7 @@
             </div>
             <div class="finder-actions">
               <input class="input finder-search" placeholder="Buscar en archivos...">
+              <button class="secondary finder-back">← Atrás</button>
               <button class="secondary finder-view-toggle">Vista: iconos</button>
               <button class="secondary finder-up">Subir</button>
               <button class="secondary finder-new-folder-top">Nueva carpeta</button>
@@ -1163,6 +1183,7 @@
     `;
 
     let currentFolder = '/';
+    let folderHistory = [];
     let files = [];
     let folders = [];
     let viewMode = localStorage.getItem('masive_finder_view') || 'grid';
@@ -1223,10 +1244,17 @@
       });
     };
 
-    const setFolder = (folder) => {
-      currentFolder = normalizeFolder(folder);
+    const setFolder = (folder, pushHistory=true) => {
+      const next = normalizeFolder(folder);
+      if(pushHistory && next !== currentFolder) folderHistory.push(currentFolder);
+      currentFolder = next;
       $$('.finder-side-item[data-folder]', root).forEach(b => b.classList.toggle('is-active', normalizeFolder(b.dataset.folder) === currentFolder));
       render();
+    };
+
+    const goBackFolder = () => {
+      const prev = folderHistory.pop();
+      if(prev !== undefined) setFolder(prev, false);
     };
 
     const filterMatches = obj => {
@@ -1408,6 +1436,7 @@
     };
 
     $$('.finder-side-item[data-folder]', root).forEach(b => b.addEventListener('click', () => setFolder(b.dataset.folder)));
+    $('.finder-back', root).addEventListener('click', goBackFolder);
     $('.finder-search', root).addEventListener('input', e => { search = e.target.value.trim(); render(); });
     $('.finder-view-toggle', root).addEventListener('click', () => { viewMode = viewMode === 'grid' ? 'list' : 'grid'; localStorage.setItem('masive_finder_view', viewMode); render(); });
     $('.finder-up', root).addEventListener('click', () => setFolder(parentFolder(currentFolder)));
@@ -1500,6 +1529,159 @@
     }catch(err){
       $('.dash-files-body', root).innerHTML = `<tr><td colspan="2">${escapeHtml(err.message)}</td></tr>`;
     }
+  }
+
+  async function renderSearch(root){
+    root.innerHTML = `
+      <div class="search-pro-wrap">
+        <div class="search-pro-head">
+          <h3 style="margin:0 0 8px">Masive Search</h3>
+          <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.45">Buscador interno del sistema. No usa iframe ni depende de Google: busca apps, iconos, archivos, dashboards, carpetas, servicios nube y equipos de ayuda remota.</p>
+          <div class="search-pro-box" style="margin-top:12px">
+            <input class="input search-pro-input" placeholder="Buscar archivos, apps, dashboards, nube, equipos..." autofocus>
+            <button class="primary search-run">Buscar</button>
+            <button class="secondary search-web">Buscar web externo</button>
+          </div>
+          <div class="search-filter-row">
+            <button class="search-filter is-active" data-type="all">Todo</button>
+            <button class="search-filter" data-type="app">Apps</button>
+            <button class="search-filter" data-type="file">Archivos</button>
+            <button class="search-filter" data-type="folder">Carpetas</button>
+            <button class="search-filter" data-type="cloud">Nube</button>
+            <button class="search-filter" data-type="remote">Remoto</button>
+          </div>
+        </div>
+        <div class="search-results"><div class="finder-empty"><b>🔎</b><div>Escribe para buscar dentro de Masive OS</div></div></div>
+      </div>
+    `;
+
+    const input = $('.search-pro-input', root);
+    const resultsBox = $('.search-results', root);
+    let filter = 'all';
+    let cache = {icons:[], files:[], folders:[], cloud:[], remote:[]};
+
+    const loadCache = async () => {
+      const [iconsData, filesData, foldersData, cloudData, remoteData] = await Promise.all([
+        api('/api/icons').catch(() => []),
+        api('/api/files').catch(() => []),
+        api('/api/folders').catch(() => []),
+        api('/api/cloud/accounts').catch(() => []),
+        api('/api/remote/connections').catch(() => [])
+      ]);
+      cache = {icons:iconsData, files:filesData, folders:foldersData, cloud:cloudData, remote:remoteData};
+    };
+
+    const addResult = (arr, type, icon, title, subtitle, action, extra={}) => {
+      arr.push({type, icon, title, subtitle, action, ...extra});
+    };
+
+    const getResults = (q) => {
+      const query = q.trim().toLowerCase();
+      const out = [];
+      if(!query) return out;
+      const match = (...vals) => vals.some(v => String(v || '').toLowerCase().includes(query));
+
+      for(const i of cache.icons){
+        if(match(i.title, i.target, i.type)){
+          addResult(out, 'app', i.icon || '🔗', i.title || 'Icono', `${i.type || ''} · ${i.target || ''}`, () => openIcon(i));
+        }
+      }
+
+      for(const f of cache.files){
+        if(match(f.original_name, f.name, f.folder, f.mime_type)){
+          addResult(out, 'file', '📄', f.original_name || f.name || 'Archivo', `${f.folder || '/'} · ${f.mime_type || ''}`, () => {
+            const url = '/api/files/download/' + encodeURIComponent(f.id);
+            if(String(f.original_name || '').toLowerCase().endsWith('.html')) openBrowser(url, f.original_name);
+            else window.open(url, '_blank');
+          });
+        }
+      }
+
+      for(const f of cache.folders){
+        if(match(f.name, f.path)){
+          addResult(out, 'folder', '📁', f.name || 'Carpeta', f.path || '/', () => openModule('files'));
+        }
+      }
+
+      for(const c of cache.cloud){
+        if(match(c.display_name, c.provider, c.url, c.resource, c.notes)){
+          addResult(out, 'cloud', '☁️', c.display_name || c.provider || 'Servicio nube', `${c.provider || ''} · ${c.url || ''}`, () => c.url ? openBrowser(c.url, c.display_name || 'Cloud') : openModule('cloud'));
+        }
+      }
+
+      for(const r of cache.remote){
+        if(match(r.name, r.host, r.protocol, r.notes, r.code)){
+          addResult(out, 'remote', '🖥️', r.name || 'Equipo remoto', `${r.protocol || ''} · ${r.host || ''}`, () => openModule('remote'));
+        }
+      }
+
+      const apps = [
+        ['browser','🌐','Navegador','Abrir navegador interno'],
+        ['files','📁','Archivos','Explorador tipo macOS'],
+        ['dashboards','📊','Dashboards','Centro de dashboards'],
+        ['cloud','☁️','Nube','Centro Cloud PRO'],
+        ['meteo','📡','Meteo & Radio','EA1FJZ Observatory'],
+        ['remote','🖥️','Ayuda remota','Windows Quick Assist'],
+        ['settings','⚙️','Configuración','Ajustes del sistema']
+      ];
+      for(const [mod, ic, title, sub] of apps){
+        if(match(title, sub, mod)) addResult(out, 'app', ic, title, sub, () => openModule(mod));
+      }
+
+      return out.filter(r => filter === 'all' || r.type === filter).slice(0, 80);
+    };
+
+    const render = () => {
+      const q = input.value;
+      const results = getResults(q);
+      if(!q.trim()){
+        resultsBox.innerHTML = `<div class="finder-empty"><b>🔎</b><div>Escribe para buscar dentro de Masive OS</div></div>`;
+        return;
+      }
+      if(!results.length){
+        resultsBox.innerHTML = `<div class="finder-empty"><b>∅</b><div>No hay resultados para "${escapeHtml(q)}"</div><div class="small">Puedes usar “Buscar web externo”.</div></div>`;
+        return;
+      }
+
+      const groups = {};
+      results.forEach(r => (groups[r.type] ||= []).push(r));
+      const labels = {app:'Apps', file:'Archivos', folder:'Carpetas', cloud:'Nube', remote:'Ayuda remota'};
+      resultsBox.innerHTML = Object.entries(groups).map(([type, rows]) => `
+        <div class="search-section-title">${escapeHtml(labels[type] || type)}</div>
+        ${rows.map((r, idx) => `
+          <div class="search-result" data-type="${escapeAttr(type)}" data-index="${idx}">
+            <div class="search-result-icon">${escapeHtml(r.icon)}</div>
+            <div><div class="search-result-title">${escapeHtml(r.title)}</div><div class="search-result-sub">${escapeHtml(r.subtitle)}</div></div>
+            <div class="row"><button class="secondary search-open" data-global-index="${escapeAttr(results.indexOf(r))}">Abrir</button></div>
+          </div>
+        `).join('')}
+      `).join('');
+
+      $$('.search-open', root).forEach(btn => btn.addEventListener('click', () => {
+        const r = results[Number(btn.dataset.globalIndex)];
+        if(r && r.action) r.action();
+      }));
+      $$('.search-result', root).forEach(row => row.addEventListener('dblclick', () => {
+        const btn = $('.search-open', row);
+        if(btn) btn.click();
+      }));
+    };
+
+    await loadCache();
+    input.addEventListener('input', render);
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') render(); });
+    $('.search-run', root).addEventListener('click', render);
+    $('.search-web', root).addEventListener('click', () => {
+      const q = input.value.trim();
+      if(q) window.open('https://duckduckgo.com/?q=' + encodeURIComponent(q), '_blank', 'noopener,noreferrer');
+    });
+    $$('.search-filter', root).forEach(btn => btn.addEventListener('click', () => {
+      $$('.search-filter', root).forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      filter = btn.dataset.type;
+      render();
+    }));
+    input.focus();
   }
 
   async function renderCloud(root){
@@ -1846,41 +2028,155 @@
 
   async function renderRemote(root){
     root.innerHTML = `
-      <div class="card"><h3>Ayuda remota</h3><p>Gestor inicial de conexiones. Para escritorio remoto real desde navegador necesitaremos integrar Guacamole, noVNC o enlaces a una herramienta externa.</p></div>
-      <div class="grid2" style="margin-top:12px">
+      <div class="remote-hero">
+        <h3 style="margin:0 0 6px">Ayuda remota Windows · Asistencia rápida</h3>
+        <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.45">Acceso guiado para trabajar como cuando en Windows pulsas <b>Ctrl + Win + Q</b>. El navegador no puede simular esa combinación de teclas ni garantizar la apertura de apps locales, pero sí puede intentar abrir el protocolo de Asistencia rápida y dejar instrucciones claras.</p>
+      </div>
+
+      <div class="grid2">
+        <div class="quick-assist-card">
+          <h3 style="margin:0 0 8px">Iniciar Asistencia rápida</h3>
+          <div class="row">
+            <button class="primary qa-launch">Intentar abrir Asistencia rápida</button>
+            <button class="secondary qa-copy-steps">Copiar pasos</button>
+            <button class="secondary qa-download-bat">Descargar lanzador .bat</button>
+          </div>
+          <div class="remote-step-list">
+            <div class="remote-step"><b>1</b><div>En Windows pulsa <b>Ctrl + Win + Q</b> o busca <b>Asistencia rápida</b>.</div></div>
+            <div class="remote-step"><b>2</b><div>El asistente pulsa <b>Ayudar a alguien</b> e inicia sesión con cuenta Microsoft si lo pide.</div></div>
+            <div class="remote-step"><b>3</b><div>Windows genera un código de seguridad de 6 caracteres.</div></div>
+            <div class="remote-step"><b>4</b><div>El usuario introduce el código, acepta compartir pantalla y permite control si procede.</div></div>
+          </div>
+          <div class="msg qa-msg"></div>
+        </div>
+
         <div class="card">
-          <h3>Añadir equipo</h3>
-          <div class="field"><label>Nombre</label><input class="input remote-name" placeholder="Ej: PC línea 1"></div>
-          <div class="field"><label>Protocolo</label><select class="input remote-protocol"><option value="external">Herramienta externa</option><option value="rdp">RDP futuro</option><option value="vnc">VNC futuro</option><option value="ssh">SSH futuro</option></select></div>
-          <div class="field"><label>Host/IP</label><input class="input remote-host" placeholder="192.168.x.x o nombre equipo"></div>
-          <button class="primary remote-add">Guardar equipo</button>
+          <h3>Registrar sesión/equipo</h3>
+          <input type="hidden" class="remote-id">
+          <div class="grid2">
+            <div class="field"><label>Nombre / usuario</label><input class="input remote-name" placeholder="Ej: PC línea 1 / usuario"></div>
+            <div class="field"><label>Tipo</label><select class="input remote-protocol"><option value="quickassist">Windows Quick Assist</option><option value="external">Herramienta externa</option><option value="rdp">RDP futuro</option><option value="vnc">VNC futuro</option><option value="ssh">SSH futuro</option></select></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Equipo / host opcional</label><input class="input remote-host" placeholder="Nombre equipo, IP o ubicación"></div>
+            <div class="field"><label>Código 6 caracteres</label><input class="input remote-code" maxlength="12" placeholder="ABC123"></div>
+          </div>
+          <div class="field"><label>Notas</label><textarea class="input remote-notes" style="min-height:76px;resize:vertical" placeholder="Incidencia, persona, teléfono, observaciones..."></textarea></div>
+          <div class="row">
+            <button class="primary remote-save">Guardar</button>
+            <button class="secondary remote-clear">Limpiar</button>
+          </div>
           <div class="msg remote-msg"></div>
         </div>
-        <div class="card">
-          <h3>Equipos configurados</h3>
-          <table class="table"><thead><tr><th>Nombre</th><th>Protocolo</th><th>Host</th></tr></thead><tbody class="remote-body"><tr><td colspan="3">Cargando…</td></tr></tbody></table>
-        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Sesiones y equipos guardados</h3>
+        <table class="table"><thead><tr><th>Tipo</th><th>Nombre</th><th>Host</th><th>Código</th><th>Acción</th></tr></thead><tbody class="remote-body"><tr><td colspan="5">Cargando…</td></tr></tbody></table>
       </div>
     `;
+
+    const form = {
+      id: $('.remote-id', root),
+      name: $('.remote-name', root),
+      protocol: $('.remote-protocol', root),
+      host: $('.remote-host', root),
+      code: $('.remote-code', root),
+      notes: $('.remote-notes', root),
+      msg: $('.remote-msg', root)
+    };
+
+    const clear = () => {
+      form.id.value = '';
+      form.name.value = '';
+      form.protocol.value = 'quickassist';
+      form.host.value = '';
+      form.code.value = '';
+      form.notes.value = '';
+      setMsg(form.msg, '');
+    };
+
     const load = async () => {
       const rows = await api('/api/remote/connections');
-      $('.remote-body', root).innerHTML = rows.length ? rows.map(r => `<tr><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.protocol)}</td><td>${escapeHtml(r.host)}</td></tr>`).join('') : '<tr><td colspan="3">No hay equipos configurados.</td></tr>';
-    };
-    await load();
-    $('.remote-add', root).addEventListener('click', async () => {
-      const msg = $('.remote-msg', root);
-      try{
-        await api('/api/remote/connections', {method:'POST', body:JSON.stringify({
-          name: $('.remote-name', root).value || 'Equipo remoto',
-          protocol: $('.remote-protocol', root).value,
-          host: $('.remote-host', root).value
-        })});
-        setMsg(msg, 'Equipo guardado.', 'ok');
-        $('.remote-name', root).value = '';
-        $('.remote-host', root).value = '';
+      $('.remote-body', root).innerHTML = rows.length ? rows.map(r => `
+        <tr>
+          <td>${escapeHtml(r.protocol || '')}</td>
+          <td>${escapeHtml(r.name || '')}</td>
+          <td>${escapeHtml(r.host || '')}</td>
+          <td><span class="quick-code" style="font-size:14px;letter-spacing:.12em;padding:5px 8px;margin:0;display:inline-block">${escapeHtml(r.code || '')}</span></td>
+          <td class="row">
+            <button class="secondary remote-edit" data-id="${escapeAttr(r.id)}">Editar</button>
+            <button class="secondary remote-open" data-id="${escapeAttr(r.id)}">Abrir QA</button>
+            <button class="danger remote-delete" data-id="${escapeAttr(r.id)}">Borrar</button>
+          </td>
+        </tr>
+      `).join('') : '<tr><td colspan="5">No hay sesiones guardadas.</td></tr>';
+
+      $$('.remote-edit', root).forEach(btn => btn.addEventListener('click', () => {
+        const r = rows.find(x => x.id === btn.dataset.id);
+        if(!r) return;
+        form.id.value = r.id;
+        form.name.value = r.name || '';
+        form.protocol.value = r.protocol || 'quickassist';
+        form.host.value = r.host || '';
+        form.code.value = r.code || '';
+        form.notes.value = r.notes || '';
+      }));
+
+      $$('.remote-open', root).forEach(btn => btn.addEventListener('click', () => launchQuickAssist($('.qa-msg', root))));
+      $$('.remote-delete', root).forEach(btn => btn.addEventListener('click', async () => {
+        if(!confirm('¿Eliminar esta sesión/equipo?')) return;
+        await api('/api/remote/connections/' + encodeURIComponent(btn.dataset.id), {method:'DELETE'});
         await load();
-      }catch(err){ setMsg(msg, err.message, 'bad'); }
+      }));
+    };
+
+    const launchQuickAssist = (msgEl) => {
+      setMsg(msgEl, 'Intentando abrir Asistencia rápida. Si no se abre, pulsa Ctrl + Win + Q en Windows.');
+      const a = document.createElement('a');
+      a.href = 'ms-quick-assist:';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => setMsg(msgEl, 'Si Windows no ha abierto la app, usa Ctrl + Win + Q o el lanzador .bat.', 'ok'), 1400);
+    };
+
+    $('.qa-launch', root).addEventListener('click', () => launchQuickAssist($('.qa-msg', root)));
+    $('.qa-copy-steps', root).addEventListener('click', async () => {
+      const text = 'Abre Asistencia rápida con Ctrl + Win + Q. El asistente pulsa Ayudar a alguien, genera el código de 6 caracteres y el usuario lo introduce para compartir pantalla.';
+      await navigator.clipboard.writeText(text).catch(() => {});
+      setMsg($('.qa-msg', root), 'Pasos copiados.', 'ok');
     });
+    $('.qa-download-bat', root).addEventListener('click', () => {
+      const bat = '@echo off\r\nstart ms-quick-assist:\r\n';
+      downloadText('abrir_asistencia_rapida.bat', bat);
+    });
+
+    $('.remote-save', root).addEventListener('click', async () => {
+      const payload = {
+        name: form.name.value || 'Sesión Quick Assist',
+        protocol: form.protocol.value,
+        host: form.host.value,
+        code: form.code.value,
+        notes: form.notes.value,
+        enabled: true
+      };
+      try{
+        if(form.id.value){
+          await api('/api/remote/connections/' + encodeURIComponent(form.id.value), {method:'PUT', body:JSON.stringify(payload)});
+          setMsg(form.msg, 'Sesión actualizada.', 'ok');
+        }else{
+          await api('/api/remote/connections', {method:'POST', body:JSON.stringify(payload)});
+          setMsg(form.msg, 'Sesión guardada.', 'ok');
+        }
+        clear();
+        await load();
+      }catch(err){ setMsg(form.msg, err.message, 'bad'); }
+    });
+
+    $('.remote-clear', root).addEventListener('click', clear);
+    await load();
   }
 
   function renderSettings(root){
@@ -1924,29 +2220,6 @@
             <button class="secondary refresh-icons">Recargar iconos</button>
           </div>
         </div>
-        <div class="card">
-          <h3>Buscador del navegador</h3>
-          <p>Configura el buscador usado por el navegador interno y por el launcher superior. Para usarlo en iframe, SearXNG es la opción recomendada.</p>
-          <div class="search-engine-box">
-            <div class="search-engine-grid">
-              <div class="field"><label>Motor de búsqueda</label>
-                <select class="input cfg-search-engine">
-                  <option value="searxng">SearXNG configurable</option>
-                  <option value="searxng_public">SearXNG público</option>
-                  <option value="duckduckgo_external">DuckDuckGo externo</option>
-                  <option value="google_external">Google externo</option>
-                  <option value="custom">URL personalizada</option>
-                </select>
-              </div>
-              <div class="field"><label>URL base SearXNG</label><input class="input cfg-search-base" value="${escapeAttr(config.searchBaseUrl || 'https://search.inetol.net')}" placeholder="https://tu-searxng"></div>
-            </div>
-            <div class="field"><label>Plantilla personalizada</label><input class="input cfg-search-template" value="${escapeAttr(config.searchCustomTemplate || '')}" placeholder="https://buscador.local/search?q={q}"></div>
-            <div class="search-test-grid">
-              <input class="input cfg-search-test-query" value="masive os" placeholder="Texto de prueba">
-              <button class="secondary cfg-search-test">Probar en navegador</button>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="card" style="margin-top:12px">
         <h3>Listado de iconos</h3>
@@ -1954,31 +2227,13 @@
       </div>
     `;
     $('.cfg-theme', root).value = config.theme || 'massive';
-    $('.cfg-search-engine', root).value = config.searchEngine || 'searxng';
-    $('.cfg-search-base', root).value = config.searchBaseUrl || 'https://search.inetol.net';
-    $('.cfg-search-template', root).value = config.searchCustomTemplate || '';
-    $('.cfg-search-test', root).addEventListener('click', () => {
-      const oldEngine = config.searchEngine;
-      const oldBase = config.searchBaseUrl;
-      const oldTpl = config.searchCustomTemplate;
-      config.searchEngine = $('.cfg-search-engine', root).value;
-      config.searchBaseUrl = $('.cfg-search-base', root).value;
-      config.searchCustomTemplate = $('.cfg-search-template', root).value;
-      openBrowser(getSearchUrl($('.cfg-search-test-query', root).value || 'masive os'), 'Prueba buscador');
-      config.searchEngine = oldEngine;
-      config.searchBaseUrl = oldBase;
-      config.searchCustomTemplate = oldTpl;
-    });
     $$('.wallpaper-preset', root).forEach(p => {
       p.addEventListener('click', async () => {
         $('.cfg-theme', root).value = p.dataset.theme || 'massive';
         $('.cfg-wallpaper', root).value = p.dataset.wallpaper || '';
         config = await api('/api/config', {method:'POST', body:JSON.stringify({
           theme: $('.cfg-theme', root).value,
-          wallpaper: $('.cfg-wallpaper', root).value,
-          searchEngine: $('.cfg-search-engine', root).value,
-          searchBaseUrl: $('.cfg-search-base', root).value,
-          searchCustomTemplate: $('.cfg-search-template', root).value
+          wallpaper: $('.cfg-wallpaper', root).value
         })});
         applyConfig();
       });
@@ -2030,10 +2285,7 @@
           title: $('.cfg-title', root).value,
           subtitle: $('.cfg-subtitle', root).value,
           theme: $('.cfg-theme', root).value,
-          wallpaper: $('.cfg-wallpaper', root).value,
-          searchEngine: $('.cfg-search-engine', root).value,
-          searchBaseUrl: $('.cfg-search-base', root).value,
-          searchCustomTemplate: $('.cfg-search-template', root).value
+          wallpaper: $('.cfg-wallpaper', root).value
         })});
         applyConfig();
         setMsg(msg, 'Configuración guardada.', 'ok');
@@ -2161,7 +2413,7 @@
 
     const lower = q.toLowerCase();
     const internal = {
-      'archivos':'files','files':'files','dashboards':'dashboards','dashboard':'dashboards','paneles':'dashboards','nube':'cloud','cloud':'cloud',
+      'archivos':'files','files':'files','dashboards':'dashboards','dashboard':'dashboards','paneles':'dashboards','buscar':'search','buscador':'search','search':'search','spotlight':'search','nube':'cloud','cloud':'cloud',
       'meteo':'meteo','meteorologia':'meteo','meteorología':'meteo','radio':'meteo','ea1fjz':'meteo','observatory':'meteo','windy':'meteo','dsn':'meteo','ayuda':'remote','remoto':'remote',
       'config':'settings','configuracion':'settings','configuración':'settings',
       'navegador':'browser','browser':'browser'
@@ -2185,12 +2437,7 @@
       return;
     }
 
-    const searchUrl = getSearchUrl(q);
-    if(isExternalSearchEngine()){
-      window.open(searchUrl, '_blank', 'noopener,noreferrer');
-    }else{
-      openBrowser(searchUrl, 'Buscar: ' + q);
-    }
+    openBrowser('https://www.google.com/search?q=' + encodeURIComponent(q), 'Buscar: ' + q);
     e.target.value = '';
   });
 
