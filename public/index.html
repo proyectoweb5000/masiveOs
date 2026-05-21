@@ -190,6 +190,20 @@
     .kv{display:grid;grid-template-columns:170px 1fr;gap:8px;font-size:13px;color:var(--muted)}
     .kv b{color:#fff}
 
+
+    .cloud-service-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:12px 0}
+    .cloud-service-card{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);border-radius:20px;padding:14px;min-height:132px;display:flex;flex-direction:column;justify-content:space-between;gap:10px}
+    .cloud-service-card h4{margin:0;font-size:15px;display:flex;align-items:center;gap:8px}
+    .cloud-service-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.35}
+    .cloud-status-dot{display:inline-flex;width:10px;height:10px;border-radius:999px;background:#94a3b8;box-shadow:0 0 0 4px rgba(148,163,184,.12)}
+    .cloud-status-dot.ok{background:#34d399;box-shadow:0 0 0 4px rgba(52,211,153,.16)}
+    .cloud-status-dot.bad{background:#fb7185;box-shadow:0 0 0 4px rgba(251,113,133,.16)}
+    .secret-field-wrap{position:relative}
+    .secret-field-wrap .input{padding-right:48px}
+    .secret-eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:34px;height:30px;border-radius:10px;padding:0;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.10);color:#fff}
+    body.theme-light .cloud-service-card{background:rgba(255,255,255,.68);border-color:rgba(15,23,42,.13)}
+    body.theme-light .secret-eye{color:#0f172a;border-color:rgba(15,23,42,.12);background:rgba(255,255,255,.70)}
+
     /* ===== MASIVE OS THEME - Glassmorphism oscuro tipo Proton/Brave ===== */
     body.theme-massive{
       background:
@@ -917,40 +931,202 @@
   async function renderCloud(root){
     root.innerHTML = `
       <div class="card">
-        <h3>Centro de servicios en la nube</h3>
-        <p>Configurador inicial para GitHub, Render, SharePoint, OneDrive u otros servicios. En esta fase guardamos cuentas y accesos; la conexión real por API se añadirá por proveedor.</p>
+        <h3>Centro Cloud PRO</h3>
+        <p>Panel para registrar servicios externos, URLs de Render, repositorios GitHub, carpetas SharePoint/OneDrive y APIs. En esta fase se guardan de forma persistente y se pueden probar endpoints HTTP desde el servidor.</p>
+        <div class="cloud-service-grid">
+          <div class="cloud-service-card"><h4>🐙 GitHub</h4><p>Repositorio, rama y token personal para futuras automatizaciones de subida de archivos.</p><button class="secondary cloud-preset" data-provider="GitHub">Configurar</button></div>
+          <div class="cloud-service-card"><h4>▲ Render</h4><p>Servicio, URL pública, deploy hook y API key para futuras acciones de deploy.</p><button class="secondary cloud-preset" data-provider="Render">Configurar</button></div>
+          <div class="cloud-service-card"><h4>☁️ OneDrive</h4><p>Cuenta o enlace de carpeta compartida para documentación y dashboards.</p><button class="secondary cloud-preset" data-provider="OneDrive">Configurar</button></div>
+          <div class="cloud-service-card"><h4>🏢 SharePoint</h4><p>URL de carpeta, site o documento compartido corporativo.</p><button class="secondary cloud-preset" data-provider="SharePoint">Configurar</button></div>
+          <div class="cloud-service-card"><h4>🔌 API propia</h4><p>Endpoint HTTP para conectar otros dashboards o servicios internos.</p><button class="secondary cloud-preset" data-provider="Custom API">Configurar</button></div>
+        </div>
       </div>
+
       <div class="grid2" style="margin-top:12px">
         <div class="card">
-          <h3>Añadir cuenta</h3>
-          <div class="field"><label>Proveedor</label><select class="input cloud-provider"><option>GitHub</option><option>Render</option><option>OneDrive</option><option>SharePoint</option><option>Dropbox</option><option>Custom API</option></select></div>
-          <div class="field"><label>Nombre visible</label><input class="input cloud-name" placeholder="Ej: GitHub MasiveOS"></div>
-          <button class="primary cloud-add">Guardar cuenta</button>
+          <h3 class="cloud-form-title">Añadir servicio</h3>
+          <input type="hidden" class="cloud-id">
+          <div class="grid2">
+            <div class="field"><label>Proveedor</label><select class="input cloud-provider"><option>GitHub</option><option>Render</option><option>OneDrive</option><option>SharePoint</option><option>Dropbox</option><option>Custom API</option></select></div>
+            <div class="field"><label>Nombre visible</label><input class="input cloud-name" placeholder="Ej: Render MasiveOS"></div>
+          </div>
+          <div class="field"><label>URL principal / endpoint</label><input class="input cloud-url" placeholder="https://..."></div>
+          <div class="grid2">
+            <div class="field"><label>Repositorio / servicio / carpeta</label><input class="input cloud-resource" placeholder="proyectoweb5000/masiveOs"></div>
+            <div class="field"><label>Rama / entorno</label><input class="input cloud-branch" placeholder="main / production"></div>
+          </div>
+          <div class="field">
+            <label>Token / API key / deploy hook</label>
+            <div class="secret-field-wrap">
+              <input class="input cloud-token" type="password" placeholder="Se guarda en la configuración del OS">
+              <button type="button" class="secret-eye cloud-token-eye">👁</button>
+            </div>
+          </div>
+          <div class="field"><label>Notas</label><textarea class="input cloud-notes" style="min-height:76px;resize:vertical" placeholder="Uso, permisos, advertencias, carpeta base..."></textarea></div>
+          <div class="row">
+            <button class="primary cloud-save">Guardar servicio</button>
+            <button class="secondary cloud-clear">Limpiar</button>
+            <button class="secondary cloud-test-url">Probar URL</button>
+          </div>
           <div class="msg cloud-msg"></div>
         </div>
+
         <div class="card">
-          <h3>Cuentas configuradas</h3>
-          <table class="table"><thead><tr><th>Proveedor</th><th>Nombre</th><th>Estado</th></tr></thead><tbody class="cloud-body"><tr><td colspan="3">Cargando…</td></tr></tbody></table>
+          <h3>Servicios configurados</h3>
+          <table class="table"><thead><tr><th>Estado</th><th>Proveedor</th><th>Nombre</th><th>Acción</th></tr></thead><tbody class="cloud-body"><tr><td colspan="4">Cargando…</td></tr></tbody></table>
         </div>
       </div>
     `;
+
+    const form = {
+      id: $('.cloud-id', root),
+      title: $('.cloud-form-title', root),
+      provider: $('.cloud-provider', root),
+      name: $('.cloud-name', root),
+      url: $('.cloud-url', root),
+      resource: $('.cloud-resource', root),
+      branch: $('.cloud-branch', root),
+      token: $('.cloud-token', root),
+      notes: $('.cloud-notes', root),
+      msg: $('.cloud-msg', root)
+    };
+
+    const clearForm = () => {
+      form.id.value = '';
+      form.title.textContent = 'Añadir servicio';
+      form.provider.value = 'GitHub';
+      form.name.value = '';
+      form.url.value = '';
+      form.resource.value = '';
+      form.branch.value = '';
+      form.token.value = '';
+      form.notes.value = '';
+      setMsg(form.msg, '');
+    };
+
+    const fillPreset = (provider) => {
+      clearForm();
+      form.provider.value = provider;
+      if(provider === 'GitHub'){
+        form.name.value = 'GitHub MasiveOS';
+        form.resource.value = 'proyectoweb5000/masiveOs';
+        form.branch.value = 'main';
+        form.url.value = 'https://github.com/proyectoweb5000/masiveOs';
+        form.notes.value = 'Repositorio principal del sistema operativo.';
+      }
+      if(provider === 'Render'){
+        form.name.value = 'Render MasiveOS';
+        form.branch.value = 'production';
+        form.url.value = location.origin;
+        form.notes.value = 'Servicio desplegado en Render con disco persistente /var/data.';
+      }
+      if(provider === 'OneDrive' || provider === 'SharePoint'){
+        form.name.value = provider + ' compartido';
+        form.notes.value = 'Pegar aquí la URL de la carpeta compartida.';
+      }
+      if(provider === 'Custom API'){
+        form.name.value = 'API interna';
+        form.notes.value = 'Endpoint para probar conexión HTTP desde el servidor.';
+      }
+    };
+
+    $$('.cloud-preset', root).forEach(b => b.addEventListener('click', () => fillPreset(b.dataset.provider)));
+    $('.cloud-clear', root).addEventListener('click', clearForm);
+    $('.cloud-token-eye', root).addEventListener('click', () => { form.token.type = form.token.type === 'password' ? 'text' : 'password'; });
+
     const load = async () => {
       const rows = await api('/api/cloud/accounts');
-      $('.cloud-body', root).innerHTML = rows.length ? rows.map(r => `<tr><td>${escapeHtml(r.provider)}</td><td>${escapeHtml(r.display_name)}</td><td>${r.enabled ? 'Activo' : 'OFF'}</td></tr>`).join('') : '<tr><td colspan="3">No hay cuentas configuradas.</td></tr>';
-    };
-    await load();
-    $('.cloud-add', root).addEventListener('click', async () => {
-      const msg = $('.cloud-msg', root);
-      try{
-        await api('/api/cloud/accounts', {method:'POST', body:JSON.stringify({
-          provider: $('.cloud-provider', root).value,
-          display_name: $('.cloud-name', root).value || 'Cuenta nube'
-        })});
-        setMsg(msg, 'Cuenta guardada.', 'ok');
-        $('.cloud-name', root).value = '';
+      $('.cloud-body', root).innerHTML = rows.length ? rows.map(r => {
+        const status = r.last_test && r.last_test.ok ? 'ok' : (r.last_test ? 'bad' : '');
+        const statusText = r.last_test ? (r.last_test.ok ? 'OK' : 'Error') : 'Sin probar';
+        return `<tr>
+          <td><span class="cloud-status-dot ${status}"></span> ${escapeHtml(statusText)}</td>
+          <td>${escapeHtml(r.provider || '')}</td>
+          <td>${escapeHtml(r.display_name || r.name || '')}</td>
+          <td class="row">
+            <button class="secondary cloud-open" data-id="${escapeAttr(r.id)}">Abrir</button>
+            <button class="secondary cloud-edit" data-id="${escapeAttr(r.id)}">Editar</button>
+            <button class="secondary cloud-test" data-id="${escapeAttr(r.id)}">Test</button>
+            <button class="danger cloud-delete" data-id="${escapeAttr(r.id)}">Borrar</button>
+          </td>
+        </tr>`;
+      }).join('') : '<tr><td colspan="4">No hay servicios configurados.</td></tr>';
+
+      $$('.cloud-open', root).forEach(btn => btn.addEventListener('click', () => {
+        const item = rows.find(x => x.id === btn.dataset.id);
+        const url = item?.url || item?.config?.url;
+        if(url) openBrowser(url, item.display_name || item.provider || 'Servicio cloud');
+      }));
+
+      $$('.cloud-edit', root).forEach(btn => btn.addEventListener('click', () => {
+        const item = rows.find(x => x.id === btn.dataset.id);
+        if(!item) return;
+        form.id.value = item.id;
+        form.title.textContent = 'Editar servicio';
+        form.provider.value = item.provider || 'Custom API';
+        form.name.value = item.display_name || item.name || '';
+        form.url.value = item.url || item.config?.url || '';
+        form.resource.value = item.resource || item.config?.resource || '';
+        form.branch.value = item.branch || item.config?.branch || '';
+        form.token.value = item.token || item.config?.token || '';
+        form.notes.value = item.notes || item.config?.notes || '';
+        setMsg(form.msg, 'Editando servicio existente.');
+      }));
+
+      $$('.cloud-test', root).forEach(btn => btn.addEventListener('click', async () => {
+        const item = rows.find(x => x.id === btn.dataset.id);
+        if(!item) return;
+        setMsg(form.msg, 'Probando conexión…');
+        try{
+          const result = await api('/api/cloud/test/' + encodeURIComponent(item.id), {method:'POST'});
+          setMsg(form.msg, result.ok ? 'Conexión OK.' : 'No responde correctamente: ' + (result.status || result.error), result.ok ? 'ok' : 'bad');
+          await load();
+        }catch(err){ setMsg(form.msg, err.message, 'bad'); }
+      }));
+
+      $$('.cloud-delete', root).forEach(btn => btn.addEventListener('click', async () => {
+        const item = rows.find(x => x.id === btn.dataset.id);
+        if(!confirm('¿Eliminar el servicio "' + (item?.display_name || '') + '"?')) return;
+        await api('/api/cloud/accounts/' + encodeURIComponent(btn.dataset.id), {method:'DELETE'});
         await load();
-      }catch(err){ setMsg(msg, err.message, 'bad'); }
+      }));
+    };
+
+    $('.cloud-save', root).addEventListener('click', async () => {
+      try{
+        const payload = {
+          provider: form.provider.value,
+          display_name: form.name.value || 'Servicio cloud',
+          url: form.url.value,
+          resource: form.resource.value,
+          branch: form.branch.value,
+          token: form.token.value,
+          notes: form.notes.value,
+          enabled: true
+        };
+        if(form.id.value){
+          await api('/api/cloud/accounts/' + encodeURIComponent(form.id.value), {method:'PUT', body:JSON.stringify(payload)});
+          setMsg(form.msg, 'Servicio actualizado.', 'ok');
+        }else{
+          await api('/api/cloud/accounts', {method:'POST', body:JSON.stringify(payload)});
+          setMsg(form.msg, 'Servicio guardado.', 'ok');
+        }
+        clearForm();
+        await load();
+      }catch(err){ setMsg(form.msg, err.message, 'bad'); }
     });
+
+    $('.cloud-test-url', root).addEventListener('click', async () => {
+      const url = form.url.value.trim();
+      if(!url){ setMsg(form.msg, 'Introduce una URL para probar.', 'bad'); return; }
+      setMsg(form.msg, 'Probando URL…');
+      try{
+        const result = await api('/api/cloud/test-url', {method:'POST', body:JSON.stringify({url})});
+        setMsg(form.msg, result.ok ? 'URL accesible desde el servidor.' : 'No responde correctamente: ' + (result.status || result.error), result.ok ? 'ok' : 'bad');
+      }catch(err){ setMsg(form.msg, err.message, 'bad'); }
+    });
+
+    await load();
   }
 
   function renderMeteo(root){
