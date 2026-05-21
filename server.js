@@ -84,12 +84,19 @@ let state = loadState();
 saveState(state);
 
 function sendJson(res, status, data, extraHeaders = {}) {
-  res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", ...extraHeaders });
+  res.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+    ...extraHeaders
+  });
   res.end(JSON.stringify(data));
 }
 
 function sendText(res, status, text) {
-  res.writeHead(status, { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" });
+  res.writeHead(status, {
+    "Content-Type": "text/plain; charset=utf-8",
+    "Cache-Control": "no-store"
+  });
   res.end(text);
 }
 
@@ -143,19 +150,33 @@ function readBody(req) {
 async function readJson(req) {
   const body = await readBody(req);
   if (!body) return {};
-  try { return JSON.parse(body); } catch { return {}; }
+  try {
+    return JSON.parse(body);
+  } catch {
+    return {};
+  }
 }
 
 function getMime(filePath) {
   const ext = path.extname(filePath).toLowerCase();
   const map = {
-    ".html": "text/html; charset=utf-8", ".htm": "text/html; charset=utf-8",
-    ".js": "application/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
-    ".json": "application/json; charset=utf-8", ".png": "image/png",
-    ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif",
-    ".webp": "image/webp", ".svg": "image/svg+xml", ".ico": "image/x-icon",
-    ".txt": "text/plain; charset=utf-8", ".pdf": "application/pdf",
-    ".csv": "text/csv; charset=utf-8", ".db": "application/octet-stream", ".sqlite": "application/octet-stream"
+    ".html": "text/html; charset=utf-8",
+    ".htm": "text/html; charset=utf-8",
+    ".js": "application/javascript; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".json": "application/json; charset=utf-8",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+    ".svg": "image/svg+xml",
+    ".ico": "image/x-icon",
+    ".txt": "text/plain; charset=utf-8",
+    ".pdf": "application/pdf",
+    ".csv": "text/csv; charset=utf-8",
+    ".db": "application/octet-stream",
+    ".sqlite": "application/octet-stream"
   };
   return map[ext] || "application/octet-stream";
 }
@@ -165,7 +186,11 @@ function serveStatic(req, res, pathname) {
   const normalized = path.normalize(filePath);
   if (!normalized.startsWith(PUBLIC_DIR)) return sendText(res, 403, "Forbidden");
   if (!fs.existsSync(normalized) || fs.statSync(normalized).isDirectory()) return sendText(res, 404, "Not found");
-  res.writeHead(200, { "Content-Type": getMime(normalized), "Cache-Control": "no-store" });
+
+  res.writeHead(200, {
+    "Content-Type": getMime(normalized),
+    "Cache-Control": "no-store"
+  });
   fs.createReadStream(normalized).pipe(res);
 }
 
@@ -184,15 +209,33 @@ function safeFileName(name) {
 function testHttpUrl(targetUrl) {
   return new Promise((resolve) => {
     let parsed;
-    try { parsed = new URL(targetUrl); } catch { return resolve({ ok: false, error: "URL no válida" }); }
-    if (!["http:", "https:"].includes(parsed.protocol)) return resolve({ ok: false, error: "Solo se permite http/https" });
+    try {
+      parsed = new URL(targetUrl);
+    } catch {
+      return resolve({ ok: false, error: "URL no válida" });
+    }
+
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      return resolve({ ok: false, error: "Solo se permite http/https" });
+    }
+
     const client = parsed.protocol === "https:" ? https : httpClient;
     const started = Date.now();
+
     const req = client.request(parsed, { method: "GET", timeout: 8000 }, (response) => {
       response.resume();
-      response.on("end", () => resolve({ ok: response.statusCode >= 200 && response.statusCode < 400, status: response.statusCode, ms: Date.now() - started }));
+      response.on("end", () => resolve({
+        ok: response.statusCode >= 200 && response.statusCode < 400,
+        status: response.statusCode,
+        ms: Date.now() - started
+      }));
     });
-    req.on("timeout", () => { req.destroy(); resolve({ ok: false, error: "Timeout" }); });
+
+    req.on("timeout", () => {
+      req.destroy();
+      resolve({ ok: false, error: "Timeout" });
+    });
+
     req.on("error", (err) => resolve({ ok: false, error: err.message }));
     req.end();
   });
@@ -236,6 +279,53 @@ function pcloudAccountConfig(account) {
   return { base, token };
 }
 
+function pcloudApiCallWithoutToken(account, method, params = {}) {
+  return new Promise((resolve, reject) => {
+    const base = (account.url || account.config?.url || "https://eapi.pcloud.com").replace(/\/+$/, "");
+    let url;
+
+    try {
+      url = new URL(base + "/" + method);
+    } catch {
+      return reject(new Error("URL base de pCloud no válida."));
+    }
+
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== undefined && v !== null && v !== "") url.searchParams.set(k, String(v));
+    }
+
+    const started = Date.now();
+    const client = url.protocol === "https:" ? https : httpClient;
+
+    const req = client.request(url, { method: "GET", timeout: 15000 }, (response) => {
+      let body = "";
+      response.setEncoding("utf8");
+      response.on("data", chunk => body += chunk);
+      response.on("end", () => {
+        try {
+          const data = JSON.parse(body || "{}");
+          if (data.result && data.result !== 0) {
+            return reject(new Error(data.error || ("pCloud error " + data.result)));
+          }
+          data._status = response.statusCode;
+          data._ms = Date.now() - started;
+          resolve(data);
+        } catch (err) {
+          reject(new Error("Respuesta pCloud no válida: " + err.message));
+        }
+      });
+    });
+
+    req.on("timeout", () => {
+      req.destroy();
+      reject(new Error("Timeout conectando con pCloud"));
+    });
+
+    req.on("error", (err) => reject(err));
+    req.end();
+  });
+}
+
 function pcloudApiCall(account, method, params = {}) {
   return new Promise((resolve, reject) => {
     const { base, token } = pcloudAccountConfig(account);
@@ -255,6 +345,7 @@ function pcloudApiCall(account, method, params = {}) {
 
     const started = Date.now();
     const client = url.protocol === "https:" ? https : httpClient;
+
     const req = client.request(url, { method: "GET", timeout: 15000 }, (response) => {
       let body = "";
       response.setEncoding("utf8");
@@ -297,7 +388,6 @@ function normalizePcloudMetadata(meta) {
     parents: Array.isArray(meta.parents) ? meta.parents : []
   };
 }
-
 async function handleApi(req, res, pathname) {
   if (pathname === "/api/health") {
     return sendJson(res, 200, {
@@ -313,9 +403,18 @@ async function handleApi(req, res, pathname) {
   if (pathname === "/api/login" && req.method === "POST") {
     const data = await readJson(req);
     const password = data.password || data.pass || "";
-    if (password !== ADMIN_PASSWORD) return sendJson(res, 401, { ok: false, error: "Contraseña incorrecta" });
+
+    if (password !== ADMIN_PASSWORD) {
+      return sendJson(res, 401, { ok: false, error: "Contraseña incorrecta" });
+    }
+
     const sid = crypto.randomBytes(32).toString("hex");
-    sessions.set(sid, { user: "admin", created: Date.now(), expires: Date.now() + 1000 * 60 * 60 * 12 });
+    sessions.set(sid, {
+      user: "admin",
+      created: Date.now(),
+      expires: Date.now() + 1000 * 60 * 60 * 12
+    });
+
     return sendJson(res, 200, { ok: true, user: "admin" }, {
       "Set-Cookie": `ea1fjz_os_sid=${encodeURIComponent(sid)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=43200`
     });
@@ -324,18 +423,26 @@ async function handleApi(req, res, pathname) {
   if (pathname === "/api/logout" && (req.method === "POST" || req.method === "GET")) {
     const sid = parseCookies(req).ea1fjz_os_sid;
     if (sid) sessions.delete(sid);
-    return sendJson(res, 200, { ok: true }, { "Set-Cookie": "ea1fjz_os_sid=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0" });
+
+    return sendJson(res, 200, { ok: true }, {
+      "Set-Cookie": "ea1fjz_os_sid=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0"
+    });
   }
 
   if (pathname === "/api/session") {
     const session = getSession(req);
-    return sendJson(res, 200, { ok: !!session, authenticated: !!session, user: session ? session.user : null });
+    return sendJson(res, 200, {
+      ok: !!session,
+      authenticated: !!session,
+      user: session ? session.user : null
+    });
   }
 
   if (!requireAuth(req, res)) return;
 
   if (pathname === "/api/config") {
     if (req.method === "GET") return sendJson(res, 200, state.config);
+
     if (req.method === "POST" || req.method === "PUT") {
       const data = await readJson(req);
       state.config = { ...state.config, ...data };
@@ -346,6 +453,7 @@ async function handleApi(req, res, pathname) {
 
   if (pathname === "/api/icons") {
     if (req.method === "GET") return sendJson(res, 200, state.icons);
+
     if (req.method === "POST") {
       const data = await readJson(req);
       const icon = {
@@ -357,6 +465,7 @@ async function handleApi(req, res, pathname) {
         x: Number(data.x || 80),
         y: Number(data.y || 80)
       };
+
       state.icons.push(icon);
       saveState(state);
       return sendJson(res, 200, icon);
@@ -366,13 +475,18 @@ async function handleApi(req, res, pathname) {
   if (pathname.startsWith("/api/icons/")) {
     const id = decodeURIComponent(pathname.split("/").pop());
     const idx = state.icons.findIndex(i => i.id === id);
-    if (idx === -1) return sendJson(res, 404, { ok: false, error: "Icono no encontrado" });
+
+    if (idx === -1) {
+      return sendJson(res, 404, { ok: false, error: "Icono no encontrado" });
+    }
+
     if (req.method === "PUT" || req.method === "PATCH") {
       const data = await readJson(req);
       state.icons[idx] = { ...state.icons[idx], ...data, id };
       saveState(state);
       return sendJson(res, 200, state.icons[idx]);
     }
+
     if (req.method === "DELETE") {
       const removed = state.icons.splice(idx, 1)[0];
       saveState(state);
@@ -388,8 +502,14 @@ async function handleApi(req, res, pathname) {
     const data = await readJson(req);
     const original = safeFileName(data.name || "archivo.bin");
     const buffer = Buffer.from(String(data.data_base64 || ""), "base64");
-    if (!buffer.length) return sendJson(res, 400, { ok: false, error: "Archivo vacío" });
-    if (buffer.length > 12 * 1024 * 1024) return sendJson(res, 413, { ok: false, error: "Archivo demasiado grande. Máximo 12 MB." });
+
+    if (!buffer.length) {
+      return sendJson(res, 400, { ok: false, error: "Archivo vacío" });
+    }
+
+    if (buffer.length > 12 * 1024 * 1024) {
+      return sendJson(res, 413, { ok: false, error: "Archivo demasiado grande. Máximo 12 MB." });
+    }
 
     const id = newId("file");
     const stored = `${id}_${original}`;
@@ -405,6 +525,7 @@ async function handleApi(req, res, pathname) {
       created_at: new Date().toISOString(),
       path: filePath
     };
+
     state.files.push(rec);
     saveState(state);
     return sendJson(res, 200, rec);
@@ -413,25 +534,45 @@ async function handleApi(req, res, pathname) {
   if (pathname.startsWith("/api/files/download/")) {
     const id = decodeURIComponent(pathname.split("/").pop());
     const file = state.files.find(f => f.id === id);
-    if (!file) return sendJson(res, 404, { ok: false, error: "Archivo no encontrado" });
+
+    if (!file) {
+      return sendJson(res, 404, { ok: false, error: "Archivo no encontrado" });
+    }
+
     const filePath = path.join(UPLOADS_PATH, file.stored_name || file.name);
-    if (!fs.existsSync(filePath)) return sendJson(res, 404, { ok: false, error: "Archivo físico no encontrado" });
+
+    if (!fs.existsSync(filePath)) {
+      return sendJson(res, 404, { ok: false, error: "Archivo físico no encontrado" });
+    }
+
     const inline = /\.(html?|pdf|png|jpe?g|gif|webp|svg|txt|csv)$/i.test(file.original_name || "");
+
     res.writeHead(200, {
       "Content-Type": file.mime_type || getMime(filePath),
       "Content-Disposition": `${inline ? "inline" : "attachment"}; filename="${encodeURIComponent(file.original_name || file.name || "archivo")}"`,
       "Cache-Control": "no-store"
     });
+
     return fs.createReadStream(filePath).pipe(res);
   }
 
   if (pathname.startsWith("/api/files/") && req.method === "DELETE") {
     const id = decodeURIComponent(pathname.split("/").pop());
     const idx = state.files.findIndex(f => f.id === id);
-    if (idx === -1) return sendJson(res, 404, { ok: false, error: "Archivo no encontrado" });
+
+    if (idx === -1) {
+      return sendJson(res, 404, { ok: false, error: "Archivo no encontrado" });
+    }
+
     const file = state.files[idx];
     const filePath = path.join(UPLOADS_PATH, file.stored_name || file.name);
-    try { if (fs.existsSync(filePath)) fs.unlinkSync(filePath); } catch (err) { console.warn(err); }
+
+    try {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    } catch (err) {
+      console.warn(err);
+    }
+
     const removed = state.files.splice(idx, 1)[0];
     saveState(state);
     return sendJson(res, 200, removed);
@@ -439,6 +580,7 @@ async function handleApi(req, res, pathname) {
 
   if (pathname === "/api/cloud/accounts") {
     if (req.method === "GET") return sendJson(res, 200, state.cloudAccounts);
+
     if (req.method === "POST") {
       const data = await readJson(req);
       const account = sanitizeCloudAccount(data);
@@ -451,7 +593,10 @@ async function handleApi(req, res, pathname) {
   if (pathname.startsWith("/api/cloud/accounts/")) {
     const id = decodeURIComponent(pathname.split("/").pop());
     const idx = state.cloudAccounts.findIndex(a => a.id === id);
-    if (idx === -1) return sendJson(res, 404, { ok: false, error: "Servicio cloud no encontrado" });
+
+    if (idx === -1) {
+      return sendJson(res, 404, { ok: false, error: "Servicio cloud no encontrado" });
+    }
 
     if (req.method === "PUT" || req.method === "PATCH") {
       const data = await readJson(req);
@@ -470,14 +615,24 @@ async function handleApi(req, res, pathname) {
   if (pathname.startsWith("/api/cloud/test/") && req.method === "POST") {
     const id = decodeURIComponent(pathname.split("/").pop());
     const idx = state.cloudAccounts.findIndex(a => a.id === id);
-    if (idx === -1) return sendJson(res, 404, { ok: false, error: "Servicio cloud no encontrado" });
+
+    if (idx === -1) {
+      return sendJson(res, 404, { ok: false, error: "Servicio cloud no encontrado" });
+    }
 
     const account = state.cloudAccounts[idx];
     const target = account.url || account.config?.url;
-    if (!target) return sendJson(res, 400, { ok: false, error: "El servicio no tiene URL configurada" });
+
+    if (!target) {
+      return sendJson(res, 400, { ok: false, error: "El servicio no tiene URL configurada" });
+    }
 
     const result = await testHttpUrl(target);
-    state.cloudAccounts[idx].last_test = { ...result, tested_at: new Date().toISOString() };
+    state.cloudAccounts[idx].last_test = {
+      ...result,
+      tested_at: new Date().toISOString()
+    };
+
     saveState(state);
     return sendJson(res, 200, result);
   }
@@ -486,6 +641,51 @@ async function handleApi(req, res, pathname) {
     const data = await readJson(req);
     const result = await testHttpUrl(data.url || "");
     return sendJson(res, 200, result);
+  }
+
+  if (pathname === "/api/pcloud/auth" && req.method === "POST") {
+    const data = await readJson(req);
+    const username = String(data.username || "").trim();
+    const password = String(data.password || "");
+    const region = data.region === "us" ? "us" : "eu";
+    const base = region === "us" ? "https://api.pcloud.com" : "https://eapi.pcloud.com";
+
+    if (!username || !password) {
+      return sendJson(res, 400, { ok: false, error: "Faltan usuario o contraseña" });
+    }
+
+    try {
+      const params = {
+        username,
+        password,
+        getauth: 1,
+        logout: 1,
+        device: "MasiveOS"
+      };
+
+      if (data.authexpire && Number(data.authexpire) > 0) {
+        params.authexpire = Number(data.authexpire);
+      }
+
+      const tempAccount = { url: base };
+      const result = await pcloudApiCallWithoutToken(tempAccount, "userinfo", params);
+
+      if (!result.auth) {
+        return sendJson(res, 500, { ok: false, error: "pCloud no devolvió token de autenticación" });
+      }
+
+      return sendJson(res, 200, {
+        ok: true,
+        auth: result.auth,
+        base,
+        email: result.email || result.mail || username,
+        userid: result.userid,
+        quota: result.quota,
+        usedquota: result.usedquota
+      });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, error: err.message });
+    }
   }
 
   if (pathname === "/api/pcloud/list" && req.method === "POST") {
@@ -564,6 +764,7 @@ async function handleApi(req, res, pathname) {
 
   if (pathname === "/api/remote/connections") {
     if (req.method === "GET") return sendJson(res, 200, state.remoteConnections);
+
     if (req.method === "POST") {
       const data = await readJson(req);
       const conn = {
@@ -575,6 +776,7 @@ async function handleApi(req, res, pathname) {
         username: data.username || "",
         enabled: data.enabled !== false
       };
+
       state.remoteConnections.push(conn);
       saveState(state);
       return sendJson(res, 200, conn);
@@ -582,25 +784,44 @@ async function handleApi(req, res, pathname) {
   }
 
   if (pathname === "/api/password" && req.method === "POST") {
-    return sendJson(res, 200, { ok: false, error: "En esta versión la contraseña se cambia desde la variable ADMIN_PASSWORD de Render." });
+    return sendJson(res, 200, {
+      ok: false,
+      error: "En esta versión la contraseña se cambia desde la variable ADMIN_PASSWORD de Render."
+    });
   }
 
   if (pathname === "/api/backup") {
-    return sendJson(res, 200, { ok: true, database: state, exported_at: new Date().toISOString() });
+    return sendJson(res, 200, {
+      ok: true,
+      database: state,
+      exported_at: new Date().toISOString()
+    });
   }
 
-  return sendJson(res, 404, { ok: false, error: "Ruta API no encontrada", path: pathname });
+  return sendJson(res, 404, {
+    ok: false,
+    error: "Ruta API no encontrada",
+    path: pathname
+  });
 }
 
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = decodeURIComponent(url.pathname);
-    if (pathname.startsWith("/api/")) return await handleApi(req, res, pathname);
+
+    if (pathname.startsWith("/api/")) {
+      return await handleApi(req, res, pathname);
+    }
+
     return serveStatic(req, res, pathname);
   } catch (err) {
     console.error(err);
-    return sendJson(res, 500, { ok: false, error: err.message || "Error interno" });
+
+    return sendJson(res, 500, {
+      ok: false,
+      error: err.message || "Error interno"
+    });
   }
 });
 
