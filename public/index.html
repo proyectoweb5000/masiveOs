@@ -193,72 +193,199 @@
 
 
 
-
-    .pcloud-assistant{
-      border:1px solid rgba(96,165,250,.25);
-      background:radial-gradient(circle at 12% 18%,rgba(96,165,250,.16),transparent 35%),rgba(255,255,255,.07);
-      border-radius:22px;padding:14px;margin-top:12px;
-    }
-    .pcloud-assistant h4{margin:0 0 6px;font-size:16px}
-    .pcloud-assistant p{margin:0 0 12px;color:var(--muted);font-size:12px;line-height:1.45}
-    .pcloud-assistant-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .pcloud-assistant-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
-    body.theme-light .pcloud-assistant{background:rgba(255,255,255,.76);border-color:rgba(59,130,246,.18)}
-    @media(max-width:800px){.pcloud-assistant-grid{grid-template-columns:1fr}}
-
-    .pcloud-pathbar{
+    /* ===== Finder / Explorador macOS ===== */
+    .finder-wrap{
+      height:100%;
+      min-height:460px;
       display:grid;
-      grid-template-columns:auto 1fr auto auto;
-      gap:8px;
+      grid-template-columns:230px minmax(0,1fr);
+      gap:0;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:24px;
+      overflow:hidden;
+      background:rgba(255,255,255,.06);
+    }
+    .finder-sidebar{
+      background:rgba(2,6,23,.24);
+      border-right:1px solid rgba(255,255,255,.12);
+      padding:14px 10px;
+      overflow:auto;
+    }
+    .finder-side-title{
+      color:var(--muted);
+      font-size:11px;
+      font-weight:950;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      padding:8px 10px 6px;
+    }
+    .finder-side-item{
+      width:100%;
+      border:0;
+      background:transparent;
+      color:#fff;
+      border-radius:13px;
+      padding:9px 10px;
+      display:flex;
       align-items:center;
-      margin:12px 0;
+      gap:9px;
+      text-align:left;
+      font-weight:850;
+      font-size:13px;
+      margin:2px 0;
     }
-    .pcloud-list-row{
+    .finder-side-item:hover,.finder-side-item.is-active{background:rgba(255,255,255,.12)}
+    .finder-main{display:flex;flex-direction:column;min-width:0;min-height:0}
+    .finder-toolbar{
+      min-height:58px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      border-bottom:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+    }
+    .finder-breadcrumb{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      min-width:0;
+      color:#e0f2fe;
+      font-weight:900;
+      font-size:13px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .finder-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .finder-actions .input{height:36px;padding:8px 11px;border-radius:12px;min-width:210px}
+    .finder-content{flex:1;min-height:0;overflow:auto;padding:14px}
+    .finder-grid{
       display:grid;
-      grid-template-columns:42px 1fr 120px 150px auto;
-      gap:8px;
+      grid-template-columns:repeat(auto-fill,minmax(128px,1fr));
+      gap:14px;
+    }
+    .finder-item{
+      border:1px solid transparent;
+      border-radius:18px;
+      min-height:118px;
+      padding:12px 8px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      gap:9px;
+      text-align:center;
+      user-select:none;
+      color:#fff;
+    }
+    .finder-item:hover,.finder-item.is-selected{
+      border-color:rgba(255,255,255,.18);
+      background:rgba(255,255,255,.10);
+    }
+    .finder-icon{
+      width:58px;height:58px;border-radius:19px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:34px;
+      background:linear-gradient(135deg,rgba(96,165,250,.30),rgba(139,92,246,.28));
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 12px 26px rgba(0,0,0,.18);
+    }
+    .finder-name{
+      width:100%;
+      line-height:1.15;
+      font-size:12px;
+      font-weight:850;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      word-break:break-word;
+    }
+    .finder-meta{font-size:10px;color:var(--muted);font-weight:800}
+    .finder-list{display:block}
+    .finder-list-row{
+      display:grid;
+      grid-template-columns:42px minmax(0,1.4fr) 110px 140px 170px;
+      gap:10px;
       align-items:center;
       padding:9px 10px;
       border-bottom:1px solid rgba(255,255,255,.10);
+      border-radius:12px;
+      min-width:760px;
     }
-    .pcloud-list-row:hover{background:rgba(255,255,255,.07)}
-    .pcloud-list-head{
+    .finder-list-row:hover{background:rgba(255,255,255,.08)}
+    .finder-list-row.header{
       color:#dbeafe;
-      background:rgba(255,255,255,.06);
-      font-size:12px;
-      font-weight:900;
+      font-size:11px;
+      font-weight:950;
       text-transform:uppercase;
-      letter-spacing:.05em;
+      letter-spacing:.06em;
+      background:rgba(255,255,255,.06);
       position:sticky;
       top:0;
       z-index:2;
     }
-    .pcloud-file-icon{font-size:24px;text-align:center}
-    .pcloud-list-box{
-      border:1px solid rgba(255,255,255,.13);
-      border-radius:18px;
-      overflow:auto;
-      max-height:430px;
-      background:rgba(255,255,255,.05);
-    }
-    .pcloud-breadcrumb{
+    .finder-small-icon{font-size:24px}
+    .finder-row-name{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .finder-empty{
+      height:100%;
+      min-height:260px;
       display:flex;
-      gap:6px;
-      flex-wrap:wrap;
       align-items:center;
+      justify-content:center;
+      flex-direction:column;
       color:var(--muted);
-      font-size:12px;
-      margin-top:8px;
+      text-align:center;
+      gap:8px;
     }
-    .pcloud-breadcrumb button{
-      width:auto;
-      padding:5px 8px;
-      border-radius:999px;
-      font-size:11px;
+    .finder-empty b{font-size:46px}
+    .finder-context{
+      position:fixed;
+      z-index:99999;
+      min-width:190px;
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:16px;
+      background:rgba(15,23,42,.92);
+      backdrop-filter:blur(20px);
+      box-shadow:0 18px 48px rgba(0,0,0,.38);
+      padding:7px;
     }
-    body.theme-light .pcloud-list-row{border-bottom-color:rgba(15,23,42,.09)}
-    body.theme-light .pcloud-list-head{color:#1e3a8a;background:rgba(59,130,246,.09)}
-    body.theme-light .pcloud-list-box{background:rgba(255,255,255,.68);border-color:rgba(15,23,42,.13)}
+    .finder-context button{
+      width:100%;
+      border:0;
+      background:transparent;
+      color:#fff;
+      padding:9px 10px;
+      border-radius:11px;
+      text-align:left;
+      font-weight:850;
+    }
+    .finder-context button:hover{background:rgba(255,255,255,.12)}
+    .finder-context .danger-item{color:#fecdd3}
+    body.theme-light .finder-wrap,
+    body.theme-light .finder-toolbar,
+    body.theme-light .finder-sidebar{background:rgba(255,255,255,.72);border-color:rgba(15,23,42,.12)}
+    body.theme-light .finder-side-item,
+    body.theme-light .finder-item,
+    body.theme-light .finder-list-row,
+    body.theme-light .finder-breadcrumb{color:#0f172a}
+    body.theme-light .finder-item:hover,
+    body.theme-light .finder-item.is-selected,
+    body.theme-light .finder-side-item:hover,
+    body.theme-light .finder-side-item.is-active{background:rgba(59,130,246,.10)}
+    body.theme-light .finder-list-row.header{color:#1e3a8a;background:rgba(59,130,246,.09)}
+    body.theme-light .finder-context{background:rgba(255,255,255,.94);border-color:rgba(15,23,42,.12)}
+    body.theme-light .finder-context button{color:#0f172a}
+    @media(max-width:850px){
+      .finder-wrap{grid-template-columns:1fr}
+      .finder-sidebar{display:none}
+      .finder-toolbar{align-items:flex-start;flex-direction:column}
+      .finder-actions{justify-content:flex-start}
+      .finder-actions .input{min-width:100%;width:100%}
+    }
 
     .meteo-hero{
       border:1px solid rgba(255,255,255,.14);
@@ -543,375 +670,7 @@
       .grid2{grid-template-columns:1fr}
       .dock{left:10px;right:10px;transform:none;justify-content:flex-start}
     }
-  
-    /* ==========================================================
-       MASSIVE GLASS PRO - reconstrucción visual premium
-       Inspirado en la referencia original: Proton/Brave cloud OS
-       ========================================================== */
-    :root{
-      --mg-bg-deep:#070814;
-      --mg-bg-blue:#0b1634;
-      --mg-purple:#7c3aed;
-      --mg-violet:#a855f7;
-      --mg-blue:#3b82f6;
-      --mg-cyan:#22d3ee;
-      --mg-white:rgba(255,255,255,.86);
-      --mg-soft:rgba(255,255,255,.58);
-      --mg-panel:rgba(255,255,255,.118);
-      --mg-panel-strong:rgba(255,255,255,.172);
-      --mg-border:rgba(255,255,255,.205);
-      --mg-border-soft:rgba(255,255,255,.115);
-      --mg-shadow:0 34px 95px rgba(0,0,0,.44);
-      --mg-shadow-soft:0 18px 42px rgba(0,0,0,.25);
-      --mg-blur:blur(30px) saturate(1.28);
-    }
-
-    body.theme-massive{
-      background:
-        radial-gradient(circle at 16% 12%,rgba(168,85,247,.60) 0,rgba(168,85,247,.26) 18%,transparent 42%),
-        radial-gradient(circle at 78% 18%,rgba(59,130,246,.52) 0,rgba(59,130,246,.22) 22%,transparent 45%),
-        radial-gradient(circle at 52% 87%,rgba(34,211,238,.28) 0,rgba(34,211,238,.10) 22%,transparent 46%),
-        radial-gradient(circle at 20% 78%,rgba(124,58,237,.28) 0,transparent 38%),
-        linear-gradient(135deg,#050613 0%,#0b1024 42%,#111a38 68%,#080b19 100%) !important;
-      color:#f8fbff;
-    }
-
-    body.theme-massive::before{
-      content:'';
-      position:fixed;
-      inset:-60px;
-      z-index:0;
-      pointer-events:none;
-      background:
-        linear-gradient(120deg,rgba(255,255,255,.045),transparent 35%,rgba(255,255,255,.035) 64%,transparent),
-        repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0,rgba(255,255,255,.018) 1px,transparent 1px,transparent 90px);
-      filter:blur(.2px);
-      opacity:.82;
-    }
-
-    body.theme-massive::after{
-      content:'';
-      position:fixed;
-      inset:0;
-      z-index:0;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 50% 40%,transparent 0,transparent 52%,rgba(0,0,0,.18) 100%);
-      opacity:.86;
-    }
-
-    body.theme-massive .topbar{
-      height:46px;
-      background:rgba(255,255,255,.085);
-      border-bottom:1px solid rgba(255,255,255,.14);
-      box-shadow:0 14px 38px rgba(0,0,0,.18);
-      backdrop-filter:var(--mg-blur);
-    }
-
-    body.theme-massive .brand{
-      letter-spacing:.2px;
-      color:rgba(255,255,255,.94);
-    }
-
-    body.theme-massive .brand-badge{
-      width:28px;
-      height:28px;
-      border-radius:12px;
-      background:
-        linear-gradient(135deg,rgba(255,255,255,.30),rgba(255,255,255,.06)),
-        linear-gradient(135deg,#60a5fa,#8b5cf6 58%,#d946ef);
-      border:1px solid rgba(255,255,255,.26);
-      box-shadow:0 14px 30px rgba(79,70,229,.28), inset 0 1px 0 rgba(255,255,255,.42);
-    }
-
-    body.theme-massive .top-pill{
-      background:rgba(255,255,255,.105);
-      border:1px solid rgba(255,255,255,.16);
-      color:rgba(255,255,255,.74);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
-    }
-
-    body.theme-massive .top-btn,
-    body.theme-massive .secondary{
-      background:rgba(255,255,255,.115);
-      border:1px solid rgba(255,255,255,.18);
-      color:#f8fbff;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 10px 28px rgba(0,0,0,.14);
-    }
-
-    body.theme-massive .primary{
-      background:
-        linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.03)),
-        linear-gradient(135deg,#5aa7ff 0%,#7c3aed 58%,#b14cff 100%);
-      border:1px solid rgba(255,255,255,.18);
-      box-shadow:0 18px 42px rgba(91,94,255,.30), inset 0 1px 0 rgba(255,255,255,.26);
-    }
-
-    body.theme-massive .desktop-search{
-      top:66px;
-      width:min(720px,calc(100vw - 52px));
-      min-height:52px;
-      padding:9px 18px;
-      background:rgba(255,255,255,.78);
-      border:1px solid rgba(255,255,255,.48);
-      border-radius:999px;
-      backdrop-filter:blur(32px) saturate(1.35);
-      box-shadow:
-        0 28px 85px rgba(0,0,0,.34),
-        0 0 0 1px rgba(255,255,255,.09) inset,
-        inset 0 1px 0 rgba(255,255,255,.65);
-    }
-
-    body.theme-massive .desktop-search span{
-      color:#6d28d9;
-      opacity:1;
-      font-weight:950;
-    }
-
-    body.theme-massive .desktop-search input{
-      color:#111827;
-      font-size:15px;
-      font-weight:800;
-    }
-
-    body.theme-massive .desktop-search input::placeholder{
-      color:rgba(30,41,59,.58);
-      font-weight:700;
-    }
-
-    body.theme-massive .dock{
-      height:78px;
-      padding:11px 16px;
-      gap:12px;
-      background:rgba(255,255,255,.125);
-      border:1px solid rgba(255,255,255,.22);
-      border-radius:30px;
-      backdrop-filter:var(--mg-blur);
-      box-shadow:0 32px 88px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,255,255,.16);
-    }
-
-    body.theme-massive .dock-btn{
-      width:54px;
-      height:54px;
-      min-width:54px;
-      border-radius:20px;
-      background:
-        linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.06));
-      border:1px solid rgba(255,255,255,.20);
-      box-shadow:0 13px 32px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.15);
-      transition:transform .16s ease, background .16s ease, box-shadow .16s ease;
-    }
-
-    body.theme-massive .dock-btn:hover{
-      transform:translateY(-7px) scale(1.06);
-      background:rgba(255,255,255,.22);
-      box-shadow:0 24px 52px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.22);
-    }
-
-    body.theme-massive .icon{
-      border-radius:26px;
-      transition:transform .14s ease, background .14s ease, border .14s ease;
-    }
-
-    body.theme-massive .icon:hover,
-    body.theme-massive .icon.is-selected{
-      background:rgba(255,255,255,.125);
-      border-color:rgba(255,255,255,.17);
-      backdrop-filter:blur(18px);
-      transform:translateY(-2px);
-    }
-
-    body.theme-massive .icon-symbol{
-      width:58px;
-      height:58px;
-      border-radius:22px;
-      background:
-        linear-gradient(145deg,rgba(255,255,255,.20),rgba(255,255,255,.06));
-      border:1px solid rgba(255,255,255,.18);
-      box-shadow:0 18px 40px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.16);
-      font-size:31px;
-    }
-
-    body.theme-massive .icon-title{
-      color:rgba(255,255,255,.92);
-      font-weight:850;
-      text-shadow:0 5px 18px rgba(0,0,0,.55);
-    }
-
-    body.theme-massive .window{
-      background:
-        linear-gradient(145deg,rgba(255,255,255,.16),rgba(255,255,255,.075));
-      border:1px solid rgba(255,255,255,.20);
-      border-radius:28px;
-      backdrop-filter:blur(34px) saturate(1.35);
-      box-shadow:var(--mg-shadow), inset 0 1px 0 rgba(255,255,255,.13);
-    }
-
-    body.theme-massive .window.maximized{
-      border-radius:24px;
-    }
-
-    body.theme-massive .titlebar{
-      height:50px;
-      background:rgba(255,255,255,.08);
-      border-bottom:1px solid rgba(255,255,255,.115);
-    }
-
-    body.theme-massive .win-title{
-      color:rgba(255,255,255,.93);
-      font-weight:950;
-      letter-spacing:.15px;
-    }
-
-    body.theme-massive .win-body{
-      background:rgba(2,6,23,.05);
-      padding:18px;
-    }
-
-    body.theme-massive .card,
-    body.theme-massive .cloud-service-card,
-    body.theme-massive .meteo-hero,
-    body.theme-massive .meteo-clock-card,
-    body.theme-massive .pcloud-assistant{
-      background:
-        linear-gradient(145deg,rgba(255,255,255,.145),rgba(255,255,255,.065));
-      border:1px solid rgba(255,255,255,.17);
-      border-radius:24px;
-      box-shadow:0 20px 56px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.10);
-      backdrop-filter:blur(24px) saturate(1.22);
-    }
-
-    body.theme-massive .card h3,
-    body.theme-massive .meteo-title-row h3{
-      color:rgba(255,255,255,.95);
-      letter-spacing:.1px;
-    }
-
-    body.theme-massive .card p,
-    body.theme-massive .meteo-sub,
-    body.theme-massive .field label,
-    body.theme-massive .msg,
-    body.theme-massive .small{
-      color:rgba(235,241,255,.68);
-    }
-
-    body.theme-massive .input,
-    body.theme-massive select.input,
-    body.theme-massive textarea.input{
-      background:rgba(255,255,255,.82);
-      color:#111827;
-      border:1px solid rgba(255,255,255,.38);
-      border-radius:18px;
-      box-shadow:0 14px 34px rgba(0,0,0,.13), inset 0 1px 0 rgba(255,255,255,.55);
-    }
-
-    body.theme-massive .input::placeholder,
-    body.theme-massive textarea.input::placeholder{
-      color:rgba(30,41,59,.48);
-    }
-
-    body.theme-massive .input:focus,
-    body.theme-massive textarea.input:focus{
-      border-color:rgba(168,85,247,.58);
-      box-shadow:0 0 0 5px rgba(168,85,247,.16), 0 16px 36px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.66);
-    }
-
-    body.theme-massive .secret-eye{
-      background:rgba(17,24,39,.09);
-      border:1px solid rgba(17,24,39,.10);
-      color:#111827;
-    }
-
-    body.theme-massive .table th{
-      background:rgba(255,255,255,.12);
-      color:rgba(229,241,255,.92);
-      border-bottom:1px solid rgba(255,255,255,.13);
-    }
-
-    body.theme-massive .table td{
-      border-bottom:1px solid rgba(255,255,255,.08);
-      color:rgba(255,255,255,.84);
-    }
-
-    body.theme-massive .pcloud-list-box,
-    body.theme-massive .meteo-frame-box{
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:24px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
-    }
-
-    body.theme-massive .pcloud-list-row:hover{
-      background:rgba(255,255,255,.105);
-    }
-
-    body.theme-massive .note{
-      background:rgba(96,165,250,.13);
-      border-left-color:rgba(96,165,250,.86);
-      color:rgba(219,234,254,.92);
-      border-radius:18px;
-    }
-
-    body.theme-massive .teletype{
-      background:rgba(3,7,18,.38);
-      border:1px solid rgba(96,165,250,.24);
-      border-radius:20px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-    }
-
-    body.theme-massive .quick-app,
-    body.theme-massive .meteo-app{
-      background:
-        linear-gradient(145deg,rgba(255,255,255,.145),rgba(255,255,255,.055));
-      border:1px solid rgba(255,255,255,.17);
-      border-radius:24px;
-      box-shadow:0 18px 44px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.10);
-      transition:transform .16s ease, background .16s ease, box-shadow .16s ease;
-    }
-
-    body.theme-massive .quick-app:hover,
-    body.theme-massive .meteo-app:hover{
-      transform:translateY(-4px);
-      background:rgba(255,255,255,.18);
-      box-shadow:0 26px 62px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.17);
-    }
-
-    body.theme-massive .modal{
-      background:
-        linear-gradient(145deg,rgba(21,28,51,.86),rgba(15,23,42,.76));
-      border:1px solid rgba(255,255,255,.20);
-      border-radius:30px;
-      backdrop-filter:blur(34px) saturate(1.30);
-      box-shadow:0 34px 110px rgba(0,0,0,.50), inset 0 1px 0 rgba(255,255,255,.11);
-    }
-
-    body.theme-massive .login-card{
-      background:
-        linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.075));
-      border:1px solid rgba(255,255,255,.21);
-      border-radius:34px;
-      backdrop-filter:blur(38px) saturate(1.36);
-      box-shadow:0 38px 120px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.13);
-    }
-
-    body.theme-massive .login-logo{
-      background:
-        linear-gradient(145deg,rgba(255,255,255,.22),rgba(255,255,255,.04)),
-        linear-gradient(135deg,#60a5fa,#7c3aed 56%,#d946ef);
-      border:1px solid rgba(255,255,255,.26);
-      box-shadow:0 24px 58px rgba(79,70,229,.34), inset 0 1px 0 rgba(255,255,255,.32);
-    }
-
-    body.theme-massive .dot{
-      box-shadow:0 2px 8px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.40);
-    }
-
-    body.theme-massive.custom-wallpaper::before,
-    body.theme-massive.custom-wallpaper::after{
-      opacity:.55;
-    }
-
-</style>
+  </style>
 </head>
 <body class="theme-massive">
   <div id="loginScreen" class="login-screen">
@@ -955,7 +714,6 @@
       <button class="dock-btn" data-module="files" title="Archivos">📁</button>
       <button class="dock-btn" data-module="dashboards" title="Dashboards">📊</button>
       <button class="dock-btn" data-module="cloud" title="Nube">☁️</button>
-      <button class="dock-btn" data-module="pcloud" title="pCloud">🅿️</button>
       <button class="dock-btn" data-module="meteo" title="Meteo & Radio">📡</button>
       <button class="dock-btn" data-module="remote" title="Ayuda remota">🖥️</button>
       <button class="dock-btn" data-module="settings" title="Configuración">⚙️</button>
@@ -1152,7 +910,6 @@
       files: ['Archivos','📁'],
       dashboards: ['Dashboards','📊'],
       cloud: ['Centro de nube','☁️'],
-      pcloud: ['pCloud','🅿️'],
       meteo: ['Meteo & Radio','📡'],
       remote: ['Ayuda remota','🖥️'],
       settings: ['Configuración','⚙️']
@@ -1164,7 +921,6 @@
     if(module === 'files') renderFiles(win.body);
     if(module === 'dashboards') renderDashboards(win.body);
     if(module === 'cloud') renderCloud(win.body);
-    if(module === 'pcloud') renderPCloud(win.body);
     if(module === 'meteo') renderMeteo(win.body);
     if(module === 'remote') renderRemote(win.body);
     if(module === 'settings') renderSettings(win.body);
@@ -1267,32 +1023,49 @@
 
   async function renderFiles(root){
     root.innerHTML = `
-      <div class="panel-grid">
-        <div class="card">
-          <h3>Gestor de archivos persistente</h3>
-          <p>Sube archivos al disco persistente de Render. Se guardan en <b>/var/data/uploads</b> y quedan registrados en la base JSON.</p>
-          <div class="field" style="margin-top:12px"><label>Seleccionar archivo</label><input class="input file-picker" type="file"></div>
-          <div class="row">
-            <button class="primary upload-file-btn">Subir archivo</button>
-            <button class="secondary reload-files-btn">Actualizar lista</button>
+      <div class="finder-wrap">
+        <aside class="finder-sidebar">
+          <div class="finder-side-title">Favoritos</div>
+          <button class="finder-side-item is-active" data-folder="/">🏠 Inicio</button>
+          <button class="finder-side-item" data-folder="/Dashboards">📊 Dashboards</button>
+          <button class="finder-side-item" data-folder="/Meteo Radio">📡 Meteo Radio</button>
+          <button class="finder-side-item" data-folder="/Documentos">📄 Documentos</button>
+          <button class="finder-side-item" data-folder="/Backups">💾 Backups</button>
+          <div class="finder-side-title">Acciones</div>
+          <button class="finder-side-item finder-new-folder">📁 Nueva carpeta</button>
+          <button class="finder-side-item finder-upload-side">⬆️ Subir archivo</button>
+          <button class="finder-side-item finder-backup-side">🧰 Backup OS</button>
+        </aside>
+        <section class="finder-main">
+          <div class="finder-toolbar">
+            <div class="finder-breadcrumb">
+              <span>📁</span><span class="finder-path">Inicio</span>
+            </div>
+            <div class="finder-actions">
+              <input class="input finder-search" placeholder="Buscar en archivos...">
+              <button class="secondary finder-view-toggle">Vista: iconos</button>
+              <button class="secondary finder-up">Subir</button>
+              <button class="secondary finder-new-folder-top">Nueva carpeta</button>
+              <button class="primary finder-upload-top">Subir archivo</button>
+              <input class="finder-file-input hidden" type="file">
+            </div>
           </div>
-          <div class="msg files-msg"></div>
-        </div>
-        <div class="card">
-          <h3>Copia de seguridad</h3>
-          <p>Exporta toda la configuración actual del sistema: iconos, fondos, cuentas, equipos y registro de archivos.</p>
-          <div style="margin-top:12px"><button class="primary backup-btn">Descargar backup JSON</button></div>
-        </div>
-      </div>
-      <div class="card" style="margin-top:12px">
-        <h3>Archivos guardados</h3>
-        <table class="table"><thead><tr><th>Nombre</th><th>Tipo</th><th>Tamaño</th><th>Fecha</th><th>Acción</th></tr></thead><tbody class="files-body"><tr><td colspan="5">Cargando…</td></tr></tbody></table>
+          <div class="finder-content">
+            <div class="finder-grid finder-items"></div>
+          </div>
+        </section>
       </div>
     `;
-    $('.backup-btn', root).addEventListener('click', async () => {
-      const data = await api('/api/backup');
-      downloadText('masive_os_backup_' + new Date().toISOString().slice(0,10) + '.json', JSON.stringify(data, null, 2));
-    });
+
+    let currentFolder = '/';
+    let files = [];
+    let folders = [];
+    let viewMode = localStorage.getItem('masive_finder_view') || 'grid';
+    let search = '';
+
+    const fileInput = $('.finder-file-input', root);
+    const itemsBox = $('.finder-items', root);
+    const pathLabel = $('.finder-path', root);
 
     const fmtSize = n => {
       n = Number(n || 0);
@@ -1301,72 +1074,245 @@
       return (n/(1024*1024)).toFixed(2) + ' MB';
     };
 
+    const iconForFile = (f) => {
+      const name = (f.original_name || f.name || '').toLowerCase();
+      const mime = f.mime_type || '';
+      if(mime.startsWith('image/')) return '🖼️';
+      if(mime.includes('pdf') || name.endsWith('.pdf')) return '📕';
+      if(name.endsWith('.html') || name.endsWith('.htm')) return '🌐';
+      if(name.endsWith('.db') || name.endsWith('.sqlite')) return '🗄️';
+      if(name.endsWith('.xls') || name.endsWith('.xlsx') || name.endsWith('.csv')) return '📊';
+      if(name.endsWith('.zip') || name.endsWith('.rar')) return '📦';
+      if(name.endsWith('.js') || name.endsWith('.json') || name.endsWith('.css')) return '🧩';
+      return '📄';
+    };
+
+    const normalizeFolder = f => {
+      if(!f || f === '/') return '/';
+      let out = '/' + String(f).replace(/^\/+|\/+$/g,'');
+      return out === '/' ? '/' : out;
+    };
+
+    const parentFolder = f => {
+      f = normalizeFolder(f);
+      if(f === '/') return '/';
+      const parts = f.split('/').filter(Boolean);
+      parts.pop();
+      return parts.length ? '/' + parts.join('/') : '/';
+    };
+
+    const friendlyPath = f => f === '/' ? 'Inicio' : 'Inicio' + f;
+
     const load = async () => {
-      try{
-        const files = await api('/api/files');
-        $('.files-body', root).innerHTML = files.length ? files.map(f => `
-          <tr>
-            <td>${escapeHtml(f.original_name || f.name || '')}</td>
-            <td>${escapeHtml(f.mime_type || f.type || '')}</td>
-            <td>${escapeHtml(fmtSize(f.size_bytes || f.size))}</td>
-            <td>${escapeHtml((f.created_at || '').replace('T',' ').slice(0,16))}</td>
-            <td class="row">
-              <a class="secondary" href="/api/files/download/${encodeURIComponent(f.id)}" target="_blank">Descargar</a>
-              <button class="secondary open-file-btn" data-id="${escapeAttr(f.id)}">Abrir</button>
-              <button class="danger delete-file-btn" data-id="${escapeAttr(f.id)}">Borrar</button>
-            </td>
-          </tr>
-        `).join('') : '<tr><td colspan="5">No hay archivos guardados todavía.</td></tr>';
+      const data = await api('/api/files');
+      files = Array.isArray(data) ? data : (data.files || []);
+      folders = await api('/api/folders').catch(() => []);
+      ensureDefaultFolders();
+      render();
+    };
 
-        $$('.open-file-btn', root).forEach(btn => btn.addEventListener('click', () => {
-          const file = files.find(f => f.id === btn.dataset.id);
-          if(!file) return;
-          const url = '/api/files/download/' + encodeURIComponent(file.id);
-          const name = file.original_name || file.name || 'Archivo';
-          const mime = file.mime_type || '';
-          if(mime.startsWith('image/') || mime.includes('pdf') || mime.includes('text') || name.toLowerCase().endsWith('.html')){
-            openBrowser(url, name);
-          }else{
-            window.open(url, '_blank');
-          }
-        }));
+    const ensureDefaultFolders = () => {
+      const defaults = ['/Dashboards','/Meteo Radio','/Documentos','/Backups'];
+      defaults.forEach(d => {
+        if(!folders.some(f => f.path === d)) folders.push({id:d,path:d,name:d.split('/').pop(),parent:'/'});
+      });
+    };
 
-        $$('.delete-file-btn', root).forEach(btn => btn.addEventListener('click', async () => {
-          const file = files.find(f => f.id === btn.dataset.id);
-          if(!confirm('¿Eliminar el archivo "' + (file?.original_name || file?.name || '') + '"?')) return;
-          await api('/api/files/' + encodeURIComponent(btn.dataset.id), {method:'DELETE'});
-          await load();
-        }));
-      }catch(err){
-        $('.files-body', root).innerHTML = `<tr><td colspan="5">${escapeHtml(err.message)}</td></tr>`;
+    const setFolder = (folder) => {
+      currentFolder = normalizeFolder(folder);
+      $$('.finder-side-item[data-folder]', root).forEach(b => b.classList.toggle('is-active', normalizeFolder(b.dataset.folder) === currentFolder));
+      render();
+    };
+
+    const filterMatches = obj => {
+      if(!search) return true;
+      const q = search.toLowerCase();
+      return String(obj.name || obj.original_name || '').toLowerCase().includes(q);
+    };
+
+    const render = () => {
+      pathLabel.textContent = friendlyPath(currentFolder);
+      $('.finder-view-toggle', root).textContent = viewMode === 'grid' ? 'Vista: iconos' : 'Vista: lista';
+      const childFolders = folders
+        .filter(f => normalizeFolder(f.parent || parentFolder(f.path)) === currentFolder && normalizeFolder(f.path) !== currentFolder)
+        .filter(filterMatches)
+        .sort((a,b) => String(a.name).localeCompare(String(b.name),'es'));
+      const childFiles = files
+        .filter(f => normalizeFolder(f.folder || '/') === currentFolder)
+        .filter(filterMatches)
+        .sort((a,b) => String(a.original_name || a.name).localeCompare(String(b.original_name || b.name),'es'));
+
+      if(viewMode === 'list'){
+        itemsBox.className = 'finder-list finder-items';
+        itemsBox.innerHTML = `<div class="finder-list-row header"><div></div><div>Nombre</div><div>Tamaño</div><div>Tipo</div><div>Fecha</div></div>` +
+          childFolders.map(f => `
+            <div class="finder-list-row finder-row" data-kind="folder" data-id="${escapeAttr(f.id || f.path)}">
+              <div class="finder-small-icon">📁</div><div class="finder-row-name">${escapeHtml(f.name)}</div><div>—</div><div>Carpeta</div><div>—</div>
+            </div>
+          `).join('') +
+          childFiles.map(f => `
+            <div class="finder-list-row finder-row" data-kind="file" data-id="${escapeAttr(f.id)}">
+              <div class="finder-small-icon">${iconForFile(f)}</div><div class="finder-row-name">${escapeHtml(f.original_name || f.name)}</div><div>${fmtSize(f.size_bytes || f.size)}</div><div>${escapeHtml(f.mime_type || '')}</div><div>${escapeHtml((f.created_at || '').replace('T',' ').slice(0,16))}</div>
+            </div>
+          `).join('');
+      }else{
+        itemsBox.className = 'finder-grid finder-items';
+        itemsBox.innerHTML =
+          childFolders.map(f => `
+            <div class="finder-item" data-kind="folder" data-id="${escapeAttr(f.id || f.path)}">
+              <div class="finder-icon">📁</div><div class="finder-name">${escapeHtml(f.name)}</div><div class="finder-meta">Carpeta</div>
+            </div>
+          `).join('') +
+          childFiles.map(f => `
+            <div class="finder-item" data-kind="file" data-id="${escapeAttr(f.id)}">
+              <div class="finder-icon">${iconForFile(f)}</div><div class="finder-name">${escapeHtml(f.original_name || f.name)}</div><div class="finder-meta">${fmtSize(f.size_bytes || f.size)}</div>
+            </div>
+          `).join('');
+      }
+
+      if(!childFolders.length && !childFiles.length){
+        itemsBox.className = 'finder-empty finder-items';
+        itemsBox.innerHTML = `<b>📂</b><div>No hay elementos en esta carpeta</div><div class="small">Sube archivos o crea una carpeta nueva.</div>`;
+      }
+
+      $$('.finder-row,.finder-item', root).forEach(el => {
+        el.addEventListener('dblclick', () => openFinderItem(el.dataset.kind, el.dataset.id));
+        el.addEventListener('click', () => {
+          $$('.finder-row,.finder-item', root).forEach(x => x.classList.remove('is-selected'));
+          el.classList.add('is-selected');
+        });
+        el.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          showFinderContext(e.clientX, e.clientY, el.dataset.kind, el.dataset.id);
+        });
+      });
+    };
+
+    const openFinderItem = (kind, id) => {
+      if(kind === 'folder'){
+        const folder = folders.find(f => String(f.id || f.path) === String(id));
+        if(folder) setFolder(folder.path);
+        return;
+      }
+      const f = files.find(x => String(x.id) === String(id));
+      if(!f) return;
+      const url = '/api/files/download/' + encodeURIComponent(f.id);
+      const name = f.original_name || f.name || 'Archivo';
+      const mime = f.mime_type || '';
+      if(mime.startsWith('image/') || mime.includes('pdf') || mime.includes('text') || name.toLowerCase().endsWith('.html') || name.toLowerCase().endsWith('.htm')){
+        openBrowser(url, name);
+      }else{
+        window.open(url, '_blank');
       }
     };
 
-    $('.reload-files-btn', root).addEventListener('click', load);
+    const createFolder = async () => {
+      const name = prompt('Nombre de la nueva carpeta');
+      if(!name) return;
+      await api('/api/folders', {method:'POST', body:JSON.stringify({name, parent: currentFolder})});
+      await load();
+    };
 
-    $('.upload-file-btn', root).addEventListener('click', async () => {
-      const msg = $('.files-msg', root);
-      const file = $('.file-picker', root).files[0];
-      if(!file){ setMsg(msg, 'Selecciona un archivo primero.', 'bad'); return; }
-      if(file.size > 12 * 1024 * 1024){ setMsg(msg, 'Archivo demasiado grande para esta versión. Máximo 12 MB.', 'bad'); return; }
-      setMsg(msg, 'Subiendo archivo…');
+    const uploadCurrent = () => fileInput.click();
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files && fileInput.files[0];
+      if(!file) return;
+      if(file.size > 12 * 1024 * 1024){ alert('Archivo demasiado grande. Máximo 12 MB.'); return; }
       const reader = new FileReader();
       reader.onload = async () => {
-        try{
-          const base64 = String(reader.result || '').split(',')[1] || '';
-          await api('/api/files/upload-json', {method:'POST', body:JSON.stringify({
-            name: file.name,
-            mime_type: file.type || 'application/octet-stream',
-            size_bytes: file.size,
-            data_base64: base64
-          })});
-          $('.file-picker', root).value = '';
-          setMsg(msg, 'Archivo subido correctamente.', 'ok');
-          await load();
-        }catch(err){ setMsg(msg, err.message, 'bad'); }
+        const base64 = String(reader.result || '').split(',')[1] || '';
+        await api('/api/files/upload-json', {method:'POST', body:JSON.stringify({
+          name: file.name,
+          mime_type: file.type || 'application/octet-stream',
+          size_bytes: file.size,
+          folder: currentFolder,
+          data_base64: base64
+        })});
+        fileInput.value = '';
+        await load();
       };
-      reader.onerror = () => setMsg(msg, 'No se pudo leer el archivo.', 'bad');
       reader.readAsDataURL(file);
+    });
+
+    const showFinderContext = (x,y,kind,id) => {
+      $$('.finder-context').forEach(m => m.remove());
+      const menu = document.createElement('div');
+      menu.className = 'finder-context';
+      menu.style.left = Math.min(x, window.innerWidth - 220) + 'px';
+      menu.style.top = Math.min(y, window.innerHeight - 220) + 'px';
+      menu.innerHTML = kind === 'folder' ? `
+        <button data-act="open">Abrir carpeta</button>
+        <button data-act="delete" class="danger-item">Eliminar carpeta</button>
+      ` : `
+        <button data-act="open">Abrir</button>
+        <button data-act="download">Descargar</button>
+        <button data-act="dash">Crear icono dashboard</button>
+        <button data-act="delete" class="danger-item">Eliminar archivo</button>
+      `;
+      document.body.appendChild(menu);
+
+      const close = () => menu.remove();
+      setTimeout(() => document.addEventListener('click', close, {once:true}), 0);
+
+      menu.addEventListener('click', async (e) => {
+        const act = e.target.dataset.act;
+        if(!act) return;
+        e.stopPropagation();
+
+        if(act === 'open') openFinderItem(kind,id);
+
+        if(kind === 'file' && act === 'download'){
+          window.open('/api/files/download/' + encodeURIComponent(id), '_blank');
+        }
+
+        if(kind === 'file' && act === 'dash'){
+          const f = files.find(x => String(x.id) === String(id));
+          if(f){
+            await api('/api/icons', {method:'POST', body:JSON.stringify({
+              title: (f.original_name || f.name || 'Dashboard').replace(/\.(html|htm)$/i,''),
+              icon: '📊',
+              type: 'link',
+              target: '/api/files/download/' + encodeURIComponent(f.id),
+              x: 120 + Math.floor(Math.random()*360),
+              y: 180 + Math.floor(Math.random()*220)
+            })});
+            icons = await api('/api/icons');
+            renderIcons();
+          }
+        }
+
+        if(act === 'delete'){
+          if(kind === 'file'){
+            const f = files.find(x => String(x.id) === String(id));
+            if(confirm('¿Eliminar "' + (f?.original_name || f?.name || '') + '"?')){
+              await api('/api/files/' + encodeURIComponent(id), {method:'DELETE'});
+              await load();
+            }
+          }else{
+            const f = folders.find(x => String(x.id || x.path) === String(id));
+            if(confirm('¿Eliminar la carpeta "' + (f?.name || '') + '"? Los archivos que contenga pasarán a Inicio.')){
+              await api('/api/folders/' + encodeURIComponent(f.id || f.path), {method:'DELETE'});
+              await load();
+            }
+          }
+        }
+
+        close();
+      });
+    };
+
+    $$('.finder-side-item[data-folder]', root).forEach(b => b.addEventListener('click', () => setFolder(b.dataset.folder)));
+    $('.finder-search', root).addEventListener('input', e => { search = e.target.value.trim(); render(); });
+    $('.finder-view-toggle', root).addEventListener('click', () => { viewMode = viewMode === 'grid' ? 'list' : 'grid'; localStorage.setItem('masive_finder_view', viewMode); render(); });
+    $('.finder-up', root).addEventListener('click', () => setFolder(parentFolder(currentFolder)));
+    $('.finder-new-folder', root).addEventListener('click', createFolder);
+    $('.finder-new-folder-top', root).addEventListener('click', createFolder);
+    $('.finder-upload-side', root).addEventListener('click', uploadCurrent);
+    $('.finder-upload-top', root).addEventListener('click', uploadCurrent);
+    $('.finder-backup-side', root).addEventListener('click', async () => {
+      const data = await api('/api/backup');
+      downloadText('masive_os_backup_' + new Date().toISOString().slice(0,10) + '.json', JSON.stringify(data, null, 2));
     });
 
     await load();
@@ -1460,7 +1406,6 @@
           <div class="cloud-service-card"><h4>🐙 GitHub</h4><p>Repositorio, rama y token personal para futuras automatizaciones de subida de archivos.</p><button class="secondary cloud-preset" data-provider="GitHub">Configurar</button></div>
           <div class="cloud-service-card"><h4>▲ Render</h4><p>Servicio, URL pública, deploy hook y API key para futuras acciones de deploy.</p><button class="secondary cloud-preset" data-provider="Render">Configurar</button></div>
           <div class="cloud-service-card"><h4>☁️ OneDrive</h4><p>Cuenta o enlace de carpeta compartida para documentación y dashboards.</p><button class="secondary cloud-preset" data-provider="OneDrive">Configurar</button></div>
-          <div class="cloud-service-card"><h4>🅿️ pCloud</h4><p>Cuenta pCloud con token API para navegar por carpetas y descargar archivos.</p><button class="secondary cloud-preset" data-provider="pCloud">Configurar</button></div>
           <div class="cloud-service-card"><h4>🏢 SharePoint</h4><p>URL de carpeta, site o documento compartido corporativo.</p><button class="secondary cloud-preset" data-provider="SharePoint">Configurar</button></div>
           <div class="cloud-service-card"><h4>🔌 API propia</h4><p>Endpoint HTTP para conectar otros dashboards o servicios internos.</p><button class="secondary cloud-preset" data-provider="Custom API">Configurar</button></div>
         </div>
@@ -1471,7 +1416,7 @@
           <h3 class="cloud-form-title">Añadir servicio</h3>
           <input type="hidden" class="cloud-id">
           <div class="grid2">
-            <div class="field"><label>Proveedor</label><select class="input cloud-provider"><option>GitHub</option><option>Render</option><option>OneDrive</option><option>pCloud</option><option>SharePoint</option><option>Dropbox</option><option>Custom API</option></select></div>
+            <div class="field"><label>Proveedor</label><select class="input cloud-provider"><option>GitHub</option><option>Render</option><option>OneDrive</option><option>SharePoint</option><option>Dropbox</option><option>Custom API</option></select></div>
             <div class="field"><label>Nombre visible</label><input class="input cloud-name" placeholder="Ej: Render MasiveOS"></div>
           </div>
           <div class="field"><label>URL principal / endpoint</label><input class="input cloud-url" placeholder="https://..."></div>
@@ -1486,29 +1431,6 @@
               <button type="button" class="secret-eye cloud-token-eye">👁</button>
             </div>
           </div>
-
-          <div class="pcloud-assistant cloud-pcloud-assistant hidden">
-            <h4>Asistente pCloud</h4>
-            <p>Introduce usuario y contraseña de pCloud para obtener automáticamente el token. El login se hace desde el servidor usando HTTPS contra la API de pCloud. Si tu cuenta tiene 2FA, login social o pCloud bloquea este método, tendrás que usar token manual/OAuth.</p>
-            <div class="pcloud-assistant-grid">
-              <div class="field"><label>Email pCloud</label><input class="input pcloud-login-user" placeholder="usuario@email.com"></div>
-              <div class="field">
-                <label>Contraseña pCloud</label>
-                <div class="secret-field-wrap">
-                  <input class="input pcloud-login-pass" type="password" placeholder="Contraseña">
-                  <button type="button" class="secret-eye pcloud-pass-eye">👁</button>
-                </div>
-              </div>
-              <div class="field"><label>Centro de datos</label><select class="input pcloud-region"><option value="eu">Europa - eapi.pcloud.com</option><option value="us">USA - api.pcloud.com</option></select></div>
-              <div class="field"><label>Caducidad token</label><select class="input pcloud-expire"><option value="0">Sin indicar</option><option value="2592000">30 días</option><option value="7776000">90 días</option><option value="31536000">1 año</option></select></div>
-            </div>
-            <div class="pcloud-assistant-actions">
-              <button type="button" class="primary pcloud-get-token">Obtener token</button>
-              <button type="button" class="secondary pcloud-fill-eu">Usar Europa</button>
-              <button type="button" class="secondary pcloud-fill-us">Usar USA</button>
-            </div>
-          </div>
-
           <div class="field"><label>Notas</label><textarea class="input cloud-notes" style="min-height:76px;resize:vertical" placeholder="Uso, permisos, advertencias, carpeta base..."></textarea></div>
           <div class="row">
             <button class="primary cloud-save">Guardar servicio</button>
@@ -1538,13 +1460,6 @@
       msg: $('.cloud-msg', root)
     };
 
-    const pcloudAssistant = $('.cloud-pcloud-assistant', root);
-    const refreshPcloudAssistant = () => {
-      if((form.provider.value || '').toLowerCase() === 'pcloud') pcloudAssistant.classList.remove('hidden');
-      else pcloudAssistant.classList.add('hidden');
-    };
-    form.provider.addEventListener('change', refreshPcloudAssistant);
-
     const clearForm = () => {
       form.id.value = '';
       form.title.textContent = 'Añadir servicio';
@@ -1556,7 +1471,6 @@
       form.token.value = '';
       form.notes.value = '';
       setMsg(form.msg, '');
-      refreshPcloudAssistant();
     };
 
     const fillPreset = (provider) => {
@@ -1575,11 +1489,6 @@
         form.url.value = location.origin;
         form.notes.value = 'Servicio desplegado en Render con disco persistente /var/data.';
       }
-      if(provider === 'pCloud'){
-        form.name.value = 'pCloud principal';
-        form.url.value = 'https://eapi.pcloud.com';
-        form.notes.value = 'Asistente preparado. Puedes obtener token con email/contraseña o pegar el access_token manualmente.';
-      }
       if(provider === 'OneDrive' || provider === 'SharePoint'){
         form.name.value = provider + ' compartido';
         form.notes.value = 'Pegar aquí la URL de la carpeta compartida.';
@@ -1593,43 +1502,6 @@
     $$('.cloud-preset', root).forEach(b => b.addEventListener('click', () => fillPreset(b.dataset.provider)));
     $('.cloud-clear', root).addEventListener('click', clearForm);
     $('.cloud-token-eye', root).addEventListener('click', () => { form.token.type = form.token.type === 'password' ? 'text' : 'password'; });
-    $('.pcloud-pass-eye', root).addEventListener('click', () => {
-      const p = $('.pcloud-login-pass', root);
-      p.type = p.type === 'password' ? 'text' : 'password';
-    });
-    $('.pcloud-fill-eu', root).addEventListener('click', () => {
-      $('.pcloud-region', root).value = 'eu';
-      form.url.value = 'https://eapi.pcloud.com';
-    });
-    $('.pcloud-fill-us', root).addEventListener('click', () => {
-      $('.pcloud-region', root).value = 'us';
-      form.url.value = 'https://api.pcloud.com';
-    });
-    $('.pcloud-get-token', root).addEventListener('click', async () => {
-      const username = $('.pcloud-login-user', root).value.trim();
-      const password = $('.pcloud-login-pass', root).value;
-      const region = $('.pcloud-region', root).value;
-      const authexpire = $('.pcloud-expire', root).value;
-      if(!username || !password){
-        setMsg(form.msg, 'Introduce usuario y contraseña de pCloud.', 'bad');
-        return;
-      }
-      setMsg(form.msg, 'Solicitando token a pCloud…');
-      try{
-        const result = await api('/api/pcloud/auth', {method:'POST', body:JSON.stringify({username,password,region,authexpire})});
-        form.provider.value = 'pCloud';
-        form.name.value = form.name.value || 'pCloud principal';
-        form.url.value = result.base;
-        form.token.value = result.auth;
-        form.resource.value = result.email || username;
-        form.notes.value = 'Token obtenido automáticamente desde asistente pCloud. Usuario: ' + (result.email || username);
-        refreshPcloudAssistant();
-        setMsg(form.msg, 'Token obtenido correctamente. Pulsa “Guardar servicio”.', 'ok');
-      }catch(err){
-        setMsg(form.msg, err.message + ' Puedes pegar un token manual si pCloud no permite login con contraseña.', 'bad');
-      }
-    });
-    refreshPcloudAssistant();
 
     const load = async () => {
       const rows = await api('/api/cloud/accounts');
@@ -1668,7 +1540,6 @@
         form.token.value = item.token || item.config?.token || '';
         form.notes.value = item.notes || item.config?.notes || '';
         setMsg(form.msg, 'Editando servicio existente.');
-        refreshPcloudAssistant();
       }));
 
       $$('.cloud-test', root).forEach(btn => btn.addEventListener('click', async () => {
@@ -1725,139 +1596,6 @@
     });
 
     await load();
-  }
-
-  async function renderPCloud(root){
-    root.innerHTML = `
-      <div class="card">
-        <h3>Explorador pCloud</h3>
-        <p>Navega por tus archivos de pCloud desde Masive OS. Configura primero una cuenta pCloud en el Centro Cloud PRO. Ahora puedes hacerlo con el asistente usando email y contraseña o pegando un token manual.</p>
-        <div class="grid2" style="margin-top:12px">
-          <div class="field"><label>Cuenta pCloud</label><select class="input pcloud-account"></select></div>
-          <div class="field"><label>Folder ID actual</label><input class="input pcloud-folderid" value="0"></div>
-        </div>
-        <div class="pcloud-pathbar">
-          <button class="secondary pcloud-root">Raíz</button>
-          <input class="input pcloud-path" value="/" placeholder="/ o folderid">
-          <button class="primary pcloud-load">Cargar</button>
-          <button class="secondary pcloud-refresh">Actualizar</button>
-        </div>
-        <div class="pcloud-breadcrumb"></div>
-        <div class="msg pcloud-msg"></div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <h3>Contenido</h3>
-        <div class="pcloud-list-box">
-          <div class="pcloud-list-row pcloud-list-head">
-            <div></div><div>Nombre</div><div>Tamaño</div><div>Modificado</div><div>Acción</div>
-          </div>
-          <div class="pcloud-list-body"><div class="pcloud-list-row"><div></div><div>Cargando cuentas…</div><div></div><div></div><div></div></div></div>
-        </div>
-      </div>
-    `;
-
-    const accountSel = $('.pcloud-account', root);
-    const folderInput = $('.pcloud-folderid', root);
-    const pathInput = $('.pcloud-path', root);
-    const msg = $('.pcloud-msg', root);
-    const body = $('.pcloud-list-body', root);
-    const breadcrumb = $('.pcloud-breadcrumb', root);
-    let current = {folderid:0, path:'/', parents:[]};
-
-    const fmtSize = n => {
-      n = Number(n || 0);
-      if(!n) return '';
-      if(n < 1024) return n + ' B';
-      if(n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
-      if(n < 1024*1024*1024) return (n/(1024*1024)).toFixed(2) + ' MB';
-      return (n/(1024*1024*1024)).toFixed(2) + ' GB';
-    };
-    const fmtDate = v => {
-      if(!v) return '';
-      const d = new Date(v);
-      return isNaN(d) ? String(v).slice(0,16) : d.toLocaleDateString('es-ES') + ' ' + d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-    };
-
-    const loadAccounts = async () => {
-      const accounts = await api('/api/cloud/accounts');
-      const pcloud = accounts.filter(a => (a.provider || '').toLowerCase() === 'pcloud');
-      accountSel.innerHTML = pcloud.length ? pcloud.map(a => `<option value="${escapeAttr(a.id)}">${escapeHtml(a.display_name || a.provider)}</option>`).join('') : '<option value="">No hay cuenta pCloud configurada</option>';
-      if(!pcloud.length){
-        body.innerHTML = '<div class="pcloud-list-row"><div>⚠️</div><div>Configura una cuenta pCloud en Nube → pCloud.</div><div></div><div></div><div></div></div>';
-      }
-      return pcloud;
-    };
-
-    const renderBreadcrumb = () => {
-      const parts = current.parents || [];
-      breadcrumb.innerHTML = `<button class="secondary crumb-root">/ raíz</button>` + parts.map(p => `<button class="secondary crumb" data-folderid="${escapeAttr(p.folderid)}">${escapeHtml(p.name || p.folderid)}</button>`).join('');
-      $('.crumb-root', breadcrumb)?.addEventListener('click', () => loadFolder({folderid:0}));
-      $$('.crumb', breadcrumb).forEach(b => b.addEventListener('click', () => loadFolder({folderid:b.dataset.folderid})));
-    };
-
-    const loadFolder = async ({folderid=null, path=null}={}) => {
-      if(!accountSel.value){ setMsg(msg, 'No hay cuenta pCloud configurada.', 'bad'); return; }
-      setMsg(msg, 'Cargando pCloud…');
-      body.innerHTML = '<div class="pcloud-list-row"><div>⏳</div><div>Cargando…</div><div></div><div></div><div></div></div>';
-      try{
-        const payload = { accountId: accountSel.value };
-        if(path) payload.path = path;
-        else payload.folderid = folderid ?? folderInput.value ?? 0;
-        const data = await api('/api/pcloud/list', {method:'POST', body:JSON.stringify(payload)});
-        current = data.metadata || {folderid: payload.folderid || 0, path: payload.path || '/', parents:[]};
-        folderInput.value = current.folderid ?? 0;
-        pathInput.value = current.path || '/';
-        renderBreadcrumb();
-
-        const items = (data.contents || []).slice().sort((a,b) => {
-          if(!!a.isfolder !== !!b.isfolder) return a.isfolder ? -1 : 1;
-          return String(a.name||'').localeCompare(String(b.name||''), 'es');
-        });
-
-        body.innerHTML = items.length ? items.map(it => `
-          <div class="pcloud-list-row">
-            <div class="pcloud-file-icon">${it.isfolder ? '📁' : '📄'}</div>
-            <div><b>${escapeHtml(it.name || '')}</b><div class="small">${escapeHtml(it.path || '')}</div></div>
-            <div>${escapeHtml(fmtSize(it.size))}</div>
-            <div>${escapeHtml(fmtDate(it.modified))}</div>
-            <div class="row">
-              ${it.isfolder
-                ? `<button class="secondary pcloud-open-folder" data-folderid="${escapeAttr(it.folderid)}">Abrir</button>`
-                : `<button class="secondary pcloud-open-file" data-fileid="${escapeAttr(it.fileid)}">Abrir</button><button class="secondary pcloud-download-file" data-fileid="${escapeAttr(it.fileid)}">Descargar</button>`
-              }
-            </div>
-          </div>
-        `).join('') : '<div class="pcloud-list-row"><div>📭</div><div>Carpeta vacía.</div><div></div><div></div><div></div></div>';
-
-        $$('.pcloud-open-folder', root).forEach(b => b.addEventListener('click', () => loadFolder({folderid:b.dataset.folderid})));
-        $$('.pcloud-open-file', root).forEach(b => b.addEventListener('click', async () => {
-          const link = await api('/api/pcloud/download-link', {method:'POST', body:JSON.stringify({accountId:accountSel.value,fileid:b.dataset.fileid})});
-          if(link.url) openBrowser(link.url, 'pCloud archivo');
-        }));
-        $$('.pcloud-download-file', root).forEach(b => b.addEventListener('click', async () => {
-          const link = await api('/api/pcloud/download-link', {method:'POST', body:JSON.stringify({accountId:accountSel.value,fileid:b.dataset.fileid, forcedownload:true})});
-          if(link.url) window.open(link.url, '_blank', 'noopener,noreferrer');
-        }));
-
-        setMsg(msg, 'Carpeta cargada correctamente.', 'ok');
-      }catch(err){
-        body.innerHTML = `<div class="pcloud-list-row"><div>❌</div><div>${escapeHtml(err.message)}</div><div></div><div></div><div></div></div>`;
-        setMsg(msg, err.message, 'bad');
-      }
-    };
-
-    await loadAccounts();
-    if(accountSel.value) await loadFolder({folderid:0});
-
-    $('.pcloud-root', root).addEventListener('click', () => loadFolder({folderid:0}));
-    $('.pcloud-refresh', root).addEventListener('click', () => loadFolder({folderid:folderInput.value || 0}));
-    $('.pcloud-load', root).addEventListener('click', () => {
-      const v = pathInput.value.trim();
-      if(v.startsWith('/')) loadFolder({path:v});
-      else loadFolder({folderid:folderInput.value || v || 0});
-    });
-    accountSel.addEventListener('change', () => loadFolder({folderid:0}));
   }
 
   function renderMeteo(root){
@@ -2074,7 +1812,6 @@
             <button class="quick-app quick-files"><b>📁</b><span>Archivos</span></button>
             <button class="quick-app quick-dashboards"><b>📊</b><span>Dashboards</span></button>
             <button class="quick-app quick-cloud"><b>☁️</b><span>Nube</span></button>
-            <button class="quick-app quick-pcloud"><b>🅿️</b><span>pCloud</span></button>
             <button class="quick-app quick-meteo"><b>📡</b><span>Meteo Radio</span></button>
           </div>
           <div style="margin-top:12px" class="row">
@@ -2113,7 +1850,6 @@
     $('.quick-files', root).addEventListener('click', () => openModule('files'));
     $('.quick-dashboards', root).addEventListener('click', () => openModule('dashboards'));
     $('.quick-cloud', root).addEventListener('click', () => openModule('cloud'));
-    $('.quick-pcloud', root).addEventListener('click', () => openModule('pcloud'));
     $('.quick-meteo', root).addEventListener('click', () => openModule('meteo'));
     const renderList = () => {
       $('.icons-table-body', root).innerHTML = icons.map(i => `
@@ -2276,7 +2012,7 @@
 
     const lower = q.toLowerCase();
     const internal = {
-      'archivos':'files','files':'files','dashboards':'dashboards','dashboard':'dashboards','paneles':'dashboards','nube':'cloud','cloud':'cloud','pcloud':'pcloud','pclaud':'pcloud','p cloud':'pcloud',
+      'archivos':'files','files':'files','dashboards':'dashboards','dashboard':'dashboards','paneles':'dashboards','nube':'cloud','cloud':'cloud',
       'meteo':'meteo','meteorologia':'meteo','meteorología':'meteo','radio':'meteo','ea1fjz':'meteo','observatory':'meteo','windy':'meteo','dsn':'meteo','ayuda':'remote','remoto':'remote',
       'config':'settings','configuracion':'settings','configuración':'settings',
       'navegador':'browser','browser':'browser'
