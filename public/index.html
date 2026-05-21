@@ -329,6 +329,67 @@
       border-color:rgba(15,23,42,.10);
     }
 
+
+    /* ===== Cloud Drive Manager ===== */
+    .drive-wrap{
+      height:100%;
+      min-height:560px;
+      display:grid;
+      grid-template-columns:300px minmax(0,1fr) 320px;
+      gap:12px;
+    }
+    .drive-panel,.drive-main,.drive-preview{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      border-radius:22px;
+      overflow:hidden;
+      min-height:0;
+    }
+    .drive-panel{padding:14px;overflow:auto}
+    .drive-provider-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:10px 0 14px}
+    .drive-provider{
+      border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:#fff;border-radius:16px;
+      min-height:78px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-weight:900;text-align:center;
+    }
+    .drive-provider b{font-size:26px}
+    .drive-main{display:flex;flex-direction:column;background:#ffffff!important;color:#111827!important}
+    .drive-toolbar{
+      flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;
+      border-bottom:1px solid rgba(15,23,42,.10);background:linear-gradient(180deg,#ffffff,#f7f8fb);color:#111827;
+    }
+    .drive-path{font-weight:950;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#111827}
+    .drive-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .drive-actions .secondary{background:#fff!important;color:#111827!important;border:1px solid rgba(15,23,42,.14)!important}
+    .drive-content{flex:1;min-height:0;overflow:auto;padding:14px;background:#fff}
+    .drive-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:14px}
+    .drive-item{
+      border:1px solid transparent;border-radius:18px;min-height:124px;padding:12px 8px;display:flex;flex-direction:column;
+      align-items:center;justify-content:flex-start;gap:9px;text-align:center;color:#111827;user-select:none;
+    }
+    .drive-item:hover,.drive-item.is-selected{background:rgba(59,130,246,.10);border-color:rgba(59,130,246,.22)}
+    .drive-ico{
+      width:60px;height:60px;border-radius:19px;display:flex;align-items:center;justify-content:center;font-size:34px;
+      background:linear-gradient(180deg,#dbeafe,#bfdbfe);border:1px solid rgba(59,130,246,.20);box-shadow:0 8px 18px rgba(59,130,246,.10);
+    }
+    .drive-name{width:100%;font-size:12px;line-height:1.18;font-weight:850;word-break:break-word}
+    .drive-meta{font-size:10px;color:#64748b;font-weight:800}
+    .drive-preview{background:rgba(255,255,255,.10);display:flex;flex-direction:column;min-height:0}
+    .drive-preview-head{padding:14px;border-bottom:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06)}
+    .drive-preview-body{flex:1;min-height:0;overflow:auto;padding:14px}
+    .drive-account{
+      width:100%;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.08);color:#fff;border-radius:15px;
+      padding:10px;text-align:left;margin:6px 0;
+    }
+    .drive-account.is-active,.drive-account:hover{background:rgba(96,165,250,.18);border-color:rgba(96,165,250,.30)}
+    .drive-account b{display:block;font-size:13px;margin-bottom:3px}
+    .drive-account span{display:block;color:var(--muted);font-size:11px}
+    .drive-status{border-left:4px solid #60a5fa;background:rgba(96,165,250,.10);border-radius:14px;padding:10px 12px;color:#dbeafe;font-size:13px;line-height:1.4;margin-top:10px}
+    .drive-preview-frame{width:100%;height:420px;border:1px solid rgba(255,255,255,.14);border-radius:16px;background:#fff}
+    .drive-preview-img{max-width:100%;border-radius:16px;background:#fff}
+    body.theme-light .drive-panel,body.theme-light .drive-preview,body.theme-light .drive-account,body.theme-light .drive-provider{background:rgba(255,255,255,.72);color:#0f172a;border-color:rgba(15,23,42,.12)}
+    body.theme-light .drive-status{color:#1e3a8a;background:rgba(59,130,246,.10)}
+    @media(max-width:1100px){.drive-wrap{grid-template-columns:1fr}.drive-preview{min-height:360px}}
+
     /* ===== FTP Client ===== */
     .ftp-wrap{
       height:100%;
@@ -1294,6 +1355,7 @@
       <button class="dock-btn" data-module="search" title="Masive Search">🔎</button>
       <button class="dock-btn" data-module="writer" title="Procesador de textos">📝</button>
       <button class="dock-btn" data-module="ftp" title="FTP">🧭</button>
+      <button class="dock-btn" data-module="drives" title="Cloud Drives">💽</button>
       <button class="dock-btn" data-module="cloud" title="Nube">☁️</button>
       <button class="dock-btn" data-module="meteo" title="Meteo & Radio">📡</button>
       <button class="dock-btn" data-module="remote" title="Ayuda remota">🖥️</button>
@@ -1505,6 +1567,7 @@
       search: ['Masive Search','🔎'],
       writer: ['Procesador de textos','📝'],
       ftp: ['FTP Client','🧭'],
+      drives: ['Cloud Drives','💽'],
       cloud: ['Centro de nube','☁️'],
       meteo: ['Meteo & Radio','📡'],
       remote: ['Ayuda remota','🖥️'],
@@ -1519,6 +1582,7 @@
     if(module === 'search') renderSearch(win.body);
     if(module === 'writer') renderWriter(win.body);
     if(module === 'ftp') renderFtp(win.body);
+    if(module === 'drives') renderCloudDrives(win.body);
     if(module === 'cloud') renderCloud(win.body);
     if(module === 'meteo') renderMeteo(win.body);
     if(module === 'remote') renderRemote(win.body);
@@ -2123,6 +2187,7 @@
         ['remote','🖥️','Ayuda remota','Remote Center'],
         ['writer','📝','Procesador de textos','Documentos y notas persistentes'],
         ['ftp','🧭','FTP Client','Conectar a servidores FTP'],
+        ['drives','💽','Cloud Drives','Dropbox pCloud Google Drive OneDrive'],
         ['settings','⚙️','Configuración','Ajustes del sistema']
       ];
       for(const [mod, ic, title, sub] of apps){
@@ -2496,6 +2561,148 @@
       reader.readAsDataURL(file);
     });
 
+    await loadAccounts();
+  }
+
+  async function renderCloudDrives(root){
+    root.innerHTML = `
+      <div class="drive-wrap">
+        <aside class="drive-panel">
+          <h3 style="margin:0 0 8px">Cloud Drives</h3>
+          <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.4">Configura tus discos en la nube y navega por ellos desde Masive OS.</p>
+          <div class="drive-provider-grid">
+            <button class="drive-provider" data-provider="dropbox"><b>📦</b><span>Dropbox</span></button>
+            <button class="drive-provider" data-provider="pcloud"><b>☁️</b><span>pCloud</span></button>
+            <button class="drive-provider" data-provider="googledrive"><b>🔺</b><span>Google Drive</span></button>
+            <button class="drive-provider" data-provider="onedrive"><b>🔷</b><span>OneDrive</span></button>
+          </div>
+          <input type="hidden" class="drive-id">
+          <div class="field"><label>Proveedor</label><select class="input drive-provider-select"><option value="dropbox">Dropbox</option><option value="pcloud">pCloud</option><option value="googledrive">Google Drive</option><option value="onedrive">OneDrive</option></select></div>
+          <div class="field"><label>Nombre visible</label><input class="input drive-name-input" placeholder="Ej: Dropbox Jordi"></div>
+          <div class="field"><label>Token / OAuth token</label><input class="input drive-token" type="password" placeholder="Pega aquí el token"></div>
+          <div class="grid2">
+            <div class="field"><label>Región pCloud</label><select class="input drive-region"><option value="eu">EU</option><option value="us">US</option></select></div>
+            <div class="field"><label>Raíz</label><input class="input drive-root" value="/"></div>
+          </div>
+          <div class="field"><label>Modo</label><select class="input drive-mode"><option value="rw">Lectura y escritura</option><option value="ro">Solo lectura</option></select></div>
+          <div class="row"><button class="primary drive-save">Guardar nube</button><button class="secondary drive-clear">Limpiar</button></div>
+          <div class="drive-status drive-msg">Preparado.</div>
+          <h3 style="margin:16px 0 8px">Mis nubes</h3>
+          <div class="drive-accounts"></div>
+        </aside>
+        <section class="drive-main">
+          <div class="drive-toolbar">
+            <div class="drive-path">Selecciona una nube</div>
+            <div class="drive-actions">
+              <button class="secondary drive-back">← Atrás</button>
+              <button class="secondary drive-refresh">Actualizar</button>
+              <button class="secondary drive-mkdir">Nueva carpeta</button>
+              <button class="primary drive-upload">Subir</button>
+              <input class="hidden drive-upload-input" type="file">
+            </div>
+          </div>
+          <div class="drive-content"><div class="finder-empty"><b>💽</b><div>Selecciona o configura una nube</div></div></div>
+        </section>
+        <aside class="drive-preview">
+          <div class="drive-preview-head">
+            <h3 style="margin:0 0 4px">Vista previa</h3>
+            <div style="color:var(--muted);font-size:12px">Imágenes, PDF, TXT, CSV y JSON internos. Word/Excel por descarga o enlace externo.</div>
+          </div>
+          <div class="drive-preview-body"><div class="finder-empty"><b>👁️</b><div>Selecciona un archivo</div></div></div>
+        </aside>
+      </div>`;
+
+    let accounts = [], active = null, currentPath = '/', history = [], items = [], selected = null;
+    const setMsg = (t) => $('.drive-msg', root).textContent = t;
+    const form = {
+      id: $('.drive-id', root), provider: $('.drive-provider-select', root), name: $('.drive-name-input', root),
+      token: $('.drive-token', root), region: $('.drive-region', root), root: $('.drive-root', root), mode: $('.drive-mode', root)
+    };
+    const providerIcon = p => ({dropbox:'📦',pcloud:'☁️',googledrive:'🔺',onedrive:'🔷'}[p] || '💽');
+    const fileIcon = it => {
+      if(it.type === 'folder') return '📁';
+      const n = (it.name || '').toLowerCase();
+      if(/\.(png|jpe?g|gif|webp|svg)$/i.test(n)) return '🖼️';
+      if(n.endsWith('.pdf')) return '📕';
+      if(/\.(xlsx?|csv)$/i.test(n)) return '📊';
+      if(/\.(docx?|rtf)$/i.test(n)) return '📄';
+      if(/\.(txt|json|log|md)$/i.test(n)) return '📝';
+      if(/\.(zip|rar|7z)$/i.test(n)) return '📦';
+      return '📄';
+    };
+    const fmtSize = n => { n = Number(n || 0); if(!n) return ''; if(n < 1024) return n + ' B'; if(n < 1024*1024) return (n/1024).toFixed(1) + ' KB'; return (n/(1024*1024)).toFixed(2) + ' MB'; };
+    const clearForm = () => { form.id.value=''; form.provider.value='dropbox'; form.name.value=''; form.token.value=''; form.region.value='eu'; form.root.value='/'; form.mode.value='rw'; };
+    const fillPreset = (provider) => {
+      clearForm(); form.provider.value = provider;
+      form.name.value = ({dropbox:'Dropbox Jordi',pcloud:'pCloud Jordi',googledrive:'Google Drive Jordi',onedrive:'OneDrive Jordi'}[provider] || 'Nube');
+      setMsg(provider === 'googledrive' || provider === 'onedrive' ? 'Preparado para OAuth/token. La integración completa requiere credenciales OAuth.' : 'Pega un token válido para listar archivos.');
+    };
+    const loadAccounts = async () => {
+      accounts = await api('/api/cloud-drive/accounts').catch(() => []);
+      $('.drive-accounts', root).innerHTML = accounts.length ? accounts.map(a => `
+        <button class="drive-account ${active && active.id === a.id ? 'is-active' : ''}" data-id="${escapeAttr(a.id)}">
+          <b>${providerIcon(a.provider)} ${escapeHtml(a.name || a.provider)}</b>
+          <span>${escapeHtml(a.provider)} · ${escapeHtml(a.mode || 'rw')} · ${escapeHtml(a.root || '/')}</span>
+        </button>`).join('') : '<div class="note">No hay nubes configuradas todavía.</div>';
+      $$('.drive-account', root).forEach(btn => btn.addEventListener('click', async () => {
+        active = accounts.find(a => a.id === btn.dataset.id); currentPath = active.root || '/'; history = []; await listDrive(false); loadAccounts();
+      }));
+    };
+    const saveAccount = async () => {
+      const payload = {provider:form.provider.value,name:form.name.value||form.provider.value,token:form.token.value,region:form.region.value,root:form.root.value||'/',mode:form.mode.value};
+      if(!payload.token){ setMsg('Introduce un token para poder conectar.'); return; }
+      if(form.id.value) active = await api('/api/cloud-drive/accounts/' + encodeURIComponent(form.id.value), {method:'PUT', body:JSON.stringify(payload)});
+      else active = await api('/api/cloud-drive/accounts', {method:'POST', body:JSON.stringify(payload)});
+      currentPath = active.root || '/'; await loadAccounts(); setMsg('Nube guardada.');
+    };
+    const renderItems = () => {
+      $('.drive-path', root).textContent = active ? `${active.name || active.provider}: ${currentPath}` : 'Selecciona una nube';
+      const box = $('.drive-content', root);
+      if(!items.length){ box.innerHTML = '<div class="finder-empty"><b>📂</b><div>Carpeta vacía o sin acceso</div></div>'; return; }
+      box.innerHTML = `<div class="drive-grid">` + items.map((it, idx) => `
+        <div class="drive-item" data-index="${idx}">
+          <div class="drive-ico">${fileIcon(it)}</div><div class="drive-name">${escapeHtml(it.name || '')}</div><div class="drive-meta">${escapeHtml(it.type || '')} ${escapeHtml(fmtSize(it.size))}</div>
+        </div>`).join('') + '</div>';
+      $$('.drive-item', root).forEach(el => {
+        el.addEventListener('click', () => { $$('.drive-item', root).forEach(x => x.classList.remove('is-selected')); el.classList.add('is-selected'); selected = items[Number(el.dataset.index)]; renderPreview(selected); });
+        el.addEventListener('dblclick', async () => { const it = items[Number(el.dataset.index)]; if(it.type === 'folder'){ history.push(currentPath); currentPath = it.path || it.id || it.name; await listDrive(false); } else await openDriveFile(it); });
+      });
+    };
+    const listDrive = async () => {
+      if(!active){ setMsg('Selecciona una nube.'); return; }
+      setMsg('Listando archivos...');
+      const data = await api('/api/cloud-drive/list', {method:'POST', body:JSON.stringify({account_id: active.id, path: currentPath})});
+      items = data.items || []; renderItems(); renderPreview(null); setMsg('Listado cargado.');
+    };
+    const renderPreview = (it) => {
+      const pane = $('.drive-preview-body', root);
+      if(!it){ pane.innerHTML = '<div class="finder-empty"><b>👁️</b><div>Selecciona un archivo</div></div>'; return; }
+      if(it.type === 'folder'){ pane.innerHTML = `<div class="finder-empty"><b>📁</b><div>${escapeHtml(it.name)}</div><div>Haz doble clic para abrir.</div></div>`; return; }
+      const dl = `/api/cloud-drive/download?account_id=${encodeURIComponent(active.id)}&id=${encodeURIComponent(it.id || '')}&path=${encodeURIComponent(it.path || '')}`;
+      const n = (it.name || '').toLowerCase();
+      if(/\.(png|jpe?g|gif|webp|svg)$/i.test(n)) pane.innerHTML = `<h3>${escapeHtml(it.name)}</h3><img class="drive-preview-img" src="${dl}"><div class="row" style="margin-top:12px"><a class="secondary" href="${dl}" target="_blank">Descargar</a></div>`;
+      else if(n.endsWith('.pdf') || /\.(txt|csv|json|log|md)$/i.test(n)) pane.innerHTML = `<h3>${escapeHtml(it.name)}</h3><iframe class="drive-preview-frame" src="${dl}"></iframe><div class="row" style="margin-top:12px"><a class="secondary" href="${dl}" target="_blank">Descargar</a></div>`;
+      else pane.innerHTML = `<div class="finder-empty"><b>${fileIcon(it)}</b><div>${escapeHtml(it.name)}</div><div>Vista previa interna no disponible todavía.</div><div class="row" style="margin-top:12px"><a class="secondary" href="${dl}" target="_blank">Descargar</a></div></div>`;
+    };
+    const openDriveFile = async (it) => {
+      const dl = `/api/cloud-drive/download?account_id=${encodeURIComponent(active.id)}&id=${encodeURIComponent(it.id || '')}&path=${encodeURIComponent(it.path || '')}`;
+      if(/\.(png|jpe?g|gif|webp|svg|pdf|txt|csv|json|log|md)$/i.test(it.name || '')) openBrowser(dl, it.name);
+      else window.open(dl, '_blank');
+    };
+    $$('.drive-provider', root).forEach(btn => btn.addEventListener('click', () => fillPreset(btn.dataset.provider)));
+    $('.drive-save', root).addEventListener('click', () => saveAccount().catch(err => setMsg(err.message)));
+    $('.drive-clear', root).addEventListener('click', clearForm);
+    $('.drive-refresh', root).addEventListener('click', () => listDrive().catch(err => setMsg(err.message)));
+    $('.drive-back', root).addEventListener('click', async () => { const prev = history.pop(); if(prev !== undefined){ currentPath = prev; await listDrive(); } });
+    $('.drive-mkdir', root).addEventListener('click', async () => { if(!active){ setMsg('Selecciona una nube.'); return; } const name = prompt('Nombre de la carpeta'); if(!name) return; await api('/api/cloud-drive/mkdir', {method:'POST', body:JSON.stringify({account_id: active.id, path: currentPath, name})}); await listDrive(); });
+    $('.drive-upload', root).addEventListener('click', () => $('.drive-upload-input', root).click());
+    $('.drive-upload-input', root).addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0]; if(!file || !active) return;
+      if(file.size > 12 * 1024 * 1024){ setMsg('Máximo 12 MB por archivo en esta versión.'); return; }
+      const reader = new FileReader();
+      reader.onload = async () => { const base64 = String(reader.result || '').split(',')[1] || ''; await api('/api/cloud-drive/upload', {method:'POST', body:JSON.stringify({account_id: active.id, path: currentPath, name: file.name, data_base64: base64})}); e.target.value = ''; await listDrive(); };
+      reader.readAsDataURL(file);
+    });
     await loadAccounts();
   }
 
@@ -3377,7 +3584,7 @@
 
     const lower = q.toLowerCase();
     const internal = {
-      'archivos':'files','files':'files','dashboards':'dashboards','dashboard':'dashboards','paneles':'dashboards','buscar':'search','buscador':'search','search':'search','spotlight':'search','texto':'writer','documento':'writer','writer':'writer','notas':'writer','ftp':'ftp','sftp':'ftp','servidor ftp':'ftp','nube':'cloud','cloud':'cloud',
+      'archivos':'files','files':'files','dashboards':'dashboards','dashboard':'dashboards','paneles':'dashboards','buscar':'search','buscador':'search','search':'search','spotlight':'search','texto':'writer','documento':'writer','writer':'writer','notas':'writer','ftp':'ftp','sftp':'ftp','servidor ftp':'ftp','drive':'drives','drives':'drives','cloud drives':'drives','disco nube':'drives','dropbox':'drives','pcloud':'drives','google drive':'drives','onedrive':'drives','one drive':'drives','nube':'cloud','cloud':'cloud',
       'meteo':'meteo','meteorologia':'meteo','meteorología':'meteo','radio':'meteo','ea1fjz':'meteo','observatory':'meteo','windy':'meteo','dsn':'meteo','ayuda':'remote','remoto':'remote',
       'config':'settings','configuracion':'settings','configuración':'settings',
       'navegador':'browser','browser':'browser'
