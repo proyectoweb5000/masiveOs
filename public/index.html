@@ -189,6 +189,187 @@
     .modal p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.45}
     .kv{display:grid;grid-template-columns:170px 1fr;gap:8px;font-size:13px;color:var(--muted)}
     .kv b{color:#fff}
+
+    /* ===== MASIVE OS THEME - Glassmorphism oscuro tipo Proton/Brave ===== */
+    body.theme-massive{
+      background:
+        radial-gradient(circle at 15% 14%,rgba(126,34,206,.50),transparent 31%),
+        radial-gradient(circle at 80% 16%,rgba(37,99,235,.38),transparent 30%),
+        radial-gradient(circle at 52% 88%,rgba(14,165,233,.28),transparent 34%),
+        linear-gradient(135deg,#070713,#111827 52%,#0b1020) !important;
+    }
+    body.theme-aurora{
+      background:
+        radial-gradient(circle at 22% 16%,rgba(16,185,129,.34),transparent 30%),
+        radial-gradient(circle at 76% 20%,rgba(59,130,246,.36),transparent 31%),
+        radial-gradient(circle at 55% 86%,rgba(168,85,247,.30),transparent 36%),
+        linear-gradient(135deg,#031315,#07162b 50%,#150b25) !important;
+    }
+    body.theme-midnight{
+      background:
+        radial-gradient(circle at 72% 16%,rgba(30,64,175,.40),transparent 34%),
+        radial-gradient(circle at 25% 78%,rgba(15,23,42,.78),transparent 36%),
+        linear-gradient(135deg,#020617,#0f172a 58%,#111827) !important;
+    }
+    body.theme-light{
+      --txt:#0f172a;
+      --muted:#475569;
+      --glass:rgba(255,255,255,.72);
+      --glass2:rgba(255,255,255,.88);
+      --line:rgba(15,23,42,.15);
+      --line2:rgba(15,23,42,.22);
+      background:
+        radial-gradient(circle at 18% 18%,rgba(59,130,246,.20),transparent 32%),
+        radial-gradient(circle at 78% 20%,rgba(139,92,246,.16),transparent 30%),
+        linear-gradient(135deg,#f8fbff,#eaf2ff 52%,#eef2ff) !important;
+      color:#0f172a;
+    }
+    body.theme-light .topbar,
+    body.theme-light .dock,
+    body.theme-light .window,
+    body.theme-light .modal,
+    body.theme-light .login-card{
+      background:rgba(255,255,255,.72);
+      color:#0f172a;
+      border-color:rgba(15,23,42,.12);
+    }
+    body.theme-light .window .win-body{background:rgba(248,250,252,.68)}
+    body.theme-light .input,
+    body.theme-light select.input,
+    body.theme-light textarea.input{
+      background:rgba(255,255,255,.92);
+      color:#0f172a;
+      border-color:rgba(15,23,42,.16);
+    }
+    body.theme-light .secondary,
+    body.theme-light .top-btn,
+    body.theme-light .dock-btn,
+    body.theme-light .icon-symbol,
+    body.theme-light .card{
+      background:rgba(255,255,255,.68);
+      color:#0f172a;
+      border-color:rgba(15,23,42,.13);
+    }
+    body.theme-light .icon-title{text-shadow:none;color:#0f172a}
+    body.theme-light .note{color:#1e3a8a;background:rgba(59,130,246,.11)}
+    body.theme-light .table th{color:#1e3a8a;background:rgba(59,130,246,.09)}
+    body.theme-light .table th,
+    body.theme-light .table td{border-bottom-color:rgba(15,23,42,.09)}
+
+    .wallpaper-preview-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .wallpaper-preset{
+      height:76px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.18);
+      overflow:hidden;
+      position:relative;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(0,0,0,.16);
+    }
+    .wallpaper-preset span{
+      position:absolute;
+      left:8px;
+      bottom:7px;
+      padding:4px 7px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
+      color:#fff;
+      background:rgba(2,6,23,.52);
+      backdrop-filter:blur(8px);
+    }
+    .wp-massive{
+      background:
+        radial-gradient(circle at 14% 20%,rgba(126,34,206,.82),transparent 38%),
+        radial-gradient(circle at 84% 18%,rgba(37,99,235,.65),transparent 36%),
+        radial-gradient(circle at 55% 88%,rgba(14,165,233,.42),transparent 38%),
+        linear-gradient(135deg,#070713,#111827 52%,#0b1020);
+    }
+    .wp-aurora{
+      background:
+        radial-gradient(circle at 20% 20%,rgba(16,185,129,.70),transparent 35%),
+        radial-gradient(circle at 80% 26%,rgba(59,130,246,.70),transparent 35%),
+        radial-gradient(circle at 60% 80%,rgba(168,85,247,.55),transparent 40%),
+        linear-gradient(135deg,#031315,#07162b 50%,#150b25);
+    }
+    .wp-midnight{
+      background:
+        radial-gradient(circle at 72% 16%,rgba(30,64,175,.72),transparent 38%),
+        radial-gradient(circle at 25% 78%,rgba(15,23,42,.90),transparent 38%),
+        linear-gradient(135deg,#020617,#0f172a 58%,#111827);
+    }
+    .wp-light{
+      background:
+        radial-gradient(circle at 18% 18%,rgba(59,130,246,.32),transparent 36%),
+        radial-gradient(circle at 78% 20%,rgba(139,92,246,.26),transparent 34%),
+        linear-gradient(135deg,#f8fbff,#eaf2ff 52%,#eef2ff);
+    }
+
+    .desktop-search{
+      position:fixed;
+      top:58px;
+      left:50%;
+      transform:translateX(-50%);
+      width:min(640px,calc(100vw - 42px));
+      z-index:3000;
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:999px;
+      background:rgba(255,255,255,.16);
+      backdrop-filter:blur(22px);
+      box-shadow:0 18px 44px rgba(0,0,0,.20);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 14px;
+    }
+    .desktop-search span{opacity:.82}
+    .desktop-search input{
+      flex:1;
+      border:0;
+      outline:0;
+      background:transparent;
+      color:#fff;
+      font-weight:700;
+      min-width:0;
+    }
+    .desktop-search input::placeholder{color:rgba(255,255,255,.72)}
+    body.theme-light .desktop-search{
+      background:rgba(255,255,255,.78);
+      border-color:rgba(15,23,42,.12);
+    }
+    body.theme-light .desktop-search input{color:#0f172a}
+    body.theme-light .desktop-search input::placeholder{color:rgba(15,23,42,.48)}
+
+    .quick-app-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+    .quick-app{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      border-radius:18px;
+      padding:12px 10px;
+      min-height:84px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-weight:900;
+    }
+    .quick-app b{font-size:24px}
+    .quick-app span{font-size:12px}
+    body.theme-light .quick-app{background:rgba(255,255,255,.72);color:#0f172a;border-color:rgba(15,23,42,.12)}
+
     @media(max-width:800px){
       .top-center{display:none}
       .desktop{padding:14px}
@@ -198,7 +379,7 @@
     }
   </style>
 </head>
-<body>
+<body class="theme-massive">
   <div id="loginScreen" class="login-screen">
     <form id="loginForm" class="login-card">
       <div class="login-logo">◈</div>
@@ -230,6 +411,8 @@
         <button id="logoutBtn" class="top-btn">Salir</button>
       </div>
     </div>
+
+    <div id="desktopSearch" class="desktop-search"><span>⌘</span><input id="globalSearchInput" placeholder="Buscar apps, abrir webs o escribir una URL..." /></div>
 
     <main id="desktop" class="desktop"></main>
 
@@ -329,6 +512,11 @@
   function applyConfig(){
     $('#systemTitle').textContent = config.title || 'Masive OS';
     document.title = config.title || 'Masive OS';
+
+    const theme = config.theme || 'massive';
+    document.body.classList.remove('theme-massive','theme-aurora','theme-midnight','theme-light');
+    document.body.classList.add('theme-' + theme);
+
     if(config.wallpaper){
       document.body.classList.add('custom-wallpaper');
       document.body.style.backgroundImage = `linear-gradient(rgba(2,6,23,.22),rgba(2,6,23,.22)), url("${config.wallpaper}")`;
@@ -668,13 +856,34 @@
           <h3>Configuración general</h3>
           <div class="field"><label>Título del sistema</label><input class="input cfg-title" value="${escapeAttr(config.title || '')}"></div>
           <div class="field"><label>Subtítulo</label><input class="input cfg-subtitle" value="${escapeAttr(config.subtitle || '')}"></div>
+          <div class="field"><label>Tema visual</label>
+            <select class="input cfg-theme">
+              <option value="massive">Massive Glass</option>
+              <option value="aurora">Aurora Radio</option>
+              <option value="midnight">Midnight Pro</option>
+              <option value="light">Light PPG</option>
+            </select>
+          </div>
           <div class="field"><label>Fondo de pantalla URL/base64</label><input class="input cfg-wallpaper" value="${escapeAttr(config.wallpaper || '')}" placeholder="https://... o data:image/..."></div>
-          <button class="primary cfg-save">Guardar configuración</button>
+          <div class="field"><label>Cargar fondo desde este PC</label><input class="input cfg-wallpaper-file" type="file" accept="image/*"></div>
+          <div class="wallpaper-preview-grid">
+            <div class="wallpaper-preset wp-massive" data-theme="massive" data-wallpaper=""><span>Massive</span></div>
+            <div class="wallpaper-preset wp-aurora" data-theme="aurora" data-wallpaper=""><span>Aurora</span></div>
+            <div class="wallpaper-preset wp-midnight" data-theme="midnight" data-wallpaper=""><span>Midnight</span></div>
+            <div class="wallpaper-preset wp-light" data-theme="light" data-wallpaper=""><span>Light</span></div>
+          </div>
+          <button class="primary cfg-save" style="margin-top:14px">Guardar configuración</button>
           <div class="msg cfg-msg"></div>
         </div>
         <div class="card">
           <h3>Iconos / Apps</h3>
           <p>Crear accesos directos a webs, módulos internos o enlaces externos. También puedes editar un icono con clic derecho sobre el escritorio.</p>
+          <div class="quick-app-grid">
+            <button class="quick-app quick-browser"><b>🌐</b><span>Navegador</span></button>
+            <button class="quick-app quick-files"><b>📁</b><span>Archivos</span></button>
+            <button class="quick-app quick-cloud"><b>☁️</b><span>Nube</span></button>
+            <button class="quick-app quick-meteo"><b>📡</b><span>Meteo Radio</span></button>
+          </div>
           <div style="margin-top:12px" class="row">
             <button class="primary add-icon">Crear icono</button>
             <button class="secondary refresh-icons">Recargar iconos</button>
@@ -686,6 +895,31 @@
         <table class="table"><thead><tr><th>Icono</th><th>Título</th><th>Tipo</th><th>Destino</th><th>Acciones</th></tr></thead><tbody class="icons-table-body"></tbody></table>
       </div>
     `;
+    $('.cfg-theme', root).value = config.theme || 'massive';
+    $$('.wallpaper-preset', root).forEach(p => {
+      p.addEventListener('click', async () => {
+        $('.cfg-theme', root).value = p.dataset.theme || 'massive';
+        $('.cfg-wallpaper', root).value = p.dataset.wallpaper || '';
+        config = await api('/api/config', {method:'POST', body:JSON.stringify({
+          theme: $('.cfg-theme', root).value,
+          wallpaper: $('.cfg-wallpaper', root).value
+        })});
+        applyConfig();
+      });
+    });
+    $('.cfg-wallpaper-file', root).addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        $('.cfg-wallpaper', root).value = String(reader.result || '');
+      };
+      reader.readAsDataURL(file);
+    });
+    $('.quick-browser', root).addEventListener('click', () => openModule('browser'));
+    $('.quick-files', root).addEventListener('click', () => openModule('files'));
+    $('.quick-cloud', root).addEventListener('click', () => openModule('cloud'));
+    $('.quick-meteo', root).addEventListener('click', () => openModule('meteo'));
     const renderList = () => {
       $('.icons-table-body', root).innerHTML = icons.map(i => `
         <tr>
@@ -718,6 +952,7 @@
         config = await api('/api/config', {method:'POST', body:JSON.stringify({
           title: $('.cfg-title', root).value,
           subtitle: $('.cfg-subtitle', root).value,
+          theme: $('.cfg-theme', root).value,
           wallpaper: $('.cfg-wallpaper', root).value
         })});
         applyConfig();
@@ -837,6 +1072,42 @@
     return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
   function escapeAttr(v){ return escapeHtml(v).replace(/`/g,'&#96;'); }
+
+
+  $('#globalSearchInput').addEventListener('keydown', (e) => {
+    if(e.key !== 'Enter') return;
+    const q = e.target.value.trim();
+    if(!q) return;
+
+    const lower = q.toLowerCase();
+    const internal = {
+      'archivos':'files','files':'files','nube':'cloud','cloud':'cloud',
+      'meteo':'meteo','radio':'meteo','ayuda':'remote','remoto':'remote',
+      'config':'settings','configuracion':'settings','configuración':'settings',
+      'navegador':'browser','browser':'browser'
+    };
+    if(internal[lower]){
+      openModule(internal[lower]);
+      e.target.value = '';
+      return;
+    }
+
+    const found = icons.find(i => (i.title || '').toLowerCase().includes(lower));
+    if(found){
+      openIcon(found);
+      e.target.value = '';
+      return;
+    }
+
+    if(/^https?:\/\//i.test(q) || q.includes('.')){
+      openBrowser(/^https?:\/\//i.test(q) ? q : 'https://' + q, q);
+      e.target.value = '';
+      return;
+    }
+
+    openBrowser('https://www.google.com/search?q=' + encodeURIComponent(q), 'Buscar: ' + q);
+    e.target.value = '';
+  });
 
   boot();
 })();
