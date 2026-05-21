@@ -543,7 +543,375 @@
       .grid2{grid-template-columns:1fr}
       .dock{left:10px;right:10px;transform:none;justify-content:flex-start}
     }
-  </style>
+  
+    /* ==========================================================
+       MASSIVE GLASS PRO - reconstrucción visual premium
+       Inspirado en la referencia original: Proton/Brave cloud OS
+       ========================================================== */
+    :root{
+      --mg-bg-deep:#070814;
+      --mg-bg-blue:#0b1634;
+      --mg-purple:#7c3aed;
+      --mg-violet:#a855f7;
+      --mg-blue:#3b82f6;
+      --mg-cyan:#22d3ee;
+      --mg-white:rgba(255,255,255,.86);
+      --mg-soft:rgba(255,255,255,.58);
+      --mg-panel:rgba(255,255,255,.118);
+      --mg-panel-strong:rgba(255,255,255,.172);
+      --mg-border:rgba(255,255,255,.205);
+      --mg-border-soft:rgba(255,255,255,.115);
+      --mg-shadow:0 34px 95px rgba(0,0,0,.44);
+      --mg-shadow-soft:0 18px 42px rgba(0,0,0,.25);
+      --mg-blur:blur(30px) saturate(1.28);
+    }
+
+    body.theme-massive{
+      background:
+        radial-gradient(circle at 16% 12%,rgba(168,85,247,.60) 0,rgba(168,85,247,.26) 18%,transparent 42%),
+        radial-gradient(circle at 78% 18%,rgba(59,130,246,.52) 0,rgba(59,130,246,.22) 22%,transparent 45%),
+        radial-gradient(circle at 52% 87%,rgba(34,211,238,.28) 0,rgba(34,211,238,.10) 22%,transparent 46%),
+        radial-gradient(circle at 20% 78%,rgba(124,58,237,.28) 0,transparent 38%),
+        linear-gradient(135deg,#050613 0%,#0b1024 42%,#111a38 68%,#080b19 100%) !important;
+      color:#f8fbff;
+    }
+
+    body.theme-massive::before{
+      content:'';
+      position:fixed;
+      inset:-60px;
+      z-index:0;
+      pointer-events:none;
+      background:
+        linear-gradient(120deg,rgba(255,255,255,.045),transparent 35%,rgba(255,255,255,.035) 64%,transparent),
+        repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0,rgba(255,255,255,.018) 1px,transparent 1px,transparent 90px);
+      filter:blur(.2px);
+      opacity:.82;
+    }
+
+    body.theme-massive::after{
+      content:'';
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 50% 40%,transparent 0,transparent 52%,rgba(0,0,0,.18) 100%);
+      opacity:.86;
+    }
+
+    body.theme-massive .topbar{
+      height:46px;
+      background:rgba(255,255,255,.085);
+      border-bottom:1px solid rgba(255,255,255,.14);
+      box-shadow:0 14px 38px rgba(0,0,0,.18);
+      backdrop-filter:var(--mg-blur);
+    }
+
+    body.theme-massive .brand{
+      letter-spacing:.2px;
+      color:rgba(255,255,255,.94);
+    }
+
+    body.theme-massive .brand-badge{
+      width:28px;
+      height:28px;
+      border-radius:12px;
+      background:
+        linear-gradient(135deg,rgba(255,255,255,.30),rgba(255,255,255,.06)),
+        linear-gradient(135deg,#60a5fa,#8b5cf6 58%,#d946ef);
+      border:1px solid rgba(255,255,255,.26);
+      box-shadow:0 14px 30px rgba(79,70,229,.28), inset 0 1px 0 rgba(255,255,255,.42);
+    }
+
+    body.theme-massive .top-pill{
+      background:rgba(255,255,255,.105);
+      border:1px solid rgba(255,255,255,.16);
+      color:rgba(255,255,255,.74);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    body.theme-massive .top-btn,
+    body.theme-massive .secondary{
+      background:rgba(255,255,255,.115);
+      border:1px solid rgba(255,255,255,.18);
+      color:#f8fbff;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 10px 28px rgba(0,0,0,.14);
+    }
+
+    body.theme-massive .primary{
+      background:
+        linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.03)),
+        linear-gradient(135deg,#5aa7ff 0%,#7c3aed 58%,#b14cff 100%);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 18px 42px rgba(91,94,255,.30), inset 0 1px 0 rgba(255,255,255,.26);
+    }
+
+    body.theme-massive .desktop-search{
+      top:66px;
+      width:min(720px,calc(100vw - 52px));
+      min-height:52px;
+      padding:9px 18px;
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(255,255,255,.48);
+      border-radius:999px;
+      backdrop-filter:blur(32px) saturate(1.35);
+      box-shadow:
+        0 28px 85px rgba(0,0,0,.34),
+        0 0 0 1px rgba(255,255,255,.09) inset,
+        inset 0 1px 0 rgba(255,255,255,.65);
+    }
+
+    body.theme-massive .desktop-search span{
+      color:#6d28d9;
+      opacity:1;
+      font-weight:950;
+    }
+
+    body.theme-massive .desktop-search input{
+      color:#111827;
+      font-size:15px;
+      font-weight:800;
+    }
+
+    body.theme-massive .desktop-search input::placeholder{
+      color:rgba(30,41,59,.58);
+      font-weight:700;
+    }
+
+    body.theme-massive .dock{
+      height:78px;
+      padding:11px 16px;
+      gap:12px;
+      background:rgba(255,255,255,.125);
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:30px;
+      backdrop-filter:var(--mg-blur);
+      box-shadow:0 32px 88px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,255,255,.16);
+    }
+
+    body.theme-massive .dock-btn{
+      width:54px;
+      height:54px;
+      min-width:54px;
+      border-radius:20px;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.20);
+      box-shadow:0 13px 32px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.15);
+      transition:transform .16s ease, background .16s ease, box-shadow .16s ease;
+    }
+
+    body.theme-massive .dock-btn:hover{
+      transform:translateY(-7px) scale(1.06);
+      background:rgba(255,255,255,.22);
+      box-shadow:0 24px 52px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.22);
+    }
+
+    body.theme-massive .icon{
+      border-radius:26px;
+      transition:transform .14s ease, background .14s ease, border .14s ease;
+    }
+
+    body.theme-massive .icon:hover,
+    body.theme-massive .icon.is-selected{
+      background:rgba(255,255,255,.125);
+      border-color:rgba(255,255,255,.17);
+      backdrop-filter:blur(18px);
+      transform:translateY(-2px);
+    }
+
+    body.theme-massive .icon-symbol{
+      width:58px;
+      height:58px;
+      border-radius:22px;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.20),rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 18px 40px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.16);
+      font-size:31px;
+    }
+
+    body.theme-massive .icon-title{
+      color:rgba(255,255,255,.92);
+      font-weight:850;
+      text-shadow:0 5px 18px rgba(0,0,0,.55);
+    }
+
+    body.theme-massive .window{
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.16),rgba(255,255,255,.075));
+      border:1px solid rgba(255,255,255,.20);
+      border-radius:28px;
+      backdrop-filter:blur(34px) saturate(1.35);
+      box-shadow:var(--mg-shadow), inset 0 1px 0 rgba(255,255,255,.13);
+    }
+
+    body.theme-massive .window.maximized{
+      border-radius:24px;
+    }
+
+    body.theme-massive .titlebar{
+      height:50px;
+      background:rgba(255,255,255,.08);
+      border-bottom:1px solid rgba(255,255,255,.115);
+    }
+
+    body.theme-massive .win-title{
+      color:rgba(255,255,255,.93);
+      font-weight:950;
+      letter-spacing:.15px;
+    }
+
+    body.theme-massive .win-body{
+      background:rgba(2,6,23,.05);
+      padding:18px;
+    }
+
+    body.theme-massive .card,
+    body.theme-massive .cloud-service-card,
+    body.theme-massive .meteo-hero,
+    body.theme-massive .meteo-clock-card,
+    body.theme-massive .pcloud-assistant{
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.145),rgba(255,255,255,.065));
+      border:1px solid rgba(255,255,255,.17);
+      border-radius:24px;
+      box-shadow:0 20px 56px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.10);
+      backdrop-filter:blur(24px) saturate(1.22);
+    }
+
+    body.theme-massive .card h3,
+    body.theme-massive .meteo-title-row h3{
+      color:rgba(255,255,255,.95);
+      letter-spacing:.1px;
+    }
+
+    body.theme-massive .card p,
+    body.theme-massive .meteo-sub,
+    body.theme-massive .field label,
+    body.theme-massive .msg,
+    body.theme-massive .small{
+      color:rgba(235,241,255,.68);
+    }
+
+    body.theme-massive .input,
+    body.theme-massive select.input,
+    body.theme-massive textarea.input{
+      background:rgba(255,255,255,.82);
+      color:#111827;
+      border:1px solid rgba(255,255,255,.38);
+      border-radius:18px;
+      box-shadow:0 14px 34px rgba(0,0,0,.13), inset 0 1px 0 rgba(255,255,255,.55);
+    }
+
+    body.theme-massive .input::placeholder,
+    body.theme-massive textarea.input::placeholder{
+      color:rgba(30,41,59,.48);
+    }
+
+    body.theme-massive .input:focus,
+    body.theme-massive textarea.input:focus{
+      border-color:rgba(168,85,247,.58);
+      box-shadow:0 0 0 5px rgba(168,85,247,.16), 0 16px 36px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.66);
+    }
+
+    body.theme-massive .secret-eye{
+      background:rgba(17,24,39,.09);
+      border:1px solid rgba(17,24,39,.10);
+      color:#111827;
+    }
+
+    body.theme-massive .table th{
+      background:rgba(255,255,255,.12);
+      color:rgba(229,241,255,.92);
+      border-bottom:1px solid rgba(255,255,255,.13);
+    }
+
+    body.theme-massive .table td{
+      border-bottom:1px solid rgba(255,255,255,.08);
+      color:rgba(255,255,255,.84);
+    }
+
+    body.theme-massive .pcloud-list-box,
+    body.theme-massive .meteo-frame-box{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:24px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    body.theme-massive .pcloud-list-row:hover{
+      background:rgba(255,255,255,.105);
+    }
+
+    body.theme-massive .note{
+      background:rgba(96,165,250,.13);
+      border-left-color:rgba(96,165,250,.86);
+      color:rgba(219,234,254,.92);
+      border-radius:18px;
+    }
+
+    body.theme-massive .teletype{
+      background:rgba(3,7,18,.38);
+      border:1px solid rgba(96,165,250,.24);
+      border-radius:20px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    body.theme-massive .quick-app,
+    body.theme-massive .meteo-app{
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.145),rgba(255,255,255,.055));
+      border:1px solid rgba(255,255,255,.17);
+      border-radius:24px;
+      box-shadow:0 18px 44px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.10);
+      transition:transform .16s ease, background .16s ease, box-shadow .16s ease;
+    }
+
+    body.theme-massive .quick-app:hover,
+    body.theme-massive .meteo-app:hover{
+      transform:translateY(-4px);
+      background:rgba(255,255,255,.18);
+      box-shadow:0 26px 62px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.17);
+    }
+
+    body.theme-massive .modal{
+      background:
+        linear-gradient(145deg,rgba(21,28,51,.86),rgba(15,23,42,.76));
+      border:1px solid rgba(255,255,255,.20);
+      border-radius:30px;
+      backdrop-filter:blur(34px) saturate(1.30);
+      box-shadow:0 34px 110px rgba(0,0,0,.50), inset 0 1px 0 rgba(255,255,255,.11);
+    }
+
+    body.theme-massive .login-card{
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.075));
+      border:1px solid rgba(255,255,255,.21);
+      border-radius:34px;
+      backdrop-filter:blur(38px) saturate(1.36);
+      box-shadow:0 38px 120px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.13);
+    }
+
+    body.theme-massive .login-logo{
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.22),rgba(255,255,255,.04)),
+        linear-gradient(135deg,#60a5fa,#7c3aed 56%,#d946ef);
+      border:1px solid rgba(255,255,255,.26);
+      box-shadow:0 24px 58px rgba(79,70,229,.34), inset 0 1px 0 rgba(255,255,255,.32);
+    }
+
+    body.theme-massive .dot{
+      box-shadow:0 2px 8px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.40);
+    }
+
+    body.theme-massive.custom-wallpaper::before,
+    body.theme-massive.custom-wallpaper::after{
+      opacity:.55;
+    }
+
+</style>
 </head>
 <body class="theme-massive">
   <div id="loginScreen" class="login-screen">
