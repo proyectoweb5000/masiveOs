@@ -194,6 +194,25 @@
 
 
 
+
+    /* ===== Ajuste iconos escritorio: evitar nombres cortados ===== */
+    .icon{
+      width:116px !important;
+      height:126px !important;
+      padding:10px 8px !important;
+    }
+    .icon-title{
+      max-width:108px !important;
+      font-size:12.5px !important;
+      line-height:1.18 !important;
+      -webkit-line-clamp:unset !important;
+      display:block !important;
+      overflow:visible !important;
+      white-space:normal !important;
+      word-break:normal !important;
+      overflow-wrap:break-word !important;
+    }
+
     /* ===== Masive Search interno ===== */
     .search-pro-wrap{display:grid;grid-template-rows:auto minmax(0,1fr);height:100%;min-height:460px;gap:12px}
     .search-pro-head{
@@ -385,6 +404,132 @@
       .search-pro-box{grid-template-columns:1fr}
       .search-result{grid-template-columns:auto 1fr}
       .search-result .row{grid-column:1 / -1}
+    }
+
+
+    /* ===== Finder blanco estilo macOS ===== */
+    .window:has(.finder-wrap){
+      background:rgba(246,248,252,.96) !important;
+    }
+    .window:has(.finder-wrap) .titlebar{
+      background:rgba(244,246,250,.94) !important;
+      color:#111827 !important;
+      border-bottom:1px solid rgba(15,23,42,.10) !important;
+    }
+    .window:has(.finder-wrap) .win-title{
+      color:#111827 !important;
+    }
+    .window:has(.finder-wrap) .win-body{
+      background:#f6f7fb !important;
+      padding:12px !important;
+    }
+    .finder-wrap{
+      background:#ffffff !important;
+      color:#111827 !important;
+      border:1px solid rgba(15,23,42,.12) !important;
+      border-radius:18px !important;
+      box-shadow:0 18px 40px rgba(15,23,42,.12) !important;
+    }
+    .finder-sidebar{
+      background:linear-gradient(180deg,#eef2f7,#e8edf5) !important;
+      border-right:1px solid rgba(15,23,42,.10) !important;
+      color:#111827 !important;
+    }
+    .finder-side-title{
+      color:#64748b !important;
+    }
+    .finder-side-item{
+      color:#1f2937 !important;
+      background:transparent !important;
+    }
+    .finder-side-item:hover,
+    .finder-side-item.is-active{
+      background:rgba(59,130,246,.14) !important;
+      color:#0f172a !important;
+    }
+    .finder-main{
+      background:#ffffff !important;
+      color:#111827 !important;
+    }
+    .finder-toolbar{
+      background:linear-gradient(180deg,#ffffff,#f7f8fb) !important;
+      border-bottom:1px solid rgba(15,23,42,.10) !important;
+      color:#111827 !important;
+      min-height:62px !important;
+    }
+    .finder-breadcrumb{
+      color:#111827 !important;
+      font-size:13px !important;
+    }
+    .finder-content{
+      background:#ffffff !important;
+    }
+    .finder-item{
+      color:#111827 !important;
+      border-color:transparent !important;
+    }
+    .finder-item:hover,
+    .finder-item.is-selected{
+      background:rgba(59,130,246,.10) !important;
+      border-color:rgba(59,130,246,.22) !important;
+    }
+    .finder-icon{
+      background:linear-gradient(180deg,#dbeafe,#bfdbfe) !important;
+      border:1px solid rgba(59,130,246,.22) !important;
+      box-shadow:0 8px 18px rgba(59,130,246,.12) !important;
+    }
+    .finder-name{
+      color:#111827 !important;
+    }
+    .finder-meta{
+      color:#64748b !important;
+    }
+    .finder-list-row{
+      color:#111827 !important;
+      border-bottom:1px solid rgba(15,23,42,.08) !important;
+    }
+    .finder-list-row:hover{
+      background:rgba(59,130,246,.08) !important;
+    }
+    .finder-list-row.header{
+      color:#475569 !important;
+      background:#f8fafc !important;
+      border-bottom:1px solid rgba(15,23,42,.12) !important;
+    }
+    .finder-empty{
+      color:#64748b !important;
+    }
+    .finder-context{
+      background:rgba(255,255,255,.96) !important;
+      border:1px solid rgba(15,23,42,.12) !important;
+      color:#111827 !important;
+    }
+    .finder-context button{
+      color:#111827 !important;
+    }
+    .finder-context button:hover{
+      background:rgba(59,130,246,.10) !important;
+    }
+    .finder-context .danger-item{
+      color:#b91c1c !important;
+    }
+    .finder-wrap .input,
+    .finder-wrap .secondary,
+    .finder-wrap .primary{
+      color:#111827;
+    }
+    .finder-wrap .secondary{
+      background:#ffffff !important;
+      color:#111827 !important;
+      border:1px solid rgba(15,23,42,.14) !important;
+    }
+    .finder-wrap .primary{
+      color:#ffffff !important;
+    }
+    .finder-wrap .input{
+      background:#ffffff !important;
+      color:#111827 !important;
+      border:1px solid rgba(15,23,42,.14) !important;
     }
 
     /* ===== Finder / Explorador macOS ===== */
@@ -1015,6 +1160,18 @@
     }
   }
 
+  function wibySearchUrl(query){
+    return 'https://wiby.org/?q=' + encodeURIComponent(query || '');
+  }
+
+  function normalizeBrowserInput(value){
+    const v = String(value || '').trim();
+    if(!v) return wibySearchUrl('Masive OS');
+    if(/^https?:\/\//i.test(v) || v.startsWith('/')) return v;
+    if(v.includes('.') && !/\s/.test(v)) return 'https://' + v;
+    return wibySearchUrl(v);
+  }
+
   async function checkHealth(){
     try{
       const h = await api('/api/health');
@@ -1200,22 +1357,37 @@
     handle.addEventListener('pointerup', () => resizing=false);
   }
 
-  function renderBrowser(root, url='https://www.google.com'){
+  function renderBrowser(root, url=null){
+    const initial = url || wibySearchUrl('Masive OS');
     root.innerHTML = `
+      <div class="browser-search-badge">🔎 Buscador iframe: <span class="browser-engine-name">Wiby</span></div>
+      <p class="browser-search-hint">Wiby es un buscador ligero del “web clásico”. Es el candidato integrado para abrir resultados dentro del iframe. Si una web concreta no carga, usa “Abrir externo”.</p>
       <div class="browser-bar">
-        <input class="input browser-url" value="${escapeAttr(url)}" placeholder="https://..." />
+        <input class="input browser-url" value="${escapeAttr(initial)}" placeholder="Buscar en Wiby o escribir URL..." />
         <button class="secondary browser-go">Ir</button>
+        <button class="secondary browser-wiby">Buscar Wiby</button>
         <button class="secondary browser-external">Abrir externo</button>
       </div>
-      <iframe class="browser-frame" src="${escapeAttr(url)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
-      <div class="note" style="margin-top:10px">Algunas webs bloquean la apertura dentro de ventanas internas. En ese caso usa “Abrir externo”.</div>
+      <iframe class="browser-frame" src="${escapeAttr(initial)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+      <div class="note" style="margin-top:10px">Ningún buscador público garantiza iframe para siempre. Si Wiby cambia cabeceras en el futuro, la solución robusta será buscador interno/API propia.</div>
     `;
     const input = $('.browser-url', root);
     const frame = $('.browser-frame', root);
-    const normalize = v => /^https?:\/\//i.test(v) ? v : 'https://' + v;
-    $('.browser-go', root).addEventListener('click', () => frame.src = normalize(input.value.trim()));
-    input.addEventListener('keydown', e => { if(e.key === 'Enter') $('.browser-go', root).click(); });
-    $('.browser-external', root).addEventListener('click', () => window.open(normalize(input.value.trim()), '_blank', 'noopener,noreferrer'));
+    const go = () => {
+      const finalUrl = normalizeBrowserInput(input.value);
+      input.value = finalUrl;
+      frame.src = finalUrl;
+    };
+    $('.browser-go', root).addEventListener('click', go);
+    $('.browser-wiby', root).addEventListener('click', () => {
+      const raw = input.value.replace(/^https?:\/\/[^?]+\?q=/i,'').trim();
+      const query = raw.startsWith('http') ? raw : decodeURIComponent(raw || 'Masive OS');
+      const finalUrl = wibySearchUrl(query);
+      input.value = finalUrl;
+      frame.src = finalUrl;
+    });
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') go(); });
+    $('.browser-external', root).addEventListener('click', () => window.open(normalizeBrowserInput(input.value), '_blank', 'noopener,noreferrer'));
   }
 
   async function renderFiles(root){
@@ -1746,7 +1918,7 @@
     $('.search-run', root).addEventListener('click', render);
     $('.search-web', root).addEventListener('click', () => {
       const q = input.value.trim();
-      if(q) window.open('https://duckduckgo.com/?q=' + encodeURIComponent(q), '_blank', 'noopener,noreferrer');
+      if(q) openBrowser(wibySearchUrl(q), 'Buscar web: ' + q);
     });
     $$('.search-filter', root).forEach(btn => btn.addEventListener('click', () => {
       $$('.search-filter', root).forEach(b => b.classList.remove('is-active'));
@@ -2659,7 +2831,7 @@
       return;
     }
 
-    openBrowser('https://www.google.com/search?q=' + encodeURIComponent(q), 'Buscar: ' + q);
+    openBrowser(wibySearchUrl(q), 'Buscar: ' + q);
     e.target.value = '';
   });
 
