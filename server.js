@@ -27,16 +27,17 @@ function defaultState() {
       theme: "massive"
     },
     icons: [
-      { id: "browser", title: "Navegador", icon: "🌐", type: "browser", target: "https://www.google.com", x: 40, y: 40 },
+      { id: "browser", title: "Navegador", icon: "🌐", type: "browser", target: "https://www.startpage.com", x: 40, y: 40 },
       { id: "files", title: "Archivos", icon: "📁", type: "module", target: "files", x: 160, y: 40 },
       { id: "dashboards", title: "Dashboards", icon: "📊", type: "module", target: "dashboards", x: 280, y: 40 },
       { id: "search", title: "Masive Search", icon: "🔎", type: "module", target: "search", x: 400, y: 40 },
       { id: "writer", title: "Textos", icon: "📝", type: "module", target: "writer", x: 520, y: 40 },
       { id: "ftp", title: "FTP", icon: "🧭", type: "module", target: "ftp", x: 640, y: 40 },
-      { id: "cloud", title: "Nube", icon: "☁️", type: "module", target: "cloud", x: 760, y: 40 },
-      { id: "meteo", title: "Meteo & Radio", icon: "📡", type: "module", target: "meteo", x: 880, y: 40 },
-      { id: "remote", title: "Ayuda remota", icon: "🖥️", type: "module", target: "remote", x: 1000, y: 40 },
-      { id: "settings", title: "Configuración", icon: "⚙️", type: "module", target: "settings", x: 1120, y: 40 }
+      { id: "drives", title: "Cloud Drives", icon: "💽", type: "module", target: "drives", x: 760, y: 40 },
+      { id: "cloud", title: "Nube", icon: "☁️", type: "module", target: "cloud", x: 880, y: 40 },
+      { id: "meteo", title: "Meteo & Radio", icon: "📡", type: "module", target: "meteo", x: 1000, y: 40 },
+      { id: "remote", title: "Ayuda remota", icon: "🖥️", type: "module", target: "remote", x: 1120, y: 40 },
+      { id: "settings", title: "Configuración", icon: "⚙️", type: "module", target: "settings", x: 1240, y: 40 }
     ],
     files: [],
     folders: [
@@ -48,8 +49,13 @@ function defaultState() {
     cloudAccounts: [],
     remoteConnections: [],
     docs: [],
-    ftpAccounts: []
+    ftpAccounts: [],
+    cloudDriveAccounts: []
   };
+}
+
+function newId(prefix = "id") {
+  return `${prefix}_${Date.now()}_${crypto.randomBytes(6).toString("hex")}`;
 }
 
 function saveState(state) {
@@ -68,6 +74,23 @@ function parentFolder(folderPath) {
   const parts = f.split("/").filter(Boolean);
   parts.pop();
   return parts.length ? "/" + parts.join("/") : "/";
+}
+
+function safeFileName(name) {
+  return String(name || "archivo")
+    .normalize("NFKD")
+    .replace(/[^\w.\- ]+/g, "_")
+    .replace(/\s+/g, "_")
+    .slice(0, 120) || "archivo";
+}
+
+function safeFolderName(name) {
+  return String(name || "Nueva carpeta")
+    .normalize("NFKD")
+    .replace(/[^\w.\- áéíóúÁÉÍÓÚñÑ]+/g, "_")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 80) || "Nueva carpeta";
 }
 
 function ensureFoldersState() {
@@ -108,7 +131,8 @@ function loadState() {
       cloudAccounts: Array.isArray(parsed.cloudAccounts) ? parsed.cloudAccounts : [],
       remoteConnections: Array.isArray(parsed.remoteConnections) ? parsed.remoteConnections : [],
       docs: Array.isArray(parsed.docs) ? parsed.docs : [],
-      ftpAccounts: Array.isArray(parsed.ftpAccounts) ? parsed.ftpAccounts : []
+      ftpAccounts: Array.isArray(parsed.ftpAccounts) ? parsed.ftpAccounts : [],
+      cloudDriveAccounts: Array.isArray(parsed.cloudDriveAccounts) ? parsed.cloudDriveAccounts : []
     });
   } catch (err) {
     console.error("Error leyendo DB JSON:", err);
@@ -167,10 +191,12 @@ function getSession(req) {
 
 function requireAuth(req, res) {
   const session = getSession(req);
+
   if (!session) {
     sendJson(res, 401, { ok: false, error: "No autorizado" });
     return null;
   }
+
   return session;
 }
 
@@ -220,7 +246,13 @@ function getMime(filePath) {
     ".pdf": "application/pdf",
     ".csv": "text/csv; charset=utf-8",
     ".db": "application/octet-stream",
-    ".sqlite": "application/octet-stream"
+    ".sqlite": "application/octet-stream",
+    ".doc": "application/msword",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".xls": "application/vnd.ms-excel",
+    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".ppt": "application/vnd.ms-powerpoint",
+    ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
   };
   return map[ext] || "application/octet-stream";
 }
@@ -241,27 +273,6 @@ function serveStatic(req, res, pathname) {
   });
 
   fs.createReadStream(normalized).pipe(res);
-}
-
-function newId(prefix = "id") {
-  return `${prefix}_${Date.now()}_${crypto.randomBytes(6).toString("hex")}`;
-}
-
-function safeFileName(name) {
-  return String(name || "archivo")
-    .normalize("NFKD")
-    .replace(/[^\w.\- ]+/g, "_")
-    .replace(/\s+/g, "_")
-    .slice(0, 120) || "archivo";
-}
-
-function safeFolderName(name) {
-  return String(name || "Nueva carpeta")
-    .normalize("NFKD")
-    .replace(/[^\w.\- áéíóúÁÉÍÓÚñÑ]+/g, "_")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 80) || "Nueva carpeta";
 }
 
 function testHttpUrl(targetUrl) {
@@ -328,9 +339,9 @@ function sanitizeCloudAccount(data, existing = {}) {
   };
 }
 
-/* ===========================
+/* ======================================================
    FTP BÁSICO
-   =========================== */
+   ====================================================== */
 
 function ftpReadLine(socket, timeoutMs = 12000) {
   return new Promise((resolve, reject) => {
@@ -560,9 +571,318 @@ async function ftpSimpleCommand(account, cmd) {
   }
 }
 
-/* ===========================
+/* ======================================================
+   CLOUD DRIVES
+   ====================================================== */
+
+function getCloudDriveAccount(id) {
+  state.cloudDriveAccounts ||= [];
+  return state.cloudDriveAccounts.find(a => a.id === id);
+}
+
+function pcloudApiHost(account) {
+  return account.region === "us" ? "https://api.pcloud.com" : "https://eapi.pcloud.com";
+}
+
+async function fetchJson(url, options = {}) {
+  const r = await fetch(url, options);
+  const text = await r.text();
+  let data = {};
+
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = { raw: text };
+  }
+
+  if (!r.ok) {
+    throw new Error(data.error_summary || data.error || data.message || ("HTTP " + r.status));
+  }
+
+  return data;
+}
+
+function joinCloudPath(base, name) {
+  const b = String(base || "/").replace(/\/+$/, "");
+  return (b || "") + "/" + String(name || "").replace(/^\/+/, "");
+}
+
+async function cloudDriveList(account, folderPath) {
+  if (account.provider === "pcloud") {
+    const url = new URL(pcloudApiHost(account) + "/listfolder");
+    url.searchParams.set("auth", account.token);
+    url.searchParams.set("path", folderPath || account.root || "/");
+
+    const data = await fetchJson(url);
+
+    if (data.result && data.result !== 0) {
+      throw new Error(data.error || "Error pCloud");
+    }
+
+    return (data.metadata?.contents || []).map(x => ({
+      id: x.fileid || x.folderid || x.path,
+      name: x.name,
+      type: x.isfolder ? "folder" : "file",
+      path: x.path,
+      size: x.size || 0,
+      modified: x.modified || ""
+    }));
+  }
+
+  if (account.provider === "dropbox") {
+    const data = await fetchJson("https://api.dropboxapi.com/2/files/list_folder", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + account.token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        path: folderPath === "/" ? "" : (folderPath || ""),
+        recursive: false,
+        include_media_info: false,
+        include_deleted: false,
+        include_has_explicit_shared_members: false
+      })
+    });
+
+    return (data.entries || []).map(x => ({
+      id: x.id || x.path_lower,
+      name: x.name,
+      type: x[".tag"] === "folder" ? "folder" : "file",
+      path: x.path_lower || x.path_display || "",
+      size: x.size || 0,
+      modified: x.server_modified || ""
+    }));
+  }
+
+  if (account.provider === "googledrive") {
+    const folderId = (!folderPath || folderPath === "/") ? "root" : folderPath;
+    const q = encodeURIComponent(`'${folderId}' in parents and trashed=false`);
+    const url = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,mimeType,size,modifiedTime)`;
+
+    const data = await fetchJson(url, {
+      headers: {
+        "Authorization": "Bearer " + account.token
+      }
+    });
+
+    return (data.files || []).map(x => ({
+      id: x.id,
+      name: x.name,
+      type: x.mimeType === "application/vnd.google-apps.folder" ? "folder" : "file",
+      path: x.id,
+      size: x.size || 0,
+      modified: x.modifiedTime || "",
+      mimeType: x.mimeType
+    }));
+  }
+
+  if (account.provider === "onedrive") {
+    const url = (!folderPath || folderPath === "/")
+      ? "https://graph.microsoft.com/v1.0/me/drive/root/children"
+      : `https://graph.microsoft.com/v1.0/me/drive/items/${encodeURIComponent(folderPath)}/children`;
+
+    const data = await fetchJson(url, {
+      headers: {
+        "Authorization": "Bearer " + account.token
+      }
+    });
+
+    return (data.value || []).map(x => ({
+      id: x.id,
+      name: x.name,
+      type: x.folder ? "folder" : "file",
+      path: x.id,
+      size: x.size || 0,
+      modified: x.lastModifiedDateTime || "",
+      downloadUrl: x["@microsoft.graph.downloadUrl"] || ""
+    }));
+  }
+
+  throw new Error("Proveedor no soportado");
+}
+
+async function cloudDriveDownload(account, id, filePath) {
+  if (account.provider === "pcloud") {
+    const url = new URL(pcloudApiHost(account) + "/getfilelink");
+    url.searchParams.set("auth", account.token);
+
+    if (filePath) url.searchParams.set("path", filePath);
+    else url.searchParams.set("fileid", id);
+
+    const data = await fetchJson(url);
+
+    if (data.result && data.result !== 0) {
+      throw new Error(data.error || "Error pCloud");
+    }
+
+    const r = await fetch("https://" + data.hosts[0] + data.path);
+    if (!r.ok) throw new Error("No se pudo descargar pCloud");
+
+    return Buffer.from(await r.arrayBuffer());
+  }
+
+  if (account.provider === "dropbox") {
+    const r = await fetch("https://content.dropboxapi.com/2/files/download", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + account.token,
+        "Dropbox-API-Arg": JSON.stringify({ path: filePath || id })
+      }
+    });
+
+    if (!r.ok) throw new Error("No se pudo descargar Dropbox");
+
+    return Buffer.from(await r.arrayBuffer());
+  }
+
+  if (account.provider === "googledrive") {
+    const r = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(id || filePath)}?alt=media`, {
+      headers: {
+        "Authorization": "Bearer " + account.token
+      }
+    });
+
+    if (!r.ok) throw new Error("No se pudo descargar Google Drive");
+
+    return Buffer.from(await r.arrayBuffer());
+  }
+
+  if (account.provider === "onedrive") {
+    const r = await fetch(`https://graph.microsoft.com/v1.0/me/drive/items/${encodeURIComponent(id || filePath)}/content`, {
+      headers: {
+        "Authorization": "Bearer " + account.token
+      }
+    });
+
+    if (!r.ok) throw new Error("No se pudo descargar OneDrive");
+
+    return Buffer.from(await r.arrayBuffer());
+  }
+
+  throw new Error("Proveedor no soportado");
+}
+
+async function cloudDriveMkdir(account, basePath, name) {
+  if (account.mode === "ro") throw new Error("Cuenta en solo lectura");
+
+  if (account.provider === "pcloud") {
+    const url = new URL(pcloudApiHost(account) + "/createfolder");
+    url.searchParams.set("auth", account.token);
+    url.searchParams.set("path", joinCloudPath(basePath || "/", name));
+
+    const data = await fetchJson(url);
+
+    if (data.result && data.result !== 0) {
+      throw new Error(data.error || "Error pCloud");
+    }
+
+    return data;
+  }
+
+  if (account.provider === "dropbox") {
+    return fetchJson("https://api.dropboxapi.com/2/files/create_folder_v2", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + account.token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        path: joinCloudPath(basePath === "/" ? "" : basePath, name),
+        autorename: false
+      })
+    });
+  }
+
+  if (account.provider === "googledrive") {
+    const parent = (!basePath || basePath === "/") ? "root" : basePath;
+
+    return fetchJson("https://www.googleapis.com/drive/v3/files", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + account.token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name,
+        mimeType: "application/vnd.google-apps.folder",
+        parents: [parent]
+      })
+    });
+  }
+
+  if (account.provider === "onedrive") {
+    const url = (!basePath || basePath === "/")
+      ? "https://graph.microsoft.com/v1.0/me/drive/root/children"
+      : `https://graph.microsoft.com/v1.0/me/drive/items/${encodeURIComponent(basePath)}/children`;
+
+    return fetchJson(url, {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + account.token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name,
+        folder: {},
+        "@microsoft.graph.conflictBehavior": "rename"
+      })
+    });
+  }
+
+  throw new Error("Proveedor no soportado");
+}
+
+async function cloudDriveUpload(account, basePath, name, buffer) {
+  if (account.mode === "ro") throw new Error("Cuenta en solo lectura");
+
+  if (account.provider === "dropbox") {
+    const target = joinCloudPath(basePath === "/" ? "" : basePath, name);
+
+    const r = await fetch("https://content.dropboxapi.com/2/files/upload", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + account.token,
+        "Content-Type": "application/octet-stream",
+        "Dropbox-API-Arg": JSON.stringify({
+          path: target,
+          mode: "add",
+          autorename: true,
+          mute: false
+        })
+      },
+      body: buffer
+    });
+
+    if (!r.ok) throw new Error("No se pudo subir a Dropbox");
+
+    return await r.json();
+  }
+
+  if (account.provider === "onedrive") {
+    const url = (!basePath || basePath === "/")
+      ? `https://graph.microsoft.com/v1.0/me/drive/root:/${encodeURIComponent(name)}:/content`
+      : `https://graph.microsoft.com/v1.0/me/drive/items/${encodeURIComponent(basePath)}:/${encodeURIComponent(name)}:/content`;
+
+    const r = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Authorization": "Bearer " + account.token
+      },
+      body: buffer
+    });
+
+    if (!r.ok) throw new Error("No se pudo subir a OneDrive");
+
+    return await r.json();
+  }
+
+  throw new Error("Subida directa todavía implementada solo para Dropbox y OneDrive en esta versión");
+}
+
+/* ======================================================
    API
-   =========================== */
+   ====================================================== */
 
 async function handleApi(req, res, pathname) {
   if (pathname === "/api/health") {
@@ -743,7 +1063,7 @@ async function handleApi(req, res, pathname) {
     return sendJson(res, 200, folder);
   }
 
-  /* ARCHIVOS */
+  /* ARCHIVOS LOCALES */
 
   if (pathname === "/api/files") {
     if (req.method === "GET") return sendJson(res, 200, state.files);
@@ -755,6 +1075,7 @@ async function handleApi(req, res, pathname) {
     const buffer = Buffer.from(String(data.data_base64 || ""), "base64");
 
     if (!buffer.length) return sendJson(res, 400, { ok: false, error: "Archivo vacío" });
+
     if (buffer.length > 12 * 1024 * 1024) {
       return sendJson(res, 413, { ok: false, error: "Archivo demasiado grande. Máximo 12 MB." });
     }
@@ -826,7 +1147,7 @@ async function handleApi(req, res, pathname) {
     return sendJson(res, 200, removed);
   }
 
-  /* CLOUD */
+  /* CLOUD ACCOUNTS GENÉRICOS */
 
   if (pathname === "/api/cloud/accounts") {
     if (req.method === "GET") return sendJson(res, 200, state.cloudAccounts);
@@ -1005,7 +1326,7 @@ async function handleApi(req, res, pathname) {
     }
   }
 
-  /* FTP ACCOUNTS */
+  /* FTP */
 
   if (pathname === "/api/ftp/accounts") {
     state.ftpAccounts ||= [];
@@ -1066,8 +1387,6 @@ async function handleApi(req, res, pathname) {
       return sendJson(res, 200, removed);
     }
   }
-
-  /* FTP OPERATIONS */
 
   if (pathname === "/api/ftp/list" && req.method === "POST") {
     const data = await readJson(req);
@@ -1138,6 +1457,142 @@ async function handleApi(req, res, pathname) {
     return sendJson(res, 200, { ok: true });
   }
 
+  /* CLOUD DRIVE MANAGER */
+
+  if (pathname === "/api/cloud-drive/accounts") {
+    state.cloudDriveAccounts ||= [];
+
+    if (req.method === "GET") return sendJson(res, 200, state.cloudDriveAccounts);
+
+    if (req.method === "POST") {
+      const data = await readJson(req);
+
+      const account = {
+        id: newId("drive"),
+        provider: data.provider || "dropbox",
+        name: data.name || data.provider || "Cloud Drive",
+        token: data.token || "",
+        region: data.region || "eu",
+        root: data.root || "/",
+        mode: data.mode || "rw",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      state.cloudDriveAccounts.push(account);
+      saveState(state);
+
+      return sendJson(res, 200, account);
+    }
+  }
+
+  if (pathname.startsWith("/api/cloud-drive/accounts/")) {
+    const id = decodeURIComponent(pathname.split("/").pop());
+
+    state.cloudDriveAccounts ||= [];
+    const idx = state.cloudDriveAccounts.findIndex(a => a.id === id);
+
+    if (idx === -1) {
+      return sendJson(res, 404, { ok: false, error: "Cuenta cloud no encontrada" });
+    }
+
+    if (req.method === "PUT" || req.method === "PATCH") {
+      const data = await readJson(req);
+
+      state.cloudDriveAccounts[idx] = {
+        ...state.cloudDriveAccounts[idx],
+        provider: data.provider || state.cloudDriveAccounts[idx].provider,
+        name: data.name || state.cloudDriveAccounts[idx].name,
+        token: data.token !== undefined ? data.token : state.cloudDriveAccounts[idx].token,
+        region: data.region || state.cloudDriveAccounts[idx].region,
+        root: data.root !== undefined ? data.root : state.cloudDriveAccounts[idx].root,
+        mode: data.mode || state.cloudDriveAccounts[idx].mode,
+        updated_at: new Date().toISOString()
+      };
+
+      saveState(state);
+      return sendJson(res, 200, state.cloudDriveAccounts[idx]);
+    }
+
+    if (req.method === "DELETE") {
+      const removed = state.cloudDriveAccounts.splice(idx, 1)[0];
+      saveState(state);
+      return sendJson(res, 200, removed);
+    }
+  }
+
+  if (pathname === "/api/cloud-drive/list" && req.method === "POST") {
+    const data = await readJson(req);
+    const account = getCloudDriveAccount(data.account_id);
+
+    if (!account) {
+      return sendJson(res, 404, { ok: false, error: "Cuenta cloud no encontrada" });
+    }
+
+    const items = await cloudDriveList(account, data.path || account.root || "/");
+
+    return sendJson(res, 200, { ok: true, items });
+  }
+
+  if (pathname === "/api/cloud-drive/download" && req.method === "GET") {
+    const fullUrl = new URL(req.url, `http://${req.headers.host}`);
+    const account = getCloudDriveAccount(fullUrl.searchParams.get("account_id"));
+
+    if (!account) {
+      return sendJson(res, 404, { ok: false, error: "Cuenta cloud no encontrada" });
+    }
+
+    const id = fullUrl.searchParams.get("id");
+    const filePath = fullUrl.searchParams.get("path");
+    const buffer = await cloudDriveDownload(account, id, filePath);
+    const filename = path.basename(filePath || id || "archivo");
+
+    res.writeHead(200, {
+      "Content-Type": getMime(filename),
+      "Content-Disposition": `inline; filename="${encodeURIComponent(filename)}"`,
+      "Cache-Control": "no-store"
+    });
+
+    return res.end(buffer);
+  }
+
+  if (pathname === "/api/cloud-drive/mkdir" && req.method === "POST") {
+    const data = await readJson(req);
+    const account = getCloudDriveAccount(data.account_id);
+
+    if (!account) {
+      return sendJson(res, 404, { ok: false, error: "Cuenta cloud no encontrada" });
+    }
+
+    const result = await cloudDriveMkdir(account, data.path || account.root || "/", data.name);
+
+    return sendJson(res, 200, { ok: true, result });
+  }
+
+  if (pathname === "/api/cloud-drive/upload" && req.method === "POST") {
+    const data = await readJson(req);
+    const account = getCloudDriveAccount(data.account_id);
+
+    if (!account) {
+      return sendJson(res, 404, { ok: false, error: "Cuenta cloud no encontrada" });
+    }
+
+    const buffer = Buffer.from(String(data.data_base64 || ""), "base64");
+
+    if (buffer.length > 12 * 1024 * 1024) {
+      return sendJson(res, 413, { ok: false, error: "Archivo demasiado grande. Máximo 12 MB." });
+    }
+
+    const result = await cloudDriveUpload(
+      account,
+      data.path || account.root || "/",
+      data.name,
+      buffer
+    );
+
+    return sendJson(res, 200, { ok: true, result });
+  }
+
   /* BACKUP / PASSWORD */
 
   if (pathname === "/api/password" && req.method === "POST") {
@@ -1162,9 +1617,9 @@ async function handleApi(req, res, pathname) {
   });
 }
 
-/* ===========================
+/* ======================================================
    SERVER
-   =========================== */
+   ====================================================== */
 
 const server = http.createServer(async (req, res) => {
   try {
@@ -1184,4 +1639,10 @@ const server = http.createServer(async (req, res) => {
       error: err.message || "Error interno"
     });
   }
+});
+
+server.listen(PORT, () => {
+  console.log(`Masive OS escuchando en puerto ${PORT}`);
+  console.log(`DB: ${DATABASE_PATH}`);
+  console.log(`Uploads: ${UPLOADS_PATH}`);
 });
