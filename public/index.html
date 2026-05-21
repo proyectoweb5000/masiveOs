@@ -419,6 +419,7 @@
     <div id="dock" class="dock">
       <button class="dock-btn" data-module="browser" title="Navegador">🌐</button>
       <button class="dock-btn" data-module="files" title="Archivos">📁</button>
+      <button class="dock-btn" data-module="dashboards" title="Dashboards">📊</button>
       <button class="dock-btn" data-module="cloud" title="Nube">☁️</button>
       <button class="dock-btn" data-module="meteo" title="Meteo & Radio">📡</button>
       <button class="dock-btn" data-module="remote" title="Ayuda remota">🖥️</button>
@@ -614,6 +615,7 @@
     const data = {
       browser: ['Navegador','🌐'],
       files: ['Archivos','📁'],
+      dashboards: ['Dashboards','📊'],
       cloud: ['Centro de nube','☁️'],
       meteo: ['Meteo & Radio','📡'],
       remote: ['Ayuda remota','🖥️'],
@@ -624,6 +626,7 @@
     const win = createWindow(id, title || t, icon || i, 920, 590);
     if(module === 'browser') renderBrowser(win.body, 'https://www.google.com');
     if(module === 'files') renderFiles(win.body);
+    if(module === 'dashboards') renderDashboards(win.body);
     if(module === 'cloud') renderCloud(win.body);
     if(module === 'meteo') renderMeteo(win.body);
     if(module === 'remote') renderRemote(win.body);
@@ -729,31 +732,185 @@
     root.innerHTML = `
       <div class="panel-grid">
         <div class="card">
-          <h3>Gestor de archivos</h3>
-          <p>Base preparada para archivos persistentes en Render. En esta versión no-deps la subida avanzada está pendiente para no romper el deploy.</p>
+          <h3>Gestor de archivos persistente</h3>
+          <p>Sube archivos al disco persistente de Render. Se guardan en <b>/var/data/uploads</b> y quedan registrados en la base JSON.</p>
+          <div class="field" style="margin-top:12px"><label>Seleccionar archivo</label><input class="input file-picker" type="file"></div>
+          <div class="row">
+            <button class="primary upload-file-btn">Subir archivo</button>
+            <button class="secondary reload-files-btn">Actualizar lista</button>
+          </div>
+          <div class="msg files-msg"></div>
         </div>
         <div class="card">
           <h3>Copia de seguridad</h3>
-          <p>Exporta la configuración actual del sistema en JSON.</p>
-          <div style="margin-top:12px"><button class="primary backup-btn">Descargar backup</button></div>
+          <p>Exporta toda la configuración actual del sistema: iconos, fondos, cuentas, equipos y registro de archivos.</p>
+          <div style="margin-top:12px"><button class="primary backup-btn">Descargar backup JSON</button></div>
         </div>
       </div>
       <div class="card" style="margin-top:12px">
-        <h3>Archivos registrados</h3>
-        <table class="table"><thead><tr><th>Nombre</th><th>Tamaño</th><th>Acción</th></tr></thead><tbody class="files-body"><tr><td colspan="3">Cargando…</td></tr></tbody></table>
+        <h3>Archivos guardados</h3>
+        <table class="table"><thead><tr><th>Nombre</th><th>Tipo</th><th>Tamaño</th><th>Fecha</th><th>Acción</th></tr></thead><tbody class="files-body"><tr><td colspan="5">Cargando…</td></tr></tbody></table>
       </div>
     `;
     $('.backup-btn', root).addEventListener('click', async () => {
       const data = await api('/api/backup');
       downloadText('masive_os_backup_' + new Date().toISOString().slice(0,10) + '.json', JSON.stringify(data, null, 2));
     });
+
+    const fmtSize = n => {
+      n = Number(n || 0);
+      if(n < 1024) return n + ' B';
+      if(n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+      return (n/(1024*1024)).toFixed(2) + ' MB';
+    };
+
+    const load = async () => {
+      try{
+        const files = await api('/api/files');
+        $('.files-body', root).innerHTML = files.length ? files.map(f => `
+          <tr>
+            <td>${escapeHtml(f.original_name || f.name || '')}</td>
+            <td>${escapeHtml(f.mime_type || f.type || '')}</td>
+            <td>${escapeHtml(fmtSize(f.size_bytes || f.size))}</td>
+            <td>${escapeHtml((f.created_at || '').replace('T',' ').slice(0,16))}</td>
+            <td class="row">
+              <a class="secondary" href="/api/files/download/${encodeURIComponent(f.id)}" target="_blank">Descargar</a>
+              <button class="secondary open-file-btn" data-id="${escapeAttr(f.id)}">Abrir</button>
+              <button class="danger delete-file-btn" data-id="${escapeAttr(f.id)}">Borrar</button>
+            </td>
+          </tr>
+        `).join('') : '<tr><td colspan="5">No hay archivos guardados todavía.</td></tr>';
+
+        $$('.open-file-btn', root).forEach(btn => btn.addEventListener('click', () => {
+          const file = files.find(f => f.id === btn.dataset.id);
+          if(!file) return;
+          const url = '/api/files/download/' + encodeURIComponent(file.id);
+          const name = file.original_name || file.name || 'Archivo';
+          const mime = file.mime_type || '';
+          if(mime.startsWith('image/') || mime.includes('pdf') || mime.includes('text') || name.toLowerCase().endsWith('.html')){
+            openBrowser(url, name);
+          }else{
+            window.open(url, '_blank');
+          }
+        }));
+
+        $$('.delete-file-btn', root).forEach(btn => btn.addEventListener('click', async () => {
+          const file = files.find(f => f.id === btn.dataset.id);
+          if(!confirm('¿Eliminar el archivo "' + (file?.original_name || file?.name || '') + '"?')) return;
+          await api('/api/files/' + encodeURIComponent(btn.dataset.id), {method:'DELETE'});
+          await load();
+        }));
+      }catch(err){
+        $('.files-body', root).innerHTML = `<tr><td colspan="5">${escapeHtml(err.message)}</td></tr>`;
+      }
+    };
+
+    $('.reload-files-btn', root).addEventListener('click', load);
+
+    $('.upload-file-btn', root).addEventListener('click', async () => {
+      const msg = $('.files-msg', root);
+      const file = $('.file-picker', root).files[0];
+      if(!file){ setMsg(msg, 'Selecciona un archivo primero.', 'bad'); return; }
+      if(file.size > 12 * 1024 * 1024){ setMsg(msg, 'Archivo demasiado grande para esta versión. Máximo 12 MB.', 'bad'); return; }
+      setMsg(msg, 'Subiendo archivo…');
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try{
+          const base64 = String(reader.result || '').split(',')[1] || '';
+          await api('/api/files/upload-json', {method:'POST', body:JSON.stringify({
+            name: file.name,
+            mime_type: file.type || 'application/octet-stream',
+            size_bytes: file.size,
+            data_base64: base64
+          })});
+          $('.file-picker', root).value = '';
+          setMsg(msg, 'Archivo subido correctamente.', 'ok');
+          await load();
+        }catch(err){ setMsg(msg, err.message, 'bad'); }
+      };
+      reader.onerror = () => setMsg(msg, 'No se pudo leer el archivo.', 'bad');
+      reader.readAsDataURL(file);
+    });
+
+    await load();
+  }
+
+  async function renderDashboards(root){
+    root.innerHTML = `
+      <div class="card">
+        <h3>Centro de dashboards</h3>
+        <p>Desde aquí puedes registrar dashboards HTML ya subidos al gestor de archivos o crear accesos directos a dashboards externos. Es el primer paso para convertir Masive OS en lanzador central de todos tus proyectos.</p>
+      </div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="card">
+          <h3>Crear acceso a dashboard</h3>
+          <div class="field"><label>Nombre</label><input class="input dash-title" placeholder="Ej: Suciedades / Sala de mezclas"></div>
+          <div class="field"><label>Icono</label><input class="input dash-icon" value="📊"></div>
+          <div class="field"><label>URL o ruta</label><input class="input dash-url" placeholder="https://... o /api/files/download/id"></div>
+          <div class="field"><label>Modo apertura</label><select class="input dash-mode"><option value="link">Ventana interna</option><option value="external">Pestaña externa</option></select></div>
+          <button class="primary dash-create">Crear icono en escritorio</button>
+          <div class="msg dash-msg"></div>
+        </div>
+        <div class="card">
+          <h3>Archivos HTML detectados</h3>
+          <p>Si subes un HTML desde el gestor de archivos, aparecerá aquí para crear un acceso rápido.</p>
+          <table class="table"><thead><tr><th>Archivo</th><th>Acción</th></tr></thead><tbody class="dash-files-body"><tr><td colspan="2">Cargando…</td></tr></tbody></table>
+        </div>
+      </div>
+    `;
+
+    const createIcon = async (payload) => {
+      await api('/api/icons', {method:'POST', body:JSON.stringify({
+        title: payload.title || 'Dashboard',
+        icon: payload.icon || '📊',
+        type: payload.type || 'link',
+        target: payload.target || '',
+        x: 80 + Math.floor(Math.random()*380),
+        y: 160 + Math.floor(Math.random()*220)
+      })});
+      icons = await api('/api/icons');
+      renderIcons();
+    };
+
+    $('.dash-create', root).addEventListener('click', async () => {
+      const msg = $('.dash-msg', root);
+      try{
+        await createIcon({
+          title: $('.dash-title', root).value,
+          icon: $('.dash-icon', root).value,
+          type: $('.dash-mode', root).value,
+          target: $('.dash-url', root).value
+        });
+        setMsg(msg, 'Icono creado en el escritorio.', 'ok');
+      }catch(err){ setMsg(msg, err.message, 'bad'); }
+    });
+
     try{
       const files = await api('/api/files');
-      $('.files-body', root).innerHTML = files.length ? files.map(f => `
-        <tr><td>${escapeHtml(f.original_name || f.name || '')}</td><td>${escapeHtml(String(f.size_bytes || f.size || ''))}</td><td><a class="secondary" href="/api/files/download/${encodeURIComponent(f.id)}">Descargar</a></td></tr>
-      `).join('') : '<tr><td colspan="3">No hay archivos registrados todavía.</td></tr>';
+      const htmlFiles = files.filter(f => {
+        const n = (f.original_name || f.name || '').toLowerCase();
+        return n.endsWith('.html') || n.endsWith('.htm') || (f.mime_type || '').includes('html');
+      });
+      $('.dash-files-body', root).innerHTML = htmlFiles.length ? htmlFiles.map(f => `
+        <tr>
+          <td>${escapeHtml(f.original_name || f.name)}</td>
+          <td><button class="secondary make-dash-icon" data-id="${escapeAttr(f.id)}">Crear acceso</button></td>
+        </tr>
+      `).join('') : '<tr><td colspan="2">No hay HTML subidos todavía.</td></tr>';
+
+      $$('.make-dash-icon', root).forEach(btn => btn.addEventListener('click', async () => {
+        const f = htmlFiles.find(x => x.id === btn.dataset.id);
+        if(!f) return;
+        await createIcon({
+          title: (f.original_name || f.name || 'Dashboard').replace(/\.(html|htm)$/i,''),
+          icon: '📊',
+          type: 'link',
+          target: '/api/files/download/' + encodeURIComponent(f.id)
+        });
+        btn.textContent = 'Creado';
+      }));
     }catch(err){
-      $('.files-body', root).innerHTML = `<tr><td colspan="3">${escapeHtml(err.message)}</td></tr>`;
+      $('.dash-files-body', root).innerHTML = `<tr><td colspan="2">${escapeHtml(err.message)}</td></tr>`;
     }
   }
 
@@ -881,6 +1038,7 @@
           <div class="quick-app-grid">
             <button class="quick-app quick-browser"><b>🌐</b><span>Navegador</span></button>
             <button class="quick-app quick-files"><b>📁</b><span>Archivos</span></button>
+            <button class="quick-app quick-dashboards"><b>📊</b><span>Dashboards</span></button>
             <button class="quick-app quick-cloud"><b>☁️</b><span>Nube</span></button>
             <button class="quick-app quick-meteo"><b>📡</b><span>Meteo Radio</span></button>
           </div>
@@ -918,6 +1076,7 @@
     });
     $('.quick-browser', root).addEventListener('click', () => openModule('browser'));
     $('.quick-files', root).addEventListener('click', () => openModule('files'));
+    $('.quick-dashboards', root).addEventListener('click', () => openModule('dashboards'));
     $('.quick-cloud', root).addEventListener('click', () => openModule('cloud'));
     $('.quick-meteo', root).addEventListener('click', () => openModule('meteo'));
     const renderList = () => {
@@ -1081,7 +1240,7 @@
 
     const lower = q.toLowerCase();
     const internal = {
-      'archivos':'files','files':'files','nube':'cloud','cloud':'cloud',
+      'archivos':'files','files':'files','dashboards':'dashboards','dashboard':'dashboards','paneles':'dashboards','nube':'cloud','cloud':'cloud',
       'meteo':'meteo','radio':'meteo','ayuda':'remote','remoto':'remote',
       'config':'settings','configuracion':'settings','configuración':'settings',
       'navegador':'browser','browser':'browser'
