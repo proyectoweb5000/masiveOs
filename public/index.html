@@ -193,6 +193,19 @@
 
 
 
+
+    .pcloud-assistant{
+      border:1px solid rgba(96,165,250,.25);
+      background:radial-gradient(circle at 12% 18%,rgba(96,165,250,.16),transparent 35%),rgba(255,255,255,.07);
+      border-radius:22px;padding:14px;margin-top:12px;
+    }
+    .pcloud-assistant h4{margin:0 0 6px;font-size:16px}
+    .pcloud-assistant p{margin:0 0 12px;color:var(--muted);font-size:12px;line-height:1.45}
+    .pcloud-assistant-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .pcloud-assistant-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+    body.theme-light .pcloud-assistant{background:rgba(255,255,255,.76);border-color:rgba(59,130,246,.18)}
+    @media(max-width:800px){.pcloud-assistant-grid{grid-template-columns:1fr}}
+
     .pcloud-pathbar{
       display:grid;
       grid-template-columns:auto 1fr auto auto;
@@ -1105,6 +1118,29 @@
               <button type="button" class="secret-eye cloud-token-eye">👁</button>
             </div>
           </div>
+
+          <div class="pcloud-assistant cloud-pcloud-assistant hidden">
+            <h4>Asistente pCloud</h4>
+            <p>Introduce usuario y contraseña de pCloud para obtener automáticamente el token. El login se hace desde el servidor usando HTTPS contra la API de pCloud. Si tu cuenta tiene 2FA, login social o pCloud bloquea este método, tendrás que usar token manual/OAuth.</p>
+            <div class="pcloud-assistant-grid">
+              <div class="field"><label>Email pCloud</label><input class="input pcloud-login-user" placeholder="usuario@email.com"></div>
+              <div class="field">
+                <label>Contraseña pCloud</label>
+                <div class="secret-field-wrap">
+                  <input class="input pcloud-login-pass" type="password" placeholder="Contraseña">
+                  <button type="button" class="secret-eye pcloud-pass-eye">👁</button>
+                </div>
+              </div>
+              <div class="field"><label>Centro de datos</label><select class="input pcloud-region"><option value="eu">Europa - eapi.pcloud.com</option><option value="us">USA - api.pcloud.com</option></select></div>
+              <div class="field"><label>Caducidad token</label><select class="input pcloud-expire"><option value="0">Sin indicar</option><option value="2592000">30 días</option><option value="7776000">90 días</option><option value="31536000">1 año</option></select></div>
+            </div>
+            <div class="pcloud-assistant-actions">
+              <button type="button" class="primary pcloud-get-token">Obtener token</button>
+              <button type="button" class="secondary pcloud-fill-eu">Usar Europa</button>
+              <button type="button" class="secondary pcloud-fill-us">Usar USA</button>
+            </div>
+          </div>
+
           <div class="field"><label>Notas</label><textarea class="input cloud-notes" style="min-height:76px;resize:vertical" placeholder="Uso, permisos, advertencias, carpeta base..."></textarea></div>
           <div class="row">
             <button class="primary cloud-save">Guardar servicio</button>
@@ -1134,6 +1170,13 @@
       msg: $('.cloud-msg', root)
     };
 
+    const pcloudAssistant = $('.cloud-pcloud-assistant', root);
+    const refreshPcloudAssistant = () => {
+      if((form.provider.value || '').toLowerCase() === 'pcloud') pcloudAssistant.classList.remove('hidden');
+      else pcloudAssistant.classList.add('hidden');
+    };
+    form.provider.addEventListener('change', refreshPcloudAssistant);
+
     const clearForm = () => {
       form.id.value = '';
       form.title.textContent = 'Añadir servicio';
@@ -1145,6 +1188,7 @@
       form.token.value = '';
       form.notes.value = '';
       setMsg(form.msg, '');
+      refreshPcloudAssistant();
     };
 
     const fillPreset = (provider) => {
@@ -1166,7 +1210,7 @@
       if(provider === 'pCloud'){
         form.name.value = 'pCloud principal';
         form.url.value = 'https://eapi.pcloud.com';
-        form.notes.value = 'Usa eapi.pcloud.com para cuenta europea o api.pcloud.com para cuenta USA. Guarda aquí el access_token.';
+        form.notes.value = 'Asistente preparado. Puedes obtener token con email/contraseña o pegar el access_token manualmente.';
       }
       if(provider === 'OneDrive' || provider === 'SharePoint'){
         form.name.value = provider + ' compartido';
@@ -1181,6 +1225,43 @@
     $$('.cloud-preset', root).forEach(b => b.addEventListener('click', () => fillPreset(b.dataset.provider)));
     $('.cloud-clear', root).addEventListener('click', clearForm);
     $('.cloud-token-eye', root).addEventListener('click', () => { form.token.type = form.token.type === 'password' ? 'text' : 'password'; });
+    $('.pcloud-pass-eye', root).addEventListener('click', () => {
+      const p = $('.pcloud-login-pass', root);
+      p.type = p.type === 'password' ? 'text' : 'password';
+    });
+    $('.pcloud-fill-eu', root).addEventListener('click', () => {
+      $('.pcloud-region', root).value = 'eu';
+      form.url.value = 'https://eapi.pcloud.com';
+    });
+    $('.pcloud-fill-us', root).addEventListener('click', () => {
+      $('.pcloud-region', root).value = 'us';
+      form.url.value = 'https://api.pcloud.com';
+    });
+    $('.pcloud-get-token', root).addEventListener('click', async () => {
+      const username = $('.pcloud-login-user', root).value.trim();
+      const password = $('.pcloud-login-pass', root).value;
+      const region = $('.pcloud-region', root).value;
+      const authexpire = $('.pcloud-expire', root).value;
+      if(!username || !password){
+        setMsg(form.msg, 'Introduce usuario y contraseña de pCloud.', 'bad');
+        return;
+      }
+      setMsg(form.msg, 'Solicitando token a pCloud…');
+      try{
+        const result = await api('/api/pcloud/auth', {method:'POST', body:JSON.stringify({username,password,region,authexpire})});
+        form.provider.value = 'pCloud';
+        form.name.value = form.name.value || 'pCloud principal';
+        form.url.value = result.base;
+        form.token.value = result.auth;
+        form.resource.value = result.email || username;
+        form.notes.value = 'Token obtenido automáticamente desde asistente pCloud. Usuario: ' + (result.email || username);
+        refreshPcloudAssistant();
+        setMsg(form.msg, 'Token obtenido correctamente. Pulsa “Guardar servicio”.', 'ok');
+      }catch(err){
+        setMsg(form.msg, err.message + ' Puedes pegar un token manual si pCloud no permite login con contraseña.', 'bad');
+      }
+    });
+    refreshPcloudAssistant();
 
     const load = async () => {
       const rows = await api('/api/cloud/accounts');
@@ -1219,6 +1300,7 @@
         form.token.value = item.token || item.config?.token || '';
         form.notes.value = item.notes || item.config?.notes || '';
         setMsg(form.msg, 'Editando servicio existente.');
+        refreshPcloudAssistant();
       }));
 
       $$('.cloud-test', root).forEach(btn => btn.addEventListener('click', async () => {
@@ -1281,7 +1363,7 @@
     root.innerHTML = `
       <div class="card">
         <h3>Explorador pCloud</h3>
-        <p>Navega por tus archivos de pCloud desde Masive OS. Configura primero una cuenta pCloud en el Centro Cloud PRO con URL <b>https://eapi.pcloud.com</b> si tu cuenta es europea o <b>https://api.pcloud.com</b> si es USA, y pega el <b>access_token</b> en el campo token.</p>
+        <p>Navega por tus archivos de pCloud desde Masive OS. Configura primero una cuenta pCloud en el Centro Cloud PRO. Ahora puedes hacerlo con el asistente usando email y contraseña o pegando un token manual.</p>
         <div class="grid2" style="margin-top:12px">
           <div class="field"><label>Cuenta pCloud</label><select class="input pcloud-account"></select></div>
           <div class="field"><label>Folder ID actual</label><input class="input pcloud-folderid" value="0"></div>
