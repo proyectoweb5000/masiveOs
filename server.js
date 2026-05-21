@@ -3,6 +3,8 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { URL } = require("url");
+const https = require("https");
+const httpClient = require("http");
 
 const PORT = process.env.PORT || 10000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "cambiar1234";
@@ -40,10 +42,17 @@ function defaultState() {
 
 function mergeDefaultIcons(state) {
   const base = defaultState();
-  if (!Array.isArray(state.icons)) state.icons = base.icons;
-  for (const icon of base.icons) {
-    if (!state.icons.some(i => i.id === icon.id)) state.icons.push(icon);
+
+  if (!Array.isArray(state.icons)) {
+    state.icons = base.icons;
   }
+
+  for (const icon of base.icons) {
+    if (!state.icons.some(i => i.id === icon.id)) {
+      state.icons.push(icon);
+    }
+  }
+
   return state;
 }
 
@@ -105,7 +114,10 @@ function parseCookies(req) {
 
   header.split(";").forEach(part => {
     const idx = part.indexOf("=");
-    if (idx > -1) out[part.slice(0, idx).trim()] = decodeURIComponent(part.slice(idx + 1).trim());
+
+    if (idx > -1) {
+      out[part.slice(0, idx).trim()] = decodeURIComponent(part.slice(idx + 1).trim());
+    }
   });
 
   return out;
@@ -113,9 +125,11 @@ function parseCookies(req) {
 
 function getSession(req) {
   const sid = parseCookies(req).ea1fjz_os_sid;
+
   if (!sid) return null;
 
   const session = sessions.get(sid);
+
   if (!session) return null;
 
   if (Date.now() > session.expires) {
@@ -124,6 +138,7 @@ function getSession(req) {
   }
 
   session.expires = Date.now() + 1000 * 60 * 60 * 12;
+
   return session;
 }
 
@@ -158,6 +173,7 @@ function readBody(req) {
 
 async function readJson(req) {
   const body = await readBody(req);
+
   if (!body) return {};
 
   try {
@@ -228,6 +244,76 @@ function safeFileName(name) {
     .slice(0, 120) || "archivo";
 }
 
+function testHttpUrl(targetUrl) {
+  return new Promise((resolve) => {
+    let parsed;
+
+    try {
+      parsed = new URL(targetUrl);
+    } catch {
+      return resolve({ ok: false, error: "URL no válida" });
+    }
+
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      return resolve({ ok: false, error: "Solo se permite http/https" });
+    }
+
+    const client = parsed.protocol === "https:" ? https : httpClient;
+    const started = Date.now();
+
+    const req = client.request(parsed, { method: "GET", timeout: 8000 }, (response) => {
+      response.resume();
+
+      response.on("end", () => {
+        resolve({
+          ok: response.statusCode >= 200 && response.statusCode < 400,
+          status: response.statusCode,
+          ms: Date.now() - started
+        });
+      });
+    });
+
+    req.on("timeout", () => {
+      req.destroy();
+      resolve({ ok: false, error: "Timeout" });
+    });
+
+    req.on("error", (err) => {
+      resolve({ ok: false, error: err.message });
+    });
+
+    req.end();
+  });
+}
+
+function sanitizeCloudAccount(data, existing = {}) {
+  return {
+    ...existing,
+    id: existing.id || data.id || newId("cloud"),
+    provider: data.provider || existing.provider || "custom",
+    display_name: data.display_name || data.name || existing.display_name || "Cuenta nube",
+    auth_type: data.auth_type || existing.auth_type || "token",
+    url: data.url || existing.url || "",
+    resource: data.resource || existing.resource || "",
+    branch: data.branch || existing.branch || "",
+    token: data.token !== undefined ? data.token : (existing.token || ""),
+    notes: data.notes || existing.notes || "",
+    enabled: data.enabled !== false,
+    config: {
+      ...(existing.config || {}),
+      ...(data.config || {}),
+      url: data.url || data.config?.url || existing.config?.url || existing.url || "",
+      resource: data.resource || data.config?.resource || existing.config?.resource || existing.resource || "",
+      branch: data.branch || data.config?.branch || existing.config?.branch || existing.branch || "",
+      token: data.token !== undefined ? data.token : (existing.config?.token || existing.token || ""),
+      notes: data.notes || data.config?.notes || existing.config?.notes || existing.notes || ""
+    },
+    updated_at: new Date().toISOString(),
+    created_at: existing.created_at || new Date().toISOString(),
+    last_test: existing.last_test || null
+  };
+}
+
 async function handleApi(req, res, pathname) {
   if (pathname === "/api/health") {
     return sendJson(res, 200, {
@@ -245,7 +331,10 @@ async function handleApi(req, res, pathname) {
     const password = data.password || data.pass || "";
 
     if (password !== ADMIN_PASSWORD) {
-      return sendJson(res, 401, { ok: false, error: "Contraseña incorrecta" });
+      return sendJson(res, 401, {
+        ok: false,
+        error: "Contraseña incorrecta"
+      });
     }
 
     const sid = crypto.randomBytes(32).toString("hex");
@@ -259,7 +348,10 @@ async function handleApi(req, res, pathname) {
     return sendJson(
       res,
       200,
-      { ok: true, user: "admin" },
+      {
+        ok: true,
+        user: "admin"
+      },
       {
         "Set-Cookie": `ea1fjz_os_sid=${encodeURIComponent(sid)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=43200`
       }
@@ -268,7 +360,10 @@ async function handleApi(req, res, pathname) {
 
   if (pathname === "/api/logout" && (req.method === "POST" || req.method === "GET")) {
     const sid = parseCookies(req).ea1fjz_os_sid;
-    if (sid) sessions.delete(sid);
+
+    if (sid) {
+      sessions.delete(sid);
+    }
 
     return sendJson(
       res,
@@ -335,19 +430,24 @@ async function handleApi(req, res, pathname) {
     const idx = state.icons.findIndex(i => i.id === id);
 
     if (idx === -1) {
-      return sendJson(res, 404, { ok: false, error: "Icono no encontrado" });
+      return sendJson(res, 404, {
+        ok: false,
+        error: "Icono no encontrado"
+      });
     }
 
     if (req.method === "PUT" || req.method === "PATCH") {
       const data = await readJson(req);
       state.icons[idx] = { ...state.icons[idx], ...data, id };
       saveState(state);
+
       return sendJson(res, 200, state.icons[idx]);
     }
 
     if (req.method === "DELETE") {
       const removed = state.icons.splice(idx, 1)[0];
       saveState(state);
+
       return sendJson(res, 200, removed);
     }
   }
@@ -364,11 +464,17 @@ async function handleApi(req, res, pathname) {
     const buffer = Buffer.from(String(data.data_base64 || ""), "base64");
 
     if (!buffer.length) {
-      return sendJson(res, 400, { ok: false, error: "Archivo vacío" });
+      return sendJson(res, 400, {
+        ok: false,
+        error: "Archivo vacío"
+      });
     }
 
     if (buffer.length > 12 * 1024 * 1024) {
-      return sendJson(res, 413, { ok: false, error: "Archivo demasiado grande. Máximo 12 MB." });
+      return sendJson(res, 413, {
+        ok: false,
+        error: "Archivo demasiado grande. Máximo 12 MB."
+      });
     }
 
     const id = newId("file");
@@ -398,13 +504,19 @@ async function handleApi(req, res, pathname) {
     const file = state.files.find(f => f.id === id);
 
     if (!file) {
-      return sendJson(res, 404, { ok: false, error: "Archivo no encontrado" });
+      return sendJson(res, 404, {
+        ok: false,
+        error: "Archivo no encontrado"
+      });
     }
 
     const filePath = path.join(UPLOADS_PATH, file.stored_name || file.name);
 
     if (!fs.existsSync(filePath)) {
-      return sendJson(res, 404, { ok: false, error: "Archivo físico no encontrado" });
+      return sendJson(res, 404, {
+        ok: false,
+        error: "Archivo físico no encontrado"
+      });
     }
 
     const inline = /\.(html?|pdf|png|jpe?g|gif|webp|svg|txt|csv)$/i.test(file.original_name || "");
@@ -423,14 +535,19 @@ async function handleApi(req, res, pathname) {
     const idx = state.files.findIndex(f => f.id === id);
 
     if (idx === -1) {
-      return sendJson(res, 404, { ok: false, error: "Archivo no encontrado" });
+      return sendJson(res, 404, {
+        ok: false,
+        error: "Archivo no encontrado"
+      });
     }
 
     const file = state.files[idx];
     const filePath = path.join(UPLOADS_PATH, file.stored_name || file.name);
 
     try {
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
     } catch (err) {
       console.warn(err);
     }
@@ -448,21 +565,80 @@ async function handleApi(req, res, pathname) {
 
     if (req.method === "POST") {
       const data = await readJson(req);
-
-      const account = {
-        id: data.id || newId("cloud"),
-        provider: data.provider || "custom",
-        display_name: data.display_name || data.name || "Cuenta nube",
-        auth_type: data.auth_type || "token",
-        enabled: data.enabled !== false,
-        config: data.config || {}
-      };
+      const account = sanitizeCloudAccount(data);
 
       state.cloudAccounts.push(account);
       saveState(state);
 
       return sendJson(res, 200, account);
     }
+  }
+
+  if (pathname.startsWith("/api/cloud/accounts/")) {
+    const id = decodeURIComponent(pathname.split("/").pop());
+    const idx = state.cloudAccounts.findIndex(a => a.id === id);
+
+    if (idx === -1) {
+      return sendJson(res, 404, {
+        ok: false,
+        error: "Servicio cloud no encontrado"
+      });
+    }
+
+    if (req.method === "PUT" || req.method === "PATCH") {
+      const data = await readJson(req);
+      state.cloudAccounts[idx] = sanitizeCloudAccount(data, state.cloudAccounts[idx]);
+      saveState(state);
+
+      return sendJson(res, 200, state.cloudAccounts[idx]);
+    }
+
+    if (req.method === "DELETE") {
+      const removed = state.cloudAccounts.splice(idx, 1)[0];
+      saveState(state);
+
+      return sendJson(res, 200, removed);
+    }
+  }
+
+  if (pathname.startsWith("/api/cloud/test/") && req.method === "POST") {
+    const id = decodeURIComponent(pathname.split("/").pop());
+    const idx = state.cloudAccounts.findIndex(a => a.id === id);
+
+    if (idx === -1) {
+      return sendJson(res, 404, {
+        ok: false,
+        error: "Servicio cloud no encontrado"
+      });
+    }
+
+    const account = state.cloudAccounts[idx];
+    const target = account.url || account.config?.url;
+
+    if (!target) {
+      return sendJson(res, 400, {
+        ok: false,
+        error: "El servicio no tiene URL configurada"
+      });
+    }
+
+    const result = await testHttpUrl(target);
+
+    state.cloudAccounts[idx].last_test = {
+      ...result,
+      tested_at: new Date().toISOString()
+    };
+
+    saveState(state);
+
+    return sendJson(res, 200, result);
+  }
+
+  if (pathname === "/api/cloud/test-url" && req.method === "POST") {
+    const data = await readJson(req);
+    const result = await testHttpUrl(data.url || "");
+
+    return sendJson(res, 200, result);
   }
 
   if (pathname === "/api/remote/connections") {
