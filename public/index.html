@@ -195,6 +195,245 @@
 
 
 
+
+    /* ===== Iconos escritorio: tipografía más legible ===== */
+    .icon{
+      width:124px !important;
+      height:132px !important;
+      padding:10px 8px !important;
+      gap:7px !important;
+    }
+    .icon-symbol{
+      width:58px !important;
+      height:58px !important;
+      font-size:30px !important;
+      flex:0 0 auto;
+    }
+    .icon-title{
+      max-width:116px !important;
+      font-family: "Segoe UI", Inter, Arial, sans-serif !important;
+      font-weight:700 !important;
+      font-size:12px !important;
+      line-height:1.28 !important;
+      letter-spacing:0 !important;
+      text-shadow:0 2px 7px rgba(0,0,0,.55) !important;
+      -webkit-line-clamp:unset !important;
+      display:block !important;
+      overflow:visible !important;
+      white-space:normal !important;
+      word-break:normal !important;
+      overflow-wrap:break-word !important;
+    }
+
+    /* ===== Procesador de textos ===== */
+    .writer-wrap{
+      height:100%;
+      min-height:520px;
+      display:grid;
+      grid-template-columns:260px minmax(0,1fr);
+      gap:12px;
+    }
+    .writer-sidebar,.writer-editor-card{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      border-radius:22px;
+      overflow:hidden;
+    }
+    .writer-sidebar{
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
+    .writer-side-head{
+      padding:13px;
+      border-bottom:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+    }
+    .writer-doc-list{
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      padding:8px;
+      display:grid;
+      gap:7px;
+      align-content:start;
+    }
+    .writer-doc-item{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.07);
+      color:#fff;
+      border-radius:15px;
+      padding:10px;
+      text-align:left;
+    }
+    .writer-doc-item.is-active,.writer-doc-item:hover{
+      background:rgba(96,165,250,.18);
+      border-color:rgba(96,165,250,.30);
+    }
+    .writer-doc-item b{display:block;font-size:13px;margin-bottom:3px}
+    .writer-doc-item span{display:block;color:var(--muted);font-size:11px}
+    .writer-editor-card{
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+      min-height:0;
+    }
+    .writer-toolbar{
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      padding:10px;
+      border-bottom:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+    }
+    .writer-title{
+      min-width:220px;
+      flex:1;
+    }
+    .writer-page{
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      padding:18px;
+      background:#e5e7eb;
+    }
+    .writer-area{
+      width:min(900px,100%);
+      min-height:920px;
+      margin:0 auto;
+      padding:54px;
+      background:#fff;
+      color:#111827;
+      border-radius:10px;
+      box-shadow:0 18px 44px rgba(15,23,42,.22);
+      outline:none;
+      line-height:1.58;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size:16px;
+    }
+    .writer-area:empty:before{
+      content:"Empieza a escribir...";
+      color:#9ca3af;
+    }
+    body.theme-light .writer-sidebar,
+    body.theme-light .writer-editor-card{
+      background:rgba(255,255,255,.72);
+      border-color:rgba(15,23,42,.12);
+      color:#0f172a;
+    }
+    body.theme-light .writer-doc-item{
+      background:#fff;
+      color:#0f172a;
+      border-color:rgba(15,23,42,.10);
+    }
+
+    /* ===== FTP Client ===== */
+    .ftp-wrap{
+      height:100%;
+      min-height:520px;
+      display:grid;
+      grid-template-columns:330px minmax(0,1fr);
+      gap:12px;
+    }
+    .ftp-panel,.ftp-browser{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      border-radius:22px;
+      overflow:hidden;
+    }
+    .ftp-panel{
+      padding:14px;
+      overflow:auto;
+    }
+    .ftp-browser{
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
+    .ftp-toolbar{
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px;
+      border-bottom:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+    }
+    .ftp-path{
+      font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+      font-weight:900;
+      color:#dbeafe;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .ftp-list{
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      padding:10px;
+    }
+    .ftp-row{
+      display:grid;
+      grid-template-columns:40px minmax(0,1fr) 110px 160px 180px;
+      gap:10px;
+      align-items:center;
+      padding:9px 10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      border-radius:12px;
+      min-width:780px;
+    }
+    .ftp-row:hover{background:rgba(255,255,255,.08)}
+    .ftp-row.header{
+      background:rgba(255,255,255,.06);
+      color:#dbeafe;
+      font-size:11px;
+      font-weight:950;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      position:sticky;
+      top:0;
+      z-index:2;
+    }
+    .ftp-name{
+      font-weight:900;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .ftp-status{
+      border-left:4px solid #60a5fa;
+      background:rgba(96,165,250,.10);
+      border-radius:14px;
+      padding:10px 12px;
+      font-size:13px;
+      line-height:1.4;
+      color:#dbeafe;
+      margin-top:12px;
+    }
+    body.theme-light .ftp-panel,
+    body.theme-light .ftp-browser{
+      background:rgba(255,255,255,.72);
+      border-color:rgba(15,23,42,.12);
+      color:#0f172a;
+    }
+    body.theme-light .ftp-row{
+      color:#0f172a;
+      border-bottom-color:rgba(15,23,42,.08);
+    }
+    body.theme-light .ftp-row.header{
+      background:rgba(59,130,246,.08);
+      color:#1e3a8a;
+    }
+    body.theme-light .ftp-path{color:#0f172a}
+    @media(max-width:900px){
+      .writer-wrap,.ftp-wrap{grid-template-columns:1fr}
+      .writer-area{padding:28px;min-height:680px}
+    }
+
     /* ===== Ajuste iconos escritorio: evitar nombres cortados ===== */
     .icon{
       width:116px !important;
@@ -1053,6 +1292,8 @@
       <button class="dock-btn" data-module="files" title="Archivos">📁</button>
       <button class="dock-btn" data-module="dashboards" title="Dashboards">📊</button>
       <button class="dock-btn" data-module="search" title="Masive Search">🔎</button>
+      <button class="dock-btn" data-module="writer" title="Procesador de textos">📝</button>
+      <button class="dock-btn" data-module="ftp" title="FTP">🧭</button>
       <button class="dock-btn" data-module="cloud" title="Nube">☁️</button>
       <button class="dock-btn" data-module="meteo" title="Meteo & Radio">📡</button>
       <button class="dock-btn" data-module="remote" title="Ayuda remota">🖥️</button>
@@ -1160,16 +1401,16 @@
     }
   }
 
-  function wibySearchUrl(query){
-    return 'https://wiby.org/?q=' + encodeURIComponent(query || '');
+  function startpageSearchUrl(query){
+    return 'https://www.startpage.com/sp/search?query=' + encodeURIComponent(query || '');
   }
 
   function normalizeBrowserInput(value){
     const v = String(value || '').trim();
-    if(!v) return wibySearchUrl('Masive OS');
+    if(!v) return startpageSearchUrl('Masive OS');
     if(/^https?:\/\//i.test(v) || v.startsWith('/')) return v;
     if(v.includes('.') && !/\s/.test(v)) return 'https://' + v;
-    return wibySearchUrl(v);
+    return startpageSearchUrl(v);
   }
 
   async function checkHealth(){
@@ -1262,6 +1503,8 @@
       files: ['Archivos','📁'],
       dashboards: ['Dashboards','📊'],
       search: ['Masive Search','🔎'],
+      writer: ['Procesador de textos','📝'],
+      ftp: ['FTP Client','🧭'],
       cloud: ['Centro de nube','☁️'],
       meteo: ['Meteo & Radio','📡'],
       remote: ['Ayuda remota','🖥️'],
@@ -1274,6 +1517,8 @@
     if(module === 'files') renderFiles(win.body);
     if(module === 'dashboards') renderDashboards(win.body);
     if(module === 'search') renderSearch(win.body);
+    if(module === 'writer') renderWriter(win.body);
+    if(module === 'ftp') renderFtp(win.body);
     if(module === 'cloud') renderCloud(win.body);
     if(module === 'meteo') renderMeteo(win.body);
     if(module === 'remote') renderRemote(win.body);
@@ -1358,34 +1603,43 @@
   }
 
   function renderBrowser(root, url=null){
-    const initial = url || wibySearchUrl('Masive OS');
+    const initial = url || startpageSearchUrl('Masive OS');
     root.innerHTML = `
-      <div class="browser-search-badge">🔎 Buscador iframe: <span class="browser-engine-name">Wiby</span></div>
-      <p class="browser-search-hint">Wiby es un buscador ligero del “web clásico”. Es el candidato integrado para abrir resultados dentro del iframe. Si una web concreta no carga, usa “Abrir externo”.</p>
+      <div class="browser-search-badge">🔎 Buscador: <span class="browser-engine-name">Startpage</span></div>
+      <p class="browser-search-hint">Startpage queda configurado como buscador principal. Si el iframe se queda en blanco o bloquea resultados, usa “Abrir externo”.</p>
       <div class="browser-bar">
-        <input class="input browser-url" value="${escapeAttr(initial)}" placeholder="Buscar en Wiby o escribir URL..." />
+        <input class="input browser-url" value="${escapeAttr(initial)}" placeholder="Buscar en Startpage o escribir URL..." />
         <button class="secondary browser-go">Ir</button>
-        <button class="secondary browser-wiby">Buscar Wiby</button>
+        <button class="secondary browser-startpage">Buscar Startpage</button>
         <button class="secondary browser-external">Abrir externo</button>
       </div>
       <iframe class="browser-frame" src="${escapeAttr(initial)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
-      <div class="note" style="margin-top:10px">Ningún buscador público garantiza iframe para siempre. Si Wiby cambia cabeceras en el futuro, la solución robusta será buscador interno/API propia.</div>
+      <div class="note" style="margin-top:10px">Startpage usa la ruta oficial /sp/search?query=. Si no permite iframe en alguna carga, el bloqueo viene del servidor remoto y no del OS.</div>
     `;
     const input = $('.browser-url', root);
     const frame = $('.browser-frame', root);
+
     const go = () => {
       const finalUrl = normalizeBrowserInput(input.value);
       input.value = finalUrl;
       frame.src = finalUrl;
     };
+
     $('.browser-go', root).addEventListener('click', go);
-    $('.browser-wiby', root).addEventListener('click', () => {
-      const raw = input.value.replace(/^https?:\/\/[^?]+\?q=/i,'').trim();
-      const query = raw.startsWith('http') ? raw : decodeURIComponent(raw || 'Masive OS');
-      const finalUrl = wibySearchUrl(query);
+
+    $('.browser-startpage', root).addEventListener('click', () => {
+      let query = input.value.trim();
+      if(/^https?:\/\//i.test(query)){
+        try{
+          const u = new URL(query);
+          query = u.searchParams.get('query') || u.searchParams.get('q') || query;
+        }catch{}
+      }
+      const finalUrl = startpageSearchUrl(query || 'Masive OS');
       input.value = finalUrl;
       frame.src = finalUrl;
     });
+
     input.addEventListener('keydown', e => { if(e.key === 'Enter') go(); });
     $('.browser-external', root).addEventListener('click', () => window.open(normalizeBrowserInput(input.value), '_blank', 'noopener,noreferrer'));
   }
@@ -1866,7 +2120,9 @@
         ['dashboards','📊','Dashboards','Centro de dashboards'],
         ['cloud','☁️','Nube','Centro Cloud PRO'],
         ['meteo','📡','Meteo & Radio','EA1FJZ Observatory'],
-        ['remote','🖥️','Ayuda remota','Windows Quick Assist'],
+        ['remote','🖥️','Ayuda remota','Remote Center'],
+        ['writer','📝','Procesador de textos','Documentos y notas persistentes'],
+        ['ftp','🧭','FTP Client','Conectar a servidores FTP'],
         ['settings','⚙️','Configuración','Ajustes del sistema']
       ];
       for(const [mod, ic, title, sub] of apps){
@@ -1918,7 +2174,7 @@
     $('.search-run', root).addEventListener('click', render);
     $('.search-web', root).addEventListener('click', () => {
       const q = input.value.trim();
-      if(q) openBrowser(wibySearchUrl(q), 'Buscar web: ' + q);
+      if(q) openBrowser(startpageSearchUrl(q), 'Buscar web: ' + q);
     });
     $$('.search-filter', root).forEach(btn => btn.addEventListener('click', () => {
       $$('.search-filter', root).forEach(b => b.classList.remove('is-active'));
@@ -1927,6 +2183,320 @@
       render();
     }));
     input.focus();
+  }
+
+  async function renderWriter(root){
+    root.innerHTML = `
+      <div class="writer-wrap">
+        <aside class="writer-sidebar">
+          <div class="writer-side-head">
+            <h3 style="margin:0 0 10px">Documentos</h3>
+            <div class="row">
+              <button class="primary writer-new">Nuevo</button>
+              <button class="secondary writer-refresh">Actualizar</button>
+            </div>
+          </div>
+          <div class="writer-doc-list"><div class="finder-empty"><b>📝</b><div>Cargando documentos…</div></div></div>
+        </aside>
+        <section class="writer-editor-card">
+          <div class="writer-toolbar">
+            <input class="input writer-title" placeholder="Título del documento">
+            <button class="secondary writer-bold"><b>B</b></button>
+            <button class="secondary writer-italic"><i>I</i></button>
+            <button class="secondary writer-ul">Lista</button>
+            <button class="secondary writer-h2">Título</button>
+            <button class="primary writer-save">Guardar</button>
+            <button class="secondary writer-download">Descargar HTML</button>
+            <button class="danger writer-delete">Borrar</button>
+          </div>
+          <div class="writer-page">
+            <div class="writer-area" contenteditable="true"></div>
+          </div>
+        </section>
+      </div>
+    `;
+
+    let docs = [];
+    let current = null;
+    const list = $('.writer-doc-list', root);
+    const title = $('.writer-title', root);
+    const area = $('.writer-area', root);
+
+    const load = async () => {
+      docs = await api('/api/docs').catch(() => []);
+      renderList();
+    };
+
+    const renderList = () => {
+      list.innerHTML = docs.length ? docs.map(d => `
+        <button class="writer-doc-item ${current && current.id === d.id ? 'is-active' : ''}" data-id="${escapeAttr(d.id)}">
+          <b>${escapeHtml(d.title || 'Sin título')}</b>
+          <span>${escapeHtml((d.updated_at || d.created_at || '').replace('T',' ').slice(0,16))}</span>
+        </button>
+      `).join('') : '<div class="finder-empty"><b>📝</b><div>No hay documentos todavía</div></div>';
+
+      $$('.writer-doc-item', root).forEach(btn => btn.addEventListener('click', async () => {
+        const doc = await api('/api/docs/' + encodeURIComponent(btn.dataset.id));
+        current = doc;
+        title.value = doc.title || '';
+        area.innerHTML = doc.html || '';
+        renderList();
+      }));
+    };
+
+    const newDoc = () => {
+      current = null;
+      title.value = 'Nuevo documento';
+      area.innerHTML = '';
+      area.focus();
+      renderList();
+    };
+
+    const save = async () => {
+      const payload = { title: title.value || 'Sin título', html: area.innerHTML };
+      if(current && current.id){
+        current = await api('/api/docs/' + encodeURIComponent(current.id), {method:'PUT', body:JSON.stringify(payload)});
+      }else{
+        current = await api('/api/docs', {method:'POST', body:JSON.stringify(payload)});
+      }
+      await load();
+    };
+
+    $('.writer-new', root).addEventListener('click', newDoc);
+    $('.writer-refresh', root).addEventListener('click', load);
+    $('.writer-save', root).addEventListener('click', save);
+    $('.writer-bold', root).addEventListener('click', () => document.execCommand('bold'));
+    $('.writer-italic', root).addEventListener('click', () => document.execCommand('italic'));
+    $('.writer-ul', root).addEventListener('click', () => document.execCommand('insertUnorderedList'));
+    $('.writer-h2', root).addEventListener('click', () => document.execCommand('formatBlock', false, 'h2'));
+    $('.writer-download', root).addEventListener('click', () => {
+      const full = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(title.value || 'documento')}</title></head><body>${area.innerHTML}</body></html>`;
+      downloadText((title.value || 'documento').replace(/[^\w\-]+/g,'_') + '.html', full);
+    });
+    $('.writer-delete', root).addEventListener('click', async () => {
+      if(!current || !current.id){ newDoc(); return; }
+      if(!confirm('¿Borrar este documento?')) return;
+      await api('/api/docs/' + encodeURIComponent(current.id), {method:'DELETE'});
+      current = null;
+      title.value = '';
+      area.innerHTML = '';
+      await load();
+    });
+
+    await load();
+    if(docs[0]){
+      current = await api('/api/docs/' + encodeURIComponent(docs[0].id));
+      title.value = current.title || '';
+      area.innerHTML = current.html || '';
+      renderList();
+    }else{
+      newDoc();
+    }
+  }
+
+  async function renderFtp(root){
+    root.innerHTML = `
+      <div class="ftp-wrap">
+        <aside class="ftp-panel">
+          <h3 style="margin:0 0 10px">FTP Client</h3>
+          <p style="margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.4">Conexión FTP básica desde el servidor de Masive OS. Soporta listar, descargar, subir, borrar y crear carpetas si el servidor remoto lo permite. No es SFTP.</p>
+          <input type="hidden" class="ftp-id">
+          <div class="grid2">
+            <div class="field"><label>Nombre</label><input class="input ftp-name" placeholder="Servidor FTP"></div>
+            <div class="field"><label>Puerto</label><input class="input ftp-port" value="21"></div>
+          </div>
+          <div class="field"><label>Host</label><input class="input ftp-host" placeholder="ftp.midominio.com"></div>
+          <div class="grid2">
+            <div class="field"><label>Usuario</label><input class="input ftp-user" placeholder="anonymous o usuario"></div>
+            <div class="field"><label>Password</label><input class="input ftp-pass" type="password"></div>
+          </div>
+          <div class="field"><label>Directorio inicial</label><input class="input ftp-initial" value="/"></div>
+          <div class="row">
+            <button class="primary ftp-save">Guardar</button>
+            <button class="secondary ftp-connect">Conectar</button>
+            <button class="secondary ftp-clear">Limpiar</button>
+          </div>
+          <div class="ftp-status ftp-msg">Preparado.</div>
+
+          <h3 style="margin:16px 0 8px">Servidores guardados</h3>
+          <div class="ftp-accounts"></div>
+        </aside>
+
+        <section class="ftp-browser">
+          <div class="ftp-toolbar">
+            <div class="ftp-path">/</div>
+            <div class="row">
+              <button class="secondary ftp-up">← Atrás</button>
+              <button class="secondary ftp-mkdir">Nueva carpeta</button>
+              <button class="primary ftp-upload">Subir archivo</button>
+              <input class="hidden ftp-upload-input" type="file">
+              <button class="secondary ftp-refresh">Actualizar</button>
+            </div>
+          </div>
+          <div class="ftp-list"><div class="finder-empty"><b>🧭</b><div>Conecta con un servidor FTP</div></div></div>
+        </section>
+      </div>
+    `;
+
+    let accounts = [];
+    let currentAccount = null;
+    let currentPath = '/';
+    let history = [];
+
+    const form = {
+      id: $('.ftp-id', root),
+      name: $('.ftp-name', root),
+      host: $('.ftp-host', root),
+      port: $('.ftp-port', root),
+      user: $('.ftp-user', root),
+      pass: $('.ftp-pass', root),
+      initial: $('.ftp-initial', root),
+      msg: $('.ftp-msg', root)
+    };
+
+    const setMsg = (t) => form.msg.textContent = t;
+    const payload = () => ({
+      name: form.name.value || form.host.value || 'Servidor FTP',
+      host: form.host.value,
+      port: Number(form.port.value || 21),
+      username: form.user.value || 'anonymous',
+      password: form.pass.value || '',
+      initial_path: form.initial.value || '/'
+    });
+
+    const fill = (a) => {
+      form.id.value = a.id || '';
+      form.name.value = a.name || '';
+      form.host.value = a.host || '';
+      form.port.value = a.port || 21;
+      form.user.value = a.username || '';
+      form.pass.value = a.password || '';
+      form.initial.value = a.initial_path || '/';
+    };
+
+    const loadAccounts = async () => {
+      accounts = await api('/api/ftp/accounts').catch(() => []);
+      $('.ftp-accounts', root).innerHTML = accounts.length ? accounts.map(a => `
+        <div class="writer-doc-item" data-id="${escapeAttr(a.id)}">
+          <b>🧭 ${escapeHtml(a.name || a.host)}</b>
+          <span>${escapeHtml(a.host || '')}:${escapeHtml(a.port || 21)}</span>
+        </div>
+      `).join('') : '<div class="note">No hay servidores FTP guardados.</div>';
+      $$('.ftp-accounts .writer-doc-item', root).forEach(btn => btn.addEventListener('click', () => {
+        const a = accounts.find(x => x.id === btn.dataset.id);
+        if(a){ currentAccount = a; fill(a); currentPath = a.initial_path || '/'; setMsg('Servidor seleccionado.'); }
+      }));
+    };
+
+    const saveAccount = async () => {
+      const data = payload();
+      if(!data.host){ setMsg('Introduce el host FTP.'); return; }
+      if(form.id.value){
+        currentAccount = await api('/api/ftp/accounts/' + encodeURIComponent(form.id.value), {method:'PUT', body:JSON.stringify(data)});
+      }else{
+        currentAccount = await api('/api/ftp/accounts', {method:'POST', body:JSON.stringify(data)});
+      }
+      fill(currentAccount);
+      await loadAccounts();
+      setMsg('Servidor guardado.');
+    };
+
+    const clearForm = () => {
+      form.id.value = '';
+      form.name.value = '';
+      form.host.value = '';
+      form.port.value = '21';
+      form.user.value = '';
+      form.pass.value = '';
+      form.initial.value = '/';
+      currentAccount = null;
+      currentPath = '/';
+      history = [];
+    };
+
+    const listPath = async (pathValue=currentPath, push=true) => {
+      if(!currentAccount && !form.host.value){ setMsg('Selecciona o configura un servidor FTP.'); return; }
+      if(!currentAccount){
+        await saveAccount();
+      }
+      if(push && pathValue !== currentPath) history.push(currentPath);
+      currentPath = pathValue || '/';
+      $('.ftp-path', root).textContent = currentPath;
+      setMsg('Conectando y listando ' + currentPath + ' ...');
+      const data = await api('/api/ftp/list', {method:'POST', body:JSON.stringify({account_id: currentAccount.id, path: currentPath})});
+      renderList(data.items || []);
+      setMsg('Listado cargado.');
+    };
+
+    const renderList = (items) => {
+      $('.ftp-list', root).innerHTML = `
+        <div class="ftp-row header"><div></div><div>Nombre</div><div>Tamaño</div><div>Tipo</div><div>Acción</div></div>
+        ${items.map(it => `
+          <div class="ftp-row" data-name="${escapeAttr(it.name)}" data-type="${escapeAttr(it.type)}">
+            <div style="font-size:24px">${it.type === 'dir' ? '📁' : '📄'}</div>
+            <div class="ftp-name">${escapeHtml(it.name)}</div>
+            <div>${escapeHtml(String(it.size || ''))}</div>
+            <div>${escapeHtml(it.type || '')}</div>
+            <div class="row">
+              ${it.type === 'dir' ? '<button class="secondary ftp-open-dir">Abrir</button>' : '<button class="secondary ftp-download">Descargar</button>'}
+              <button class="danger ftp-delete">Borrar</button>
+            </div>
+          </div>
+        `).join('')}
+      `;
+      $$('.ftp-open-dir', root).forEach(btn => btn.addEventListener('click', () => {
+        const name = btn.closest('.ftp-row').dataset.name;
+        const next = currentPath.replace(/\/$/,'') + '/' + name;
+        listPath(next, true).catch(err => setMsg(err.message));
+      }));
+      $$('.ftp-download', root).forEach(btn => btn.addEventListener('click', async () => {
+        const name = btn.closest('.ftp-row').dataset.name;
+        const remotePath = currentPath.replace(/\/$/,'') + '/' + name;
+        window.open('/api/ftp/download?account_id=' + encodeURIComponent(currentAccount.id) + '&path=' + encodeURIComponent(remotePath), '_blank');
+      }));
+      $$('.ftp-delete', root).forEach(btn => btn.addEventListener('click', async () => {
+        const row = btn.closest('.ftp-row');
+        const name = row.dataset.name;
+        const type = row.dataset.type;
+        if(!confirm('¿Borrar "' + name + '" del FTP?')) return;
+        const remotePath = currentPath.replace(/\/$/,'') + '/' + name;
+        await api('/api/ftp/delete', {method:'POST', body:JSON.stringify({account_id: currentAccount.id, path: remotePath, type})});
+        await listPath(currentPath, false);
+      }));
+    };
+
+    $('.ftp-save', root).addEventListener('click', () => saveAccount().catch(err => setMsg(err.message)));
+    $('.ftp-connect', root).addEventListener('click', () => listPath(form.initial.value || '/', false).catch(err => setMsg(err.message)));
+    $('.ftp-clear', root).addEventListener('click', clearForm);
+    $('.ftp-refresh', root).addEventListener('click', () => listPath(currentPath, false).catch(err => setMsg(err.message)));
+    $('.ftp-up', root).addEventListener('click', () => {
+      const prev = history.pop();
+      if(prev !== undefined) listPath(prev, false).catch(err => setMsg(err.message));
+    });
+    $('.ftp-mkdir', root).addEventListener('click', async () => {
+      const name = prompt('Nombre de la carpeta FTP');
+      if(!name) return;
+      const remotePath = currentPath.replace(/\/$/,'') + '/' + name;
+      await api('/api/ftp/mkdir', {method:'POST', body:JSON.stringify({account_id: currentAccount.id, path: remotePath})});
+      await listPath(currentPath, false);
+    });
+    $('.ftp-upload', root).addEventListener('click', () => $('.ftp-upload-input', root).click());
+    $('.ftp-upload-input', root).addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      if(file.size > 12 * 1024 * 1024){ setMsg('Archivo demasiado grande. Máximo 12 MB.'); return; }
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = String(reader.result || '').split(',')[1] || '';
+        const remotePath = currentPath.replace(/\/$/,'') + '/' + file.name;
+        await api('/api/ftp/upload', {method:'POST', body:JSON.stringify({account_id: currentAccount.id, path: remotePath, data_base64: base64})});
+        e.target.value = '';
+        await listPath(currentPath, false);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    await loadAccounts();
   }
 
   async function renderCloud(root){
@@ -2807,7 +3377,7 @@
 
     const lower = q.toLowerCase();
     const internal = {
-      'archivos':'files','files':'files','dashboards':'dashboards','dashboard':'dashboards','paneles':'dashboards','buscar':'search','buscador':'search','search':'search','spotlight':'search','nube':'cloud','cloud':'cloud',
+      'archivos':'files','files':'files','dashboards':'dashboards','dashboard':'dashboards','paneles':'dashboards','buscar':'search','buscador':'search','search':'search','spotlight':'search','texto':'writer','documento':'writer','writer':'writer','notas':'writer','ftp':'ftp','sftp':'ftp','servidor ftp':'ftp','nube':'cloud','cloud':'cloud',
       'meteo':'meteo','meteorologia':'meteo','meteorología':'meteo','radio':'meteo','ea1fjz':'meteo','observatory':'meteo','windy':'meteo','dsn':'meteo','ayuda':'remote','remoto':'remote',
       'config':'settings','configuracion':'settings','configuración':'settings',
       'navegador':'browser','browser':'browser'
@@ -2831,7 +3401,7 @@
       return;
     }
 
-    openBrowser(wibySearchUrl(q), 'Buscar: ' + q);
+    openBrowser(startpageSearchUrl(q), 'Buscar: ' + q);
     e.target.value = '';
   });
 
