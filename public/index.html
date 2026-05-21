@@ -193,6 +193,61 @@
 
 
 
+
+    /* ===== Buscador alternativo / SearXNG ===== */
+    .search-engine-box{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:12px;
+      margin-top:12px;
+    }
+    .search-engine-grid{
+      display:grid;
+      grid-template-columns:1fr 1.2fr;
+      gap:10px;
+      align-items:end;
+    }
+    .browser-search-hint{
+      margin:0 0 10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .browser-search-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      color:#dbeafe;
+      border-radius:999px;
+      padding:5px 9px;
+      font-size:11px;
+      font-weight:900;
+      margin-bottom:8px;
+    }
+    .search-test-grid{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:8px;
+      align-items:center;
+      margin-top:10px;
+    }
+    body.theme-light .search-engine-box{
+      background:rgba(255,255,255,.72);
+      border-color:rgba(15,23,42,.12);
+    }
+    body.theme-light .browser-search-badge{
+      background:rgba(59,130,246,.10);
+      border-color:rgba(15,23,42,.12);
+      color:#1e3a8a;
+    }
+    @media(max-width:850px){
+      .search-engine-grid{grid-template-columns:1fr}
+      .search-test-grid{grid-template-columns:1fr}
+    }
+
     /* ===== Finder / Explorador macOS ===== */
     .finder-wrap{
       height:100%;
@@ -820,6 +875,45 @@
     }
   }
 
+  function getSearchEngineLabel(){
+    const engine = config.searchEngine || 'searxng';
+    const labels = {
+      searxng: 'SearXNG',
+      searxng_public: 'SearXNG público',
+      duckduckgo_external: 'DuckDuckGo externo',
+      google_external: 'Google externo',
+      custom: 'Buscador personalizado'
+    };
+    return labels[engine] || 'SearXNG';
+  }
+
+  function getSearchUrl(query){
+    const q = encodeURIComponent(query || '');
+    const engine = config.searchEngine || 'searxng';
+    const base = (config.searchBaseUrl || 'https://search.inetol.net').replace(/\/+$/,'');
+
+    if(engine === 'duckduckgo_external') return 'https://duckduckgo.com/?q=' + q;
+    if(engine === 'google_external') return 'https://www.google.com/search?q=' + q;
+    if(engine === 'custom'){
+      const tpl = config.searchCustomTemplate || (base + '/search?q={q}');
+      return tpl.includes('{q}') ? tpl.replace('{q}', q) : tpl + q;
+    }
+
+    return base + '/search?q=' + q;
+  }
+
+  function normalizeBrowserInput(value){
+    const v = String(value || '').trim();
+    if(!v) return '';
+    if(/^https?:\/\//i.test(v) || v.startsWith('/')) return v;
+    if(v.includes('.') && !/\s/.test(v)) return 'https://' + v;
+    return getSearchUrl(v);
+  }
+
+  function isExternalSearchEngine(){
+    return ['duckduckgo_external','google_external'].includes(config.searchEngine || '');
+  }
+
   async function checkHealth(){
     try{
       const h = await api('/api/health');
@@ -1003,22 +1097,33 @@
     handle.addEventListener('pointerup', () => resizing=false);
   }
 
-  function renderBrowser(root, url='https://www.google.com'){
+  function renderBrowser(root, url=null){
+    const initial = url || getSearchUrl('Masive OS');
     root.innerHTML = `
+      <div class="browser-search-badge">🔎 Buscador: <span class="browser-engine-name">${escapeHtml(getSearchEngineLabel())}</span></div>
+      <p class="browser-search-hint">Escribe una URL o una búsqueda. Para iframe se recomienda SearXNG. Google y DuckDuckGo se abrirán mejor en pestaña externa si bloquean iframe.</p>
       <div class="browser-bar">
-        <input class="input browser-url" value="${escapeAttr(url)}" placeholder="https://..." />
+        <input class="input browser-url" value="${escapeAttr(initial)}" placeholder="Buscar o escribir URL..." />
         <button class="secondary browser-go">Ir</button>
         <button class="secondary browser-external">Abrir externo</button>
       </div>
-      <iframe class="browser-frame" src="${escapeAttr(url)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
-      <div class="note" style="margin-top:10px">Algunas webs bloquean la apertura dentro de ventanas internas. En ese caso usa “Abrir externo”.</div>
+      <iframe class="browser-frame" src="${escapeAttr(initial)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+      <div class="note" style="margin-top:10px">Si una web bloquea la ventana interna, usa “Abrir externo”. Para un buscador realmente embebible lo ideal será usar una instancia SearXNG propia.</div>
     `;
     const input = $('.browser-url', root);
     const frame = $('.browser-frame', root);
-    const normalize = v => /^https?:\/\//i.test(v) ? v : 'https://' + v;
-    $('.browser-go', root).addEventListener('click', () => frame.src = normalize(input.value.trim()));
-    input.addEventListener('keydown', e => { if(e.key === 'Enter') $('.browser-go', root).click(); });
-    $('.browser-external', root).addEventListener('click', () => window.open(normalize(input.value.trim()), '_blank', 'noopener,noreferrer'));
+    const go = () => {
+      const finalUrl = normalizeBrowserInput(input.value);
+      input.value = finalUrl;
+      if(isExternalSearchEngine()){
+        window.open(finalUrl, '_blank', 'noopener,noreferrer');
+      }else{
+        frame.src = finalUrl;
+      }
+    };
+    $('.browser-go', root).addEventListener('click', go);
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') go(); });
+    $('.browser-external', root).addEventListener('click', () => window.open(normalizeBrowserInput(input.value), '_blank', 'noopener,noreferrer'));
   }
 
   async function renderFiles(root){
@@ -1819,6 +1924,29 @@
             <button class="secondary refresh-icons">Recargar iconos</button>
           </div>
         </div>
+        <div class="card">
+          <h3>Buscador del navegador</h3>
+          <p>Configura el buscador usado por el navegador interno y por el launcher superior. Para usarlo en iframe, SearXNG es la opción recomendada.</p>
+          <div class="search-engine-box">
+            <div class="search-engine-grid">
+              <div class="field"><label>Motor de búsqueda</label>
+                <select class="input cfg-search-engine">
+                  <option value="searxng">SearXNG configurable</option>
+                  <option value="searxng_public">SearXNG público</option>
+                  <option value="duckduckgo_external">DuckDuckGo externo</option>
+                  <option value="google_external">Google externo</option>
+                  <option value="custom">URL personalizada</option>
+                </select>
+              </div>
+              <div class="field"><label>URL base SearXNG</label><input class="input cfg-search-base" value="${escapeAttr(config.searchBaseUrl || 'https://search.inetol.net')}" placeholder="https://tu-searxng"></div>
+            </div>
+            <div class="field"><label>Plantilla personalizada</label><input class="input cfg-search-template" value="${escapeAttr(config.searchCustomTemplate || '')}" placeholder="https://buscador.local/search?q={q}"></div>
+            <div class="search-test-grid">
+              <input class="input cfg-search-test-query" value="masive os" placeholder="Texto de prueba">
+              <button class="secondary cfg-search-test">Probar en navegador</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="card" style="margin-top:12px">
         <h3>Listado de iconos</h3>
@@ -1826,13 +1954,31 @@
       </div>
     `;
     $('.cfg-theme', root).value = config.theme || 'massive';
+    $('.cfg-search-engine', root).value = config.searchEngine || 'searxng';
+    $('.cfg-search-base', root).value = config.searchBaseUrl || 'https://search.inetol.net';
+    $('.cfg-search-template', root).value = config.searchCustomTemplate || '';
+    $('.cfg-search-test', root).addEventListener('click', () => {
+      const oldEngine = config.searchEngine;
+      const oldBase = config.searchBaseUrl;
+      const oldTpl = config.searchCustomTemplate;
+      config.searchEngine = $('.cfg-search-engine', root).value;
+      config.searchBaseUrl = $('.cfg-search-base', root).value;
+      config.searchCustomTemplate = $('.cfg-search-template', root).value;
+      openBrowser(getSearchUrl($('.cfg-search-test-query', root).value || 'masive os'), 'Prueba buscador');
+      config.searchEngine = oldEngine;
+      config.searchBaseUrl = oldBase;
+      config.searchCustomTemplate = oldTpl;
+    });
     $$('.wallpaper-preset', root).forEach(p => {
       p.addEventListener('click', async () => {
         $('.cfg-theme', root).value = p.dataset.theme || 'massive';
         $('.cfg-wallpaper', root).value = p.dataset.wallpaper || '';
         config = await api('/api/config', {method:'POST', body:JSON.stringify({
           theme: $('.cfg-theme', root).value,
-          wallpaper: $('.cfg-wallpaper', root).value
+          wallpaper: $('.cfg-wallpaper', root).value,
+          searchEngine: $('.cfg-search-engine', root).value,
+          searchBaseUrl: $('.cfg-search-base', root).value,
+          searchCustomTemplate: $('.cfg-search-template', root).value
         })});
         applyConfig();
       });
@@ -1884,7 +2030,10 @@
           title: $('.cfg-title', root).value,
           subtitle: $('.cfg-subtitle', root).value,
           theme: $('.cfg-theme', root).value,
-          wallpaper: $('.cfg-wallpaper', root).value
+          wallpaper: $('.cfg-wallpaper', root).value,
+          searchEngine: $('.cfg-search-engine', root).value,
+          searchBaseUrl: $('.cfg-search-base', root).value,
+          searchCustomTemplate: $('.cfg-search-template', root).value
         })});
         applyConfig();
         setMsg(msg, 'Configuración guardada.', 'ok');
@@ -2036,7 +2185,12 @@
       return;
     }
 
-    openBrowser('https://www.google.com/search?q=' + encodeURIComponent(q), 'Buscar: ' + q);
+    const searchUrl = getSearchUrl(q);
+    if(isExternalSearchEngine()){
+      window.open(searchUrl, '_blank', 'noopener,noreferrer');
+    }else{
+      openBrowser(searchUrl, 'Buscar: ' + q);
+    }
     e.target.value = '';
   });
 
