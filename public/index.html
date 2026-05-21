@@ -249,6 +249,79 @@
       padding:5px 2px 0;
     }
 
+
+    .remote-mode-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+      gap:12px;
+      margin-top:12px;
+    }
+    .remote-mode-card{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      border-radius:22px;
+      padding:14px;
+      min-height:136px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .remote-mode-card h4{margin:0;font-size:16px;display:flex;gap:8px;align-items:center}
+    .remote-mode-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.38}
+    .remote-connect-panel{
+      border:1px solid rgba(52,211,153,.20);
+      background:rgba(52,211,153,.08);
+      border-radius:22px;
+      padding:14px;
+    }
+    .remote-id-box{
+      font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+      font-size:18px;
+      font-weight:950;
+      letter-spacing:.08em;
+      padding:9px 10px;
+      border-radius:14px;
+      background:rgba(2,6,23,.24);
+      border:1px solid rgba(255,255,255,.14);
+      display:inline-flex;
+      margin:3px 0;
+    }
+    .remote-status-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      border-radius:999px;
+      padding:5px 9px;
+      font-size:11px;
+      font-weight:950;
+    }
+    .remote-status-pill::before{
+      content:'';
+      width:8px;height:8px;border-radius:999px;background:#34d399;
+      box-shadow:0 0 0 4px rgba(52,211,153,.12);
+    }
+    .remote-warning{
+      border-left:4px solid #fbbf24;
+      background:rgba(251,191,36,.10);
+      color:#fde68a;
+      border-radius:14px;
+      padding:10px 12px;
+      font-size:13px;
+      line-height:1.42;
+      margin-top:12px;
+    }
+    body.theme-light .remote-mode-card,
+    body.theme-light .remote-connect-panel{
+      background:rgba(255,255,255,.72);
+      border-color:rgba(15,23,42,.12);
+      color:#0f172a;
+    }
+    body.theme-light .remote-id-box{background:rgba(59,130,246,.08);border-color:rgba(15,23,42,.12)}
+    body.theme-light .remote-warning{color:#78350f;background:rgba(251,191,36,.18)}
+
     /* ===== Ayuda remota / Quick Assist ===== */
     .remote-hero{
       border:1px solid rgba(255,255,255,.14);
@@ -2029,153 +2102,302 @@
   async function renderRemote(root){
     root.innerHTML = `
       <div class="remote-hero">
-        <h3 style="margin:0 0 6px">Ayuda remota Windows · Asistencia rápida</h3>
-        <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.45">Acceso guiado para trabajar como cuando en Windows pulsas <b>Ctrl + Win + Q</b>. El navegador no puede simular esa combinación de teclas ni garantizar la apertura de apps locales, pero sí puede intentar abrir el protocolo de Asistencia rápida y dejar instrucciones claras.</p>
+        <h3 style="margin:0 0 6px">Masive Remote Center</h3>
+        <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.45">Centro de asistencia remota pensado para abrir Masive OS desde Linux, macOS o cualquier navegador y conectar a PCs Windows usando tecnologías web como RustDesk Web o Apache Guacamole. Quick Assist queda solo como modo manual para cuando se esté delante de Windows.</p>
+        <div class="remote-mode-grid">
+          <div class="remote-mode-card">
+            <div><h4>🦀 RustDesk Web</h4><p>Opción recomendada para asistencia tipo AnyDesk/TeamViewer. El PC Windows necesita RustDesk instalado/configurado.</p></div>
+            <button class="secondary remote-preset" data-mode="rustdesk">Configurar RustDesk</button>
+          </div>
+          <div class="remote-mode-card">
+            <div><h4>🖥️ Guacamole</h4><p>Pasarela web para RDP/VNC/SSH desde navegador. Requiere servidor Guacamole y acceso de red al PC.</p></div>
+            <button class="secondary remote-preset" data-mode="guacamole">Configurar Guacamole</button>
+          </div>
+          <div class="remote-mode-card">
+            <div><h4>🔗 Enlace externo</h4><p>Para AnyDesk, TeamViewer, RustDesk externo, portal corporativo o una URL de conexión propia.</p></div>
+            <button class="secondary remote-preset" data-mode="external">Configurar enlace</button>
+          </div>
+          <div class="remote-mode-card">
+            <div><h4>🪟 Quick Assist manual</h4><p>Solo instrucciones. No sirve para controlar Windows desde Linux sin una app/agente remoto.</p></div>
+            <button class="secondary remote-preset" data-mode="quickassist">Configurar manual</button>
+          </div>
+        </div>
+        <div class="remote-warning">Para controlar un Windows desde Masive OS abierto en Linux, el PC Windows debe tener un agente o servicio remoto: RustDesk, RDP vía Guacamole, VNC vía Guacamole/noVNC, o herramienta equivalente.</div>
       </div>
 
       <div class="grid2">
-        <div class="quick-assist-card">
-          <h3 style="margin:0 0 8px">Iniciar Asistencia rápida</h3>
+        <div class="remote-connect-panel">
+          <h3 class="remote-form-title" style="margin:0 0 10px">Registrar conexión remota</h3>
+          <input type="hidden" class="remote-id">
+          <div class="grid2">
+            <div class="field"><label>Nombre del equipo</label><input class="input remote-name" placeholder="Ej: PC Línea 1"></div>
+            <div class="field"><label>Tipo de conexión</label>
+              <select class="input remote-protocol">
+                <option value="rustdesk">RustDesk Web</option>
+                <option value="guacamole">Apache Guacamole</option>
+                <option value="external">Enlace externo</option>
+                <option value="rdp">RDP futuro</option>
+                <option value="vnc">VNC futuro</option>
+                <option value="quickassist">Quick Assist manual</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>ID RustDesk / Host / IP</label><input class="input remote-host" placeholder="ID RustDesk, IP, host o nombre"></div>
+            <div class="field"><label>Puerto / código / etiqueta</label><input class="input remote-port" placeholder="21118 / 3389 / código"></div>
+          </div>
+          <div class="field"><label>URL web client / portal remoto</label><input class="input remote-url" placeholder="https://rustdesk.example.com o https://guacamole.example.com"></div>
+          <div class="grid2">
+            <div class="field"><label>Usuario</label><input class="input remote-username" placeholder="Opcional"></div>
+            <div class="field"><label>Password / clave temporal</label><input class="input remote-password" type="password" placeholder="Opcional"></div>
+          </div>
+          <div class="field"><label>Notas</label><textarea class="input remote-notes" style="min-height:76px;resize:vertical" placeholder="Ubicación, persona de contacto, instrucciones, permisos..."></textarea></div>
           <div class="row">
-            <button class="primary qa-launch">Intentar abrir Asistencia rápida</button>
-            <button class="secondary qa-copy-steps">Copiar pasos</button>
-            <button class="secondary qa-download-bat">Descargar lanzador .bat</button>
+            <button class="primary remote-save">Guardar conexión</button>
+            <button class="secondary remote-clear">Limpiar</button>
+            <button class="secondary remote-test-url">Probar URL</button>
           </div>
-          <div class="remote-step-list">
-            <div class="remote-step"><b>1</b><div>En Windows pulsa <b>Ctrl + Win + Q</b> o busca <b>Asistencia rápida</b>.</div></div>
-            <div class="remote-step"><b>2</b><div>El asistente pulsa <b>Ayudar a alguien</b> e inicia sesión con cuenta Microsoft si lo pide.</div></div>
-            <div class="remote-step"><b>3</b><div>Windows genera un código de seguridad de 6 caracteres.</div></div>
-            <div class="remote-step"><b>4</b><div>El usuario introduce el código, acepta compartir pantalla y permite control si procede.</div></div>
-          </div>
-          <div class="msg qa-msg"></div>
+          <div class="msg remote-msg"></div>
         </div>
 
         <div class="card">
-          <h3>Registrar sesión/equipo</h3>
-          <input type="hidden" class="remote-id">
-          <div class="grid2">
-            <div class="field"><label>Nombre / usuario</label><input class="input remote-name" placeholder="Ej: PC línea 1 / usuario"></div>
-            <div class="field"><label>Tipo</label><select class="input remote-protocol"><option value="quickassist">Windows Quick Assist</option><option value="external">Herramienta externa</option><option value="rdp">RDP futuro</option><option value="vnc">VNC futuro</option><option value="ssh">SSH futuro</option></select></div>
+          <h3>Conexión seleccionada</h3>
+          <p>Selecciona una conexión guardada para abrirla en una ventana de Masive OS o en una pestaña externa.</p>
+          <div class="remote-selected-box" style="margin-top:12px">
+            <div class="remote-status-pill">Preparado</div>
+            <div style="margin-top:12px;color:var(--muted);font-size:13px">No hay conexión seleccionada.</div>
           </div>
-          <div class="grid2">
-            <div class="field"><label>Equipo / host opcional</label><input class="input remote-host" placeholder="Nombre equipo, IP o ubicación"></div>
-            <div class="field"><label>Código 6 caracteres</label><input class="input remote-code" maxlength="12" placeholder="ABC123"></div>
+          <div class="row" style="margin-top:12px">
+            <button class="primary remote-connect-selected">Conectar en ventana</button>
+            <button class="secondary remote-open-selected">Abrir externo</button>
+            <button class="secondary remote-copy-selected">Copiar datos</button>
           </div>
-          <div class="field"><label>Notas</label><textarea class="input remote-notes" style="min-height:76px;resize:vertical" placeholder="Incidencia, persona, teléfono, observaciones..."></textarea></div>
-          <div class="row">
-            <button class="primary remote-save">Guardar</button>
-            <button class="secondary remote-clear">Limpiar</button>
-          </div>
-          <div class="msg remote-msg"></div>
+          <div class="msg remote-selected-msg"></div>
         </div>
       </div>
 
       <div class="card" style="margin-top:12px">
-        <h3>Sesiones y equipos guardados</h3>
-        <table class="table"><thead><tr><th>Tipo</th><th>Nombre</th><th>Host</th><th>Código</th><th>Acción</th></tr></thead><tbody class="remote-body"><tr><td colspan="5">Cargando…</td></tr></tbody></table>
+        <h3>Equipos y accesos remotos</h3>
+        <table class="table"><thead><tr><th>Tipo</th><th>Nombre</th><th>ID/Host</th><th>URL</th><th>Acción</th></tr></thead><tbody class="remote-body"><tr><td colspan="5">Cargando…</td></tr></tbody></table>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Modo Quick Assist manual</h3>
+        <p>Se mantiene como guía para Windows. Desde Linux no ejecuta Quick Assist en el PC remoto. Para eso necesitas RustDesk/Guacamole/otro agente.</p>
+        <div class="row">
+          <button class="secondary qa-copy-steps">Copiar instrucciones Quick Assist</button>
+          <button class="secondary qa-download-bat">Descargar lanzador .bat para Windows</button>
+        </div>
+        <div class="remote-step-list">
+          <div class="remote-step"><b>1</b><div>En el PC Windows pulsa <b>Ctrl + Win + Q</b>.</div></div>
+          <div class="remote-step"><b>2</b><div>El asistente genera el código y el usuario lo introduce.</div></div>
+          <div class="remote-step"><b>3</b><div>El usuario acepta compartir pantalla y control remoto.</div></div>
+        </div>
+        <div class="msg qa-msg"></div>
       </div>
     `;
 
     const form = {
       id: $('.remote-id', root),
+      title: $('.remote-form-title', root),
       name: $('.remote-name', root),
       protocol: $('.remote-protocol', root),
       host: $('.remote-host', root),
-      code: $('.remote-code', root),
+      port: $('.remote-port', root),
+      url: $('.remote-url', root),
+      username: $('.remote-username', root),
+      password: $('.remote-password', root),
       notes: $('.remote-notes', root),
       msg: $('.remote-msg', root)
     };
 
+    let rowsCache = [];
+    let selected = null;
+
     const clear = () => {
       form.id.value = '';
+      form.title.textContent = 'Registrar conexión remota';
       form.name.value = '';
-      form.protocol.value = 'quickassist';
+      form.protocol.value = 'rustdesk';
       form.host.value = '';
-      form.code.value = '';
+      form.port.value = '';
+      form.url.value = '';
+      form.username.value = '';
+      form.password.value = '';
       form.notes.value = '';
       setMsg(form.msg, '');
     };
 
+    const applyPreset = (mode) => {
+      clear();
+      form.protocol.value = mode;
+      if(mode === 'rustdesk'){
+        form.name.value = 'PC Windows RustDesk';
+        form.url.value = config.rustdeskWebUrl || '';
+        form.notes.value = 'Instalar RustDesk en el PC Windows. Guardar ID y clave temporal/fija.';
+      }
+      if(mode === 'guacamole'){
+        form.name.value = 'PC Windows vía Guacamole';
+        form.url.value = config.guacamoleUrl || '';
+        form.port.value = '3389';
+        form.notes.value = 'Requiere servidor Guacamole y RDP/VNC/SSH accesible desde la red.';
+      }
+      if(mode === 'external'){
+        form.name.value = 'Acceso remoto externo';
+        form.notes.value = 'Pegar URL de portal, AnyDesk, TeamViewer, RustDesk Web u otra herramienta.';
+      }
+      if(mode === 'quickassist'){
+        form.name.value = 'Quick Assist manual';
+        form.notes.value = 'Solo guía manual: Ctrl + Win + Q en Windows.';
+      }
+    };
+
+    const connectionUrl = (r) => {
+      if(!r) return '';
+      const url = r.url || r.web_url || '';
+      if(url) {
+        if(r.protocol === 'rustdesk' && r.host && url.includes('{id}')) return url.replace('{id}', encodeURIComponent(r.host));
+        if(r.protocol === 'guacamole' && r.host && url.includes('{host}')) return url.replace('{host}', encodeURIComponent(r.host));
+        return url;
+      }
+      if(r.protocol === 'rustdesk' && r.host) return 'https://rustdesk.com/web/';
+      if(r.protocol === 'guacamole') return r.host ? 'http://' + r.host : '';
+      return '';
+    };
+
+    const selectConnection = (r) => {
+      selected = r;
+      const url = connectionUrl(r);
+      $('.remote-selected-box', root).innerHTML = `
+        <div class="remote-status-pill">${escapeHtml(r.protocol || 'remote')}</div>
+        <div style="margin-top:12px">
+          <div><b>${escapeHtml(r.name || 'Conexión')}</b></div>
+          <div class="remote-id-box">${escapeHtml(r.host || 'sin ID/host')}</div>
+          <div style="color:var(--muted);font-size:13px;line-height:1.4">${escapeHtml(url || 'Sin URL configurada')}</div>
+          <div style="color:var(--muted);font-size:12px;margin-top:7px">${escapeHtml(r.notes || '')}</div>
+        </div>
+      `;
+    };
+
     const load = async () => {
-      const rows = await api('/api/remote/connections');
-      $('.remote-body', root).innerHTML = rows.length ? rows.map(r => `
+      rowsCache = await api('/api/remote/connections');
+      $('.remote-body', root).innerHTML = rowsCache.length ? rowsCache.map(r => `
         <tr>
           <td>${escapeHtml(r.protocol || '')}</td>
           <td>${escapeHtml(r.name || '')}</td>
           <td>${escapeHtml(r.host || '')}</td>
-          <td><span class="quick-code" style="font-size:14px;letter-spacing:.12em;padding:5px 8px;margin:0;display:inline-block">${escapeHtml(r.code || '')}</span></td>
+          <td>${escapeHtml((r.url || '').slice(0,70))}</td>
           <td class="row">
+            <button class="secondary remote-select" data-id="${escapeAttr(r.id)}">Seleccionar</button>
+            <button class="secondary remote-connect" data-id="${escapeAttr(r.id)}">Conectar</button>
             <button class="secondary remote-edit" data-id="${escapeAttr(r.id)}">Editar</button>
-            <button class="secondary remote-open" data-id="${escapeAttr(r.id)}">Abrir QA</button>
             <button class="danger remote-delete" data-id="${escapeAttr(r.id)}">Borrar</button>
           </td>
         </tr>
-      `).join('') : '<tr><td colspan="5">No hay sesiones guardadas.</td></tr>';
+      `).join('') : '<tr><td colspan="5">No hay conexiones remotas guardadas.</td></tr>';
+
+      $$('.remote-select', root).forEach(btn => btn.addEventListener('click', () => {
+        const r = rowsCache.find(x => x.id === btn.dataset.id);
+        if(r) selectConnection(r);
+      }));
+
+      $$('.remote-connect', root).forEach(btn => btn.addEventListener('click', () => {
+        const r = rowsCache.find(x => x.id === btn.dataset.id);
+        if(r){ selectConnection(r); connectSelected(false); }
+      }));
 
       $$('.remote-edit', root).forEach(btn => btn.addEventListener('click', () => {
-        const r = rows.find(x => x.id === btn.dataset.id);
+        const r = rowsCache.find(x => x.id === btn.dataset.id);
         if(!r) return;
         form.id.value = r.id;
+        form.title.textContent = 'Editar conexión remota';
         form.name.value = r.name || '';
-        form.protocol.value = r.protocol || 'quickassist';
+        form.protocol.value = r.protocol || 'rustdesk';
         form.host.value = r.host || '';
-        form.code.value = r.code || '';
+        form.port.value = r.port || '';
+        form.url.value = r.url || '';
+        form.username.value = r.username || '';
+        form.password.value = r.password || '';
         form.notes.value = r.notes || '';
       }));
 
-      $$('.remote-open', root).forEach(btn => btn.addEventListener('click', () => launchQuickAssist($('.qa-msg', root))));
       $$('.remote-delete', root).forEach(btn => btn.addEventListener('click', async () => {
-        if(!confirm('¿Eliminar esta sesión/equipo?')) return;
+        if(!confirm('¿Eliminar esta conexión remota?')) return;
         await api('/api/remote/connections/' + encodeURIComponent(btn.dataset.id), {method:'DELETE'});
+        if(selected && selected.id === btn.dataset.id) selected = null;
         await load();
       }));
     };
 
-    const launchQuickAssist = (msgEl) => {
-      setMsg(msgEl, 'Intentando abrir Asistencia rápida. Si no se abre, pulsa Ctrl + Win + Q en Windows.');
-      const a = document.createElement('a');
-      a.href = 'ms-quick-assist:';
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => setMsg(msgEl, 'Si Windows no ha abierto la app, usa Ctrl + Win + Q o el lanzador .bat.', 'ok'), 1400);
+    const connectSelected = (external=false) => {
+      const msg = $('.remote-selected-msg', root);
+      if(!selected){ setMsg(msg, 'Selecciona una conexión primero.', 'bad'); return; }
+      const url = connectionUrl(selected);
+      if(!url){ setMsg(msg, 'Esta conexión no tiene URL web configurada.', 'bad'); return; }
+      if(external) window.open(url, '_blank', 'noopener,noreferrer');
+      else openBrowser(url, selected.name || 'Conexión remota');
+      setMsg(msg, 'Abriendo conexión remota.', 'ok');
     };
 
-    $('.qa-launch', root).addEventListener('click', () => launchQuickAssist($('.qa-msg', root)));
-    $('.qa-copy-steps', root).addEventListener('click', async () => {
-      const text = 'Abre Asistencia rápida con Ctrl + Win + Q. El asistente pulsa Ayudar a alguien, genera el código de 6 caracteres y el usuario lo introduce para compartir pantalla.';
-      await navigator.clipboard.writeText(text).catch(() => {});
-      setMsg($('.qa-msg', root), 'Pasos copiados.', 'ok');
-    });
-    $('.qa-download-bat', root).addEventListener('click', () => {
-      const bat = '@echo off\r\nstart ms-quick-assist:\r\n';
-      downloadText('abrir_asistencia_rapida.bat', bat);
-    });
+    $$('.remote-preset', root).forEach(btn => btn.addEventListener('click', () => applyPreset(btn.dataset.mode)));
+    $('.remote-clear', root).addEventListener('click', clear);
 
     $('.remote-save', root).addEventListener('click', async () => {
       const payload = {
-        name: form.name.value || 'Sesión Quick Assist',
+        name: form.name.value || 'Conexión remota',
         protocol: form.protocol.value,
         host: form.host.value,
-        code: form.code.value,
+        port: form.port.value,
+        url: form.url.value,
+        username: form.username.value,
+        password: form.password.value,
         notes: form.notes.value,
         enabled: true
       };
       try{
         if(form.id.value){
           await api('/api/remote/connections/' + encodeURIComponent(form.id.value), {method:'PUT', body:JSON.stringify(payload)});
-          setMsg(form.msg, 'Sesión actualizada.', 'ok');
+          setMsg(form.msg, 'Conexión actualizada.', 'ok');
         }else{
           await api('/api/remote/connections', {method:'POST', body:JSON.stringify(payload)});
-          setMsg(form.msg, 'Sesión guardada.', 'ok');
+          setMsg(form.msg, 'Conexión guardada.', 'ok');
         }
         clear();
         await load();
       }catch(err){ setMsg(form.msg, err.message, 'bad'); }
     });
 
-    $('.remote-clear', root).addEventListener('click', clear);
+    $('.remote-test-url', root).addEventListener('click', async () => {
+      const url = form.url.value.trim();
+      if(!url){ setMsg(form.msg, 'Introduce una URL para probar.', 'bad'); return; }
+      setMsg(form.msg, 'Probando URL…');
+      try{
+        const result = await api('/api/cloud/test-url', {method:'POST', body:JSON.stringify({url})});
+        setMsg(form.msg, result.ok ? 'URL accesible desde el servidor.' : 'No responde correctamente: ' + (result.status || result.error), result.ok ? 'ok' : 'bad');
+      }catch(err){ setMsg(form.msg, err.message, 'bad'); }
+    });
+
+    $('.remote-connect-selected', root).addEventListener('click', () => connectSelected(false));
+    $('.remote-open-selected', root).addEventListener('click', () => connectSelected(true));
+    $('.remote-copy-selected', root).addEventListener('click', async () => {
+      const msg = $('.remote-selected-msg', root);
+      if(!selected){ setMsg(msg, 'Selecciona una conexión primero.', 'bad'); return; }
+      const text = `Conexión remota: ${selected.name || ''}\nTipo: ${selected.protocol || ''}\nID/Host: ${selected.host || ''}\nURL: ${connectionUrl(selected)}\nUsuario: ${selected.username || ''}\nNotas: ${selected.notes || ''}`;
+      await navigator.clipboard.writeText(text).catch(() => {});
+      setMsg(msg, 'Datos copiados.', 'ok');
+    });
+
+    $('.qa-copy-steps', root).addEventListener('click', async () => {
+      const text = 'Quick Assist manual: en Windows pulsa Ctrl + Win + Q. El asistente genera el código y el usuario acepta compartir pantalla/control.';
+      await navigator.clipboard.writeText(text).catch(() => {});
+      setMsg($('.qa-msg', root), 'Instrucciones copiadas.', 'ok');
+    });
+
+    $('.qa-download-bat', root).addEventListener('click', () => {
+      const bat = '@echo off\r\nstart ms-quick-assist:\r\n';
+      downloadText('abrir_asistencia_rapida_windows.bat', bat);
+    });
+
     await load();
   }
 
