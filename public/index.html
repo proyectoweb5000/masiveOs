@@ -192,6 +192,61 @@
 
 
 
+
+    .pcloud-pathbar{
+      display:grid;
+      grid-template-columns:auto 1fr auto auto;
+      gap:8px;
+      align-items:center;
+      margin:12px 0;
+    }
+    .pcloud-list-row{
+      display:grid;
+      grid-template-columns:42px 1fr 120px 150px auto;
+      gap:8px;
+      align-items:center;
+      padding:9px 10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .pcloud-list-row:hover{background:rgba(255,255,255,.07)}
+    .pcloud-list-head{
+      color:#dbeafe;
+      background:rgba(255,255,255,.06);
+      font-size:12px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      position:sticky;
+      top:0;
+      z-index:2;
+    }
+    .pcloud-file-icon{font-size:24px;text-align:center}
+    .pcloud-list-box{
+      border:1px solid rgba(255,255,255,.13);
+      border-radius:18px;
+      overflow:auto;
+      max-height:430px;
+      background:rgba(255,255,255,.05);
+    }
+    .pcloud-breadcrumb{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      align-items:center;
+      color:var(--muted);
+      font-size:12px;
+      margin-top:8px;
+    }
+    .pcloud-breadcrumb button{
+      width:auto;
+      padding:5px 8px;
+      border-radius:999px;
+      font-size:11px;
+    }
+    body.theme-light .pcloud-list-row{border-bottom-color:rgba(15,23,42,.09)}
+    body.theme-light .pcloud-list-head{color:#1e3a8a;background:rgba(59,130,246,.09)}
+    body.theme-light .pcloud-list-box{background:rgba(255,255,255,.68);border-color:rgba(15,23,42,.13)}
+
     .meteo-hero{
       border:1px solid rgba(255,255,255,.14);
       border-radius:24px;
@@ -519,6 +574,7 @@
       <button class="dock-btn" data-module="files" title="Archivos">📁</button>
       <button class="dock-btn" data-module="dashboards" title="Dashboards">📊</button>
       <button class="dock-btn" data-module="cloud" title="Nube">☁️</button>
+      <button class="dock-btn" data-module="pcloud" title="pCloud">🅿️</button>
       <button class="dock-btn" data-module="meteo" title="Meteo & Radio">📡</button>
       <button class="dock-btn" data-module="remote" title="Ayuda remota">🖥️</button>
       <button class="dock-btn" data-module="settings" title="Configuración">⚙️</button>
@@ -715,6 +771,7 @@
       files: ['Archivos','📁'],
       dashboards: ['Dashboards','📊'],
       cloud: ['Centro de nube','☁️'],
+      pcloud: ['pCloud','🅿️'],
       meteo: ['Meteo & Radio','📡'],
       remote: ['Ayuda remota','🖥️'],
       settings: ['Configuración','⚙️']
@@ -726,6 +783,7 @@
     if(module === 'files') renderFiles(win.body);
     if(module === 'dashboards') renderDashboards(win.body);
     if(module === 'cloud') renderCloud(win.body);
+    if(module === 'pcloud') renderPCloud(win.body);
     if(module === 'meteo') renderMeteo(win.body);
     if(module === 'remote') renderRemote(win.body);
     if(module === 'settings') renderSettings(win.body);
@@ -1021,6 +1079,7 @@
           <div class="cloud-service-card"><h4>🐙 GitHub</h4><p>Repositorio, rama y token personal para futuras automatizaciones de subida de archivos.</p><button class="secondary cloud-preset" data-provider="GitHub">Configurar</button></div>
           <div class="cloud-service-card"><h4>▲ Render</h4><p>Servicio, URL pública, deploy hook y API key para futuras acciones de deploy.</p><button class="secondary cloud-preset" data-provider="Render">Configurar</button></div>
           <div class="cloud-service-card"><h4>☁️ OneDrive</h4><p>Cuenta o enlace de carpeta compartida para documentación y dashboards.</p><button class="secondary cloud-preset" data-provider="OneDrive">Configurar</button></div>
+          <div class="cloud-service-card"><h4>🅿️ pCloud</h4><p>Cuenta pCloud con token API para navegar por carpetas y descargar archivos.</p><button class="secondary cloud-preset" data-provider="pCloud">Configurar</button></div>
           <div class="cloud-service-card"><h4>🏢 SharePoint</h4><p>URL de carpeta, site o documento compartido corporativo.</p><button class="secondary cloud-preset" data-provider="SharePoint">Configurar</button></div>
           <div class="cloud-service-card"><h4>🔌 API propia</h4><p>Endpoint HTTP para conectar otros dashboards o servicios internos.</p><button class="secondary cloud-preset" data-provider="Custom API">Configurar</button></div>
         </div>
@@ -1031,7 +1090,7 @@
           <h3 class="cloud-form-title">Añadir servicio</h3>
           <input type="hidden" class="cloud-id">
           <div class="grid2">
-            <div class="field"><label>Proveedor</label><select class="input cloud-provider"><option>GitHub</option><option>Render</option><option>OneDrive</option><option>SharePoint</option><option>Dropbox</option><option>Custom API</option></select></div>
+            <div class="field"><label>Proveedor</label><select class="input cloud-provider"><option>GitHub</option><option>Render</option><option>OneDrive</option><option>pCloud</option><option>SharePoint</option><option>Dropbox</option><option>Custom API</option></select></div>
             <div class="field"><label>Nombre visible</label><input class="input cloud-name" placeholder="Ej: Render MasiveOS"></div>
           </div>
           <div class="field"><label>URL principal / endpoint</label><input class="input cloud-url" placeholder="https://..."></div>
@@ -1103,6 +1162,11 @@
         form.branch.value = 'production';
         form.url.value = location.origin;
         form.notes.value = 'Servicio desplegado en Render con disco persistente /var/data.';
+      }
+      if(provider === 'pCloud'){
+        form.name.value = 'pCloud principal';
+        form.url.value = 'https://eapi.pcloud.com';
+        form.notes.value = 'Usa eapi.pcloud.com para cuenta europea o api.pcloud.com para cuenta USA. Guarda aquí el access_token.';
       }
       if(provider === 'OneDrive' || provider === 'SharePoint'){
         form.name.value = provider + ' compartido';
@@ -1211,6 +1275,139 @@
     });
 
     await load();
+  }
+
+  async function renderPCloud(root){
+    root.innerHTML = `
+      <div class="card">
+        <h3>Explorador pCloud</h3>
+        <p>Navega por tus archivos de pCloud desde Masive OS. Configura primero una cuenta pCloud en el Centro Cloud PRO con URL <b>https://eapi.pcloud.com</b> si tu cuenta es europea o <b>https://api.pcloud.com</b> si es USA, y pega el <b>access_token</b> en el campo token.</p>
+        <div class="grid2" style="margin-top:12px">
+          <div class="field"><label>Cuenta pCloud</label><select class="input pcloud-account"></select></div>
+          <div class="field"><label>Folder ID actual</label><input class="input pcloud-folderid" value="0"></div>
+        </div>
+        <div class="pcloud-pathbar">
+          <button class="secondary pcloud-root">Raíz</button>
+          <input class="input pcloud-path" value="/" placeholder="/ o folderid">
+          <button class="primary pcloud-load">Cargar</button>
+          <button class="secondary pcloud-refresh">Actualizar</button>
+        </div>
+        <div class="pcloud-breadcrumb"></div>
+        <div class="msg pcloud-msg"></div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Contenido</h3>
+        <div class="pcloud-list-box">
+          <div class="pcloud-list-row pcloud-list-head">
+            <div></div><div>Nombre</div><div>Tamaño</div><div>Modificado</div><div>Acción</div>
+          </div>
+          <div class="pcloud-list-body"><div class="pcloud-list-row"><div></div><div>Cargando cuentas…</div><div></div><div></div><div></div></div></div>
+        </div>
+      </div>
+    `;
+
+    const accountSel = $('.pcloud-account', root);
+    const folderInput = $('.pcloud-folderid', root);
+    const pathInput = $('.pcloud-path', root);
+    const msg = $('.pcloud-msg', root);
+    const body = $('.pcloud-list-body', root);
+    const breadcrumb = $('.pcloud-breadcrumb', root);
+    let current = {folderid:0, path:'/', parents:[]};
+
+    const fmtSize = n => {
+      n = Number(n || 0);
+      if(!n) return '';
+      if(n < 1024) return n + ' B';
+      if(n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+      if(n < 1024*1024*1024) return (n/(1024*1024)).toFixed(2) + ' MB';
+      return (n/(1024*1024*1024)).toFixed(2) + ' GB';
+    };
+    const fmtDate = v => {
+      if(!v) return '';
+      const d = new Date(v);
+      return isNaN(d) ? String(v).slice(0,16) : d.toLocaleDateString('es-ES') + ' ' + d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+    };
+
+    const loadAccounts = async () => {
+      const accounts = await api('/api/cloud/accounts');
+      const pcloud = accounts.filter(a => (a.provider || '').toLowerCase() === 'pcloud');
+      accountSel.innerHTML = pcloud.length ? pcloud.map(a => `<option value="${escapeAttr(a.id)}">${escapeHtml(a.display_name || a.provider)}</option>`).join('') : '<option value="">No hay cuenta pCloud configurada</option>';
+      if(!pcloud.length){
+        body.innerHTML = '<div class="pcloud-list-row"><div>⚠️</div><div>Configura una cuenta pCloud en Nube → pCloud.</div><div></div><div></div><div></div></div>';
+      }
+      return pcloud;
+    };
+
+    const renderBreadcrumb = () => {
+      const parts = current.parents || [];
+      breadcrumb.innerHTML = `<button class="secondary crumb-root">/ raíz</button>` + parts.map(p => `<button class="secondary crumb" data-folderid="${escapeAttr(p.folderid)}">${escapeHtml(p.name || p.folderid)}</button>`).join('');
+      $('.crumb-root', breadcrumb)?.addEventListener('click', () => loadFolder({folderid:0}));
+      $$('.crumb', breadcrumb).forEach(b => b.addEventListener('click', () => loadFolder({folderid:b.dataset.folderid})));
+    };
+
+    const loadFolder = async ({folderid=null, path=null}={}) => {
+      if(!accountSel.value){ setMsg(msg, 'No hay cuenta pCloud configurada.', 'bad'); return; }
+      setMsg(msg, 'Cargando pCloud…');
+      body.innerHTML = '<div class="pcloud-list-row"><div>⏳</div><div>Cargando…</div><div></div><div></div><div></div></div>';
+      try{
+        const payload = { accountId: accountSel.value };
+        if(path) payload.path = path;
+        else payload.folderid = folderid ?? folderInput.value ?? 0;
+        const data = await api('/api/pcloud/list', {method:'POST', body:JSON.stringify(payload)});
+        current = data.metadata || {folderid: payload.folderid || 0, path: payload.path || '/', parents:[]};
+        folderInput.value = current.folderid ?? 0;
+        pathInput.value = current.path || '/';
+        renderBreadcrumb();
+
+        const items = (data.contents || []).slice().sort((a,b) => {
+          if(!!a.isfolder !== !!b.isfolder) return a.isfolder ? -1 : 1;
+          return String(a.name||'').localeCompare(String(b.name||''), 'es');
+        });
+
+        body.innerHTML = items.length ? items.map(it => `
+          <div class="pcloud-list-row">
+            <div class="pcloud-file-icon">${it.isfolder ? '📁' : '📄'}</div>
+            <div><b>${escapeHtml(it.name || '')}</b><div class="small">${escapeHtml(it.path || '')}</div></div>
+            <div>${escapeHtml(fmtSize(it.size))}</div>
+            <div>${escapeHtml(fmtDate(it.modified))}</div>
+            <div class="row">
+              ${it.isfolder
+                ? `<button class="secondary pcloud-open-folder" data-folderid="${escapeAttr(it.folderid)}">Abrir</button>`
+                : `<button class="secondary pcloud-open-file" data-fileid="${escapeAttr(it.fileid)}">Abrir</button><button class="secondary pcloud-download-file" data-fileid="${escapeAttr(it.fileid)}">Descargar</button>`
+              }
+            </div>
+          </div>
+        `).join('') : '<div class="pcloud-list-row"><div>📭</div><div>Carpeta vacía.</div><div></div><div></div><div></div></div>';
+
+        $$('.pcloud-open-folder', root).forEach(b => b.addEventListener('click', () => loadFolder({folderid:b.dataset.folderid})));
+        $$('.pcloud-open-file', root).forEach(b => b.addEventListener('click', async () => {
+          const link = await api('/api/pcloud/download-link', {method:'POST', body:JSON.stringify({accountId:accountSel.value,fileid:b.dataset.fileid})});
+          if(link.url) openBrowser(link.url, 'pCloud archivo');
+        }));
+        $$('.pcloud-download-file', root).forEach(b => b.addEventListener('click', async () => {
+          const link = await api('/api/pcloud/download-link', {method:'POST', body:JSON.stringify({accountId:accountSel.value,fileid:b.dataset.fileid, forcedownload:true})});
+          if(link.url) window.open(link.url, '_blank', 'noopener,noreferrer');
+        }));
+
+        setMsg(msg, 'Carpeta cargada correctamente.', 'ok');
+      }catch(err){
+        body.innerHTML = `<div class="pcloud-list-row"><div>❌</div><div>${escapeHtml(err.message)}</div><div></div><div></div><div></div></div>`;
+        setMsg(msg, err.message, 'bad');
+      }
+    };
+
+    await loadAccounts();
+    if(accountSel.value) await loadFolder({folderid:0});
+
+    $('.pcloud-root', root).addEventListener('click', () => loadFolder({folderid:0}));
+    $('.pcloud-refresh', root).addEventListener('click', () => loadFolder({folderid:folderInput.value || 0}));
+    $('.pcloud-load', root).addEventListener('click', () => {
+      const v = pathInput.value.trim();
+      if(v.startsWith('/')) loadFolder({path:v});
+      else loadFolder({folderid:folderInput.value || v || 0});
+    });
+    accountSel.addEventListener('change', () => loadFolder({folderid:0}));
   }
 
   function renderMeteo(root){
@@ -1427,6 +1624,7 @@
             <button class="quick-app quick-files"><b>📁</b><span>Archivos</span></button>
             <button class="quick-app quick-dashboards"><b>📊</b><span>Dashboards</span></button>
             <button class="quick-app quick-cloud"><b>☁️</b><span>Nube</span></button>
+            <button class="quick-app quick-pcloud"><b>🅿️</b><span>pCloud</span></button>
             <button class="quick-app quick-meteo"><b>📡</b><span>Meteo Radio</span></button>
           </div>
           <div style="margin-top:12px" class="row">
@@ -1465,6 +1663,7 @@
     $('.quick-files', root).addEventListener('click', () => openModule('files'));
     $('.quick-dashboards', root).addEventListener('click', () => openModule('dashboards'));
     $('.quick-cloud', root).addEventListener('click', () => openModule('cloud'));
+    $('.quick-pcloud', root).addEventListener('click', () => openModule('pcloud'));
     $('.quick-meteo', root).addEventListener('click', () => openModule('meteo'));
     const renderList = () => {
       $('.icons-table-body', root).innerHTML = icons.map(i => `
@@ -1627,7 +1826,7 @@
 
     const lower = q.toLowerCase();
     const internal = {
-      'archivos':'files','files':'files','dashboards':'dashboards','dashboard':'dashboards','paneles':'dashboards','nube':'cloud','cloud':'cloud',
+      'archivos':'files','files':'files','dashboards':'dashboards','dashboard':'dashboards','paneles':'dashboards','nube':'cloud','cloud':'cloud','pcloud':'pcloud','pclaud':'pcloud','p cloud':'pcloud',
       'meteo':'meteo','meteorologia':'meteo','meteorología':'meteo','radio':'meteo','ea1fjz':'meteo','observatory':'meteo','windy':'meteo','dsn':'meteo','ayuda':'remote','remoto':'remote',
       'config':'settings','configuracion':'settings','configuración':'settings',
       'navegador':'browser','browser':'browser'
