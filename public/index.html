@@ -2,187 +2,844 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EA1FJZ Cloud OS</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Masive OS</title>
   <style>
     :root{
-      --bg:#0b1220;--panel:rgba(15,23,42,.78);--panel2:rgba(255,255,255,.08);--line:rgba(255,255,255,.16);
-      --text:#f8fafc;--muted:#a9b5c8;--accent:#2f7df6;--danger:#ef4444;--ok:#22c55e;--warn:#f59e0b;
-      --shadow:0 22px 70px rgba(0,0,0,.35);--radius:22px;--top:42px;--dock:82px;
+      --bg0:#060814;
+      --bg1:#111827;
+      --glass:rgba(18,25,45,.62);
+      --glass2:rgba(255,255,255,.10);
+      --line:rgba(255,255,255,.18);
+      --line2:rgba(255,255,255,.28);
+      --txt:#f8fafc;
+      --muted:#b8c0d4;
+      --blue:#5aa7ff;
+      --violet:#8b5cf6;
+      --ok:#34d399;
+      --bad:#fb7185;
+      --warn:#fbbf24;
+      --shadow:0 24px 70px rgba(0,0,0,.42);
+      --radius:24px;
+      --topbar:42px;
+      --dock:86px;
     }
-    *{box-sizing:border-box} html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);overflow:hidden}
-    body{background:#07111f}.desktop{position:fixed;inset:0;background:linear-gradient(135deg,#09111f 0%,#132b4f 45%,#0f172a 100%);background-size:cover;background-position:center;user-select:none}
-    .desktop:before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 25% 10%,rgba(47,125,246,.35),transparent 26%),radial-gradient(circle at 78% 20%,rgba(34,197,94,.16),transparent 30%),linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.42));pointer-events:none}
-    .topbar{position:absolute;top:0;left:0;right:0;height:var(--top);display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:rgba(2,6,23,.64);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);z-index:5000}
-    .brand{display:flex;gap:10px;align-items:center;font-weight:900}.brand-badge{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#174ea6);display:grid;place-items:center;box-shadow:0 8px 24px rgba(47,125,246,.35);font-size:11px}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:600;margin-top:-2px}
-    .top-center{display:flex;gap:8px;align-items:center}.task-pill{display:none;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.08);color:var(--text);padding:6px 10px;font-size:12px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}.task-pill.is-visible{display:flex}
-    .top-right{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}.status-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(34,197,94,.14)}
-    button,input,select,textarea{font:inherit}.btn{border:1px solid var(--line);background:rgba(255,255,255,.09);color:var(--text);border-radius:14px;padding:10px 12px;font-weight:800;cursor:pointer;transition:.16s ease}.btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.14)}.btn:active{transform:translateY(1px) scale(.99)}.btn.primary{background:linear-gradient(135deg,var(--accent),#1d4ed8);border-color:rgba(255,255,255,.18)}.btn.danger{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.35)}.btn.ok{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.35)}
-    .login{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;background:radial-gradient(circle at 40% 20%,rgba(47,125,246,.22),transparent 30%),#08101d}.login-card{width:min(420px,calc(100% - 32px));background:rgba(15,23,42,.82);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:28px;backdrop-filter:blur(20px);text-align:center}.login-logo{width:62px;height:62px;margin:0 auto 14px;border-radius:18px;background:linear-gradient(135deg,var(--accent),#123b7f);display:grid;place-items:center;font-weight:1000}.login-card h1{margin:0;font-size:28px}.login-card p{color:var(--muted);line-height:1.45}.field{display:grid;gap:7px;text-align:left;margin:12px 0}.field label{font-size:12px;color:var(--muted);font-weight:800}.input{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--text);border-radius:14px;padding:12px 13px;outline:none}.input:focus{border-color:rgba(47,125,246,.7);box-shadow:0 0 0 4px rgba(47,125,246,.16)}.login-msg{min-height:20px;color:#fca5a5;font-size:13px;margin-top:10px}.hint{color:var(--muted);font-size:12px;line-height:1.35}
-    .icons{position:absolute;inset:var(--top) 0 var(--dock) 0;z-index:10}.desk-icon{position:absolute;width:88px;min-height:88px;display:grid;justify-items:center;align-content:start;gap:7px;padding:8px;border-radius:18px;cursor:pointer;text-align:center;color:#fff}.desk-icon:hover{background:rgba(255,255,255,.12);backdrop-filter:blur(4px)}.desk-icon .emoji{width:52px;height:52px;border-radius:17px;display:grid;place-items:center;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);font-size:28px;box-shadow:0 10px 22px rgba(0,0,0,.18)}.desk-icon span{font-size:12px;text-shadow:0 2px 8px rgba(0,0,0,.9);line-height:1.15;word-break:break-word}
-    .dock{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);height:64px;display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--line);border-radius:24px;background:rgba(15,23,42,.55);backdrop-filter:blur(18px);box-shadow:var(--shadow);z-index:5000}.dock-btn{width:48px;height:48px;border-radius:17px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:25px;cursor:pointer}.dock-btn:hover{transform:translateY(-6px);background:rgba(255,255,255,.2)}
-    .window{position:absolute;min-width:420px;min-height:260px;width:860px;height:560px;top:82px;left:120px;background:rgba(15,23,42,.86);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);backdrop-filter:blur(22px);z-index:100;overflow:hidden;resize:both}.window.max{top:48px!important;left:10px!important;width:calc(100vw - 20px)!important;height:calc(100vh - 128px)!important;resize:none}.titlebar{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.06);cursor:move}.traffic{display:flex;gap:8px}.dot{width:13px;height:13px;border-radius:50%;cursor:pointer}.dot.close{background:#ff5f57}.dot.min{background:#ffbd2e}.dot.max{background:#28c840}.wtitle{font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}.wbody{height:calc(100% - 42px);overflow:auto;padding:16px}.window iframe{width:100%;height:100%;border:0;background:#fff;border-radius:0}.no-pad{padding:0}.grid{display:grid;gap:14px}.grid.two{grid-template-columns:1fr 1fr}.grid.three{grid-template-columns:repeat(3,1fr)}.card{background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:20px;padding:16px}.card h3{margin:0 0 8px}.muted{color:var(--muted)}.small{font-size:12px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid var(--line);padding:9px;text-align:left;font-size:13px}.table th{color:#dbeafe}.badge{display:inline-flex;padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid var(--line);font-size:11px;font-weight:900}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form-row.three{grid-template-columns:1fr 1fr 1fr}.app-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}.app-tile{border:1px solid var(--line);background:rgba(255,255,255,.08);border-radius:18px;padding:14px;cursor:pointer}.app-tile:hover{background:rgba(255,255,255,.14)}.app-tile .big{font-size:34px}.toast{position:fixed;right:16px;bottom:94px;background:rgba(15,23,42,.92);border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);z-index:10000;display:none}.toast.show{display:block}.hidden{display:none!important}
-    @media(max-width:760px){.grid.two,.grid.three,.form-row,.form-row.three{grid-template-columns:1fr}.window{left:8px!important;top:52px!important;width:calc(100vw - 16px)!important;height:calc(100vh - 140px)!important;resize:none}.dock{max-width:calc(100vw - 18px);overflow:auto}.top-center{display:none}.brand small{display:none}}
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--txt);background:#050713}
+    body{
+      background:
+        radial-gradient(circle at 18% 10%,rgba(112,55,255,.42),transparent 32%),
+        radial-gradient(circle at 82% 18%,rgba(29,124,255,.34),transparent 28%),
+        radial-gradient(circle at 62% 84%,rgba(14,165,233,.28),transparent 34%),
+        linear-gradient(135deg,#070916,#111827 55%,#0b1020);
+    }
+    body.custom-wallpaper{
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .hidden{display:none!important}
+
+    .login-screen{
+      position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px;
+      background:
+        radial-gradient(circle at 30% 20%,rgba(139,92,246,.35),transparent 35%),
+        radial-gradient(circle at 72% 72%,rgba(14,165,233,.28),transparent 34%),
+        linear-gradient(135deg,#050713,#111827);
+    }
+    .login-card{
+      width:min(440px,calc(100% - 20px));
+      border:1px solid var(--line);
+      border-radius:32px;
+      background:rgba(15,23,42,.64);
+      backdrop-filter:blur(24px);
+      box-shadow:var(--shadow);
+      padding:30px;
+    }
+    .login-logo{
+      width:74px;height:74px;border-radius:24px;margin:0 auto 16px;
+      display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,rgba(90,167,255,.95),rgba(139,92,246,.95));
+      box-shadow:0 16px 40px rgba(79,70,229,.35);
+      font-size:36px;
+    }
+    .login-card h1{text-align:center;margin:0 0 6px;font-size:30px;letter-spacing:.2px}
+    .login-card p{text-align:center;margin:0 0 22px;color:var(--muted);font-size:14px;line-height:1.45}
+    .field{display:grid;gap:7px;margin:0 0 14px}
+    .field label{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    .input{
+      width:100%;border:1px solid var(--line);border-radius:16px;padding:13px 14px;background:rgba(255,255,255,.08);
+      color:#fff;outline:none;
+    }
+    .input:focus{border-color:rgba(90,167,255,.72);box-shadow:0 0 0 4px rgba(90,167,255,.12)}
+    .primary{
+      border:0;border-radius:16px;background:linear-gradient(135deg,#60a5fa,#7c3aed);color:#fff;
+      padding:12px 16px;font-weight:900;box-shadow:0 12px 28px rgba(79,70,229,.28);
+    }
+    .secondary{
+      border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.09);color:#fff;padding:10px 13px;font-weight:800;
+    }
+    .danger{
+      border:1px solid rgba(251,113,133,.45);border-radius:14px;background:rgba(251,113,133,.16);color:#fecdd3;padding:10px 13px;font-weight:900;
+    }
+    .msg{min-height:18px;font-size:13px;color:var(--muted);margin-top:10px}
+    .msg.bad{color:#fecdd3}.msg.ok{color:#bbf7d0}
+
+    .topbar{
+      position:fixed;left:0;right:0;top:0;height:var(--topbar);z-index:5000;
+      display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 14px;
+      background:rgba(5,8,22,.54);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.12);
+      user-select:none;
+    }
+    .brand{display:flex;align-items:center;gap:10px;font-weight:950}
+    .brand-badge{
+      width:24px;height:24px;border-radius:9px;background:linear-gradient(135deg,#60a5fa,#7c3aed);
+      display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 8px 22px rgba(96,165,250,.18)
+    }
+    .top-center{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;min-width:0}
+    .top-pill{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);padding:5px 9px;border-radius:999px;white-space:nowrap}
+    .top-actions{display:flex;align-items:center;gap:8px}
+    .top-btn{
+      width:auto;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:#fff;border-radius:12px;
+      padding:6px 10px;font-weight:800;font-size:12px
+    }
+
+    .desktop{
+      position:fixed;left:0;right:0;top:var(--topbar);bottom:0;z-index:1;overflow:hidden;
+      padding:22px 22px calc(var(--dock) + 22px);
+    }
+    .icon{
+      position:absolute;width:92px;height:98px;border:1px solid transparent;border-radius:22px;
+      display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px;padding:10px 6px;
+      color:#fff;text-align:center;user-select:none;
+    }
+    .icon:hover,.icon.is-selected{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.16);backdrop-filter:blur(8px)}
+    .icon-symbol{
+      width:54px;height:54px;border-radius:20px;background:rgba(255,255,255,.13);
+      border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:30px;
+      box-shadow:0 10px 24px rgba(0,0,0,.18)
+    }
+    .icon-title{
+      max-width:84px;line-height:1.15;font-size:12px;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.55);
+      overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    }
+
+    .dock{
+      position:fixed;left:50%;bottom:14px;transform:translateX(-50%);height:72px;z-index:4800;
+      display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid rgba(255,255,255,.18);
+      border-radius:25px;background:rgba(10,15,30,.52);backdrop-filter:blur(26px);box-shadow:var(--shadow);
+      max-width:calc(100vw - 28px);overflow:auto;
+    }
+    .dock-btn{
+      width:50px;height:50px;min-width:50px;border-radius:18px;border:1px solid rgba(255,255,255,.18);
+      display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.10);color:#fff;font-size:25px;
+      position:relative;
+    }
+    .dock-btn.running::after{
+      content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:999px;background:#fff;
+    }
+
+    .window{
+      position:absolute;left:170px;top:90px;width:860px;height:560px;z-index:100;background:rgba(15,23,42,.72);
+      border:1px solid rgba(255,255,255,.17);border-radius:22px;backdrop-filter:blur(22px);box-shadow:var(--shadow);
+      overflow:hidden;display:flex;flex-direction:column;min-width:360px;min-height:260px;
+    }
+    .window.maximized{left:10px!important;top:52px!important;width:calc(100vw - 20px)!important;height:calc(100vh - 62px)!important;border-radius:18px}
+    .window.minimized{display:none}
+    .titlebar{
+      height:46px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 12px;
+      border-bottom:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);user-select:none;cursor:move;
+      flex:0 0 auto;
+    }
+    .traffic{display:flex;gap:7px;align-items:center}
+    .dot{width:13px;height:13px;border-radius:999px;border:0;padding:0}
+    .close{background:#ff5f57}.min{background:#ffbd2e}.max{background:#28c840}
+    .win-title{font-size:13px;font-weight:950;display:flex;gap:8px;align-items:center;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .win-body{flex:1;overflow:auto;padding:16px;background:rgba(2,6,23,.08)}
+    .resize-handle{position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize}
+    .resize-handle::after{content:'⇲';position:absolute;right:3px;bottom:1px;color:rgba(255,255,255,.45);font-size:13px}
+
+    .panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .card{
+      border:1px solid rgba(255,255,255,.13);border-radius:18px;background:rgba(255,255,255,.08);padding:14px;
+    }
+    .card h3{margin:0 0 8px;font-size:16px}
+    .card p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{border-bottom:1px solid rgba(255,255,255,.10);padding:9px;text-align:left;font-size:13px;vertical-align:middle}
+    .table th{color:#dbeafe;background:rgba(255,255,255,.06);position:sticky;top:0}
+    .table button{padding:7px 9px;border-radius:10px;font-size:12px}
+    .browser-bar{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-bottom:10px}
+    iframe.browser-frame{width:100%;height:calc(100% - 52px);border:1px solid rgba(255,255,255,.14);border-radius:16px;background:#fff}
+    .note{border-left:4px solid var(--blue);padding:10px 12px;border-radius:14px;background:rgba(96,165,250,.11);color:#dbeafe;font-size:13px;line-height:1.45}
+    .status-ok{color:#bbf7d0}.status-bad{color:#fecdd3}
+    .form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+    .modal-backdrop{
+      position:fixed;inset:0;z-index:9000;background:rgba(2,6,23,.45);display:flex;align-items:center;justify-content:center;padding:20px;
+    }
+    .modal{
+      width:min(620px,calc(100vw - 30px));max-height:90vh;overflow:auto;border:1px solid rgba(255,255,255,.18);
+      border-radius:24px;background:rgba(15,23,42,.86);backdrop-filter:blur(24px);box-shadow:var(--shadow);padding:18px;
+    }
+    .modal h2{margin:0 0 6px;font-size:22px}
+    .modal p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.45}
+    .kv{display:grid;grid-template-columns:170px 1fr;gap:8px;font-size:13px;color:var(--muted)}
+    .kv b{color:#fff}
+    @media(max-width:800px){
+      .top-center{display:none}
+      .desktop{padding:14px}
+      .window{left:8px!important;top:52px!important;width:calc(100vw - 16px)!important;height:calc(100vh - 122px)!important}
+      .grid2{grid-template-columns:1fr}
+      .dock{left:10px;right:10px;transform:none;justify-content:flex-start}
+    }
   </style>
 </head>
 <body>
-<div id="login" class="login">
-  <div class="login-card">
-    <div class="login-logo">OS</div>
-    <h1>EA1FJZ Cloud OS</h1>
-    <p>Acceso protegido al escritorio web, archivos, nube, meteorología/radio y configuración.</p>
-    <div class="field"><label>Usuario</label><input id="loginUser" class="input" value="admin" autocomplete="username"></div>
-    <div class="field"><label>Contraseña</label><input id="loginPass" class="input" type="password" placeholder="Contraseña" autocomplete="current-password"></div>
-    <button id="loginBtn" class="btn primary" style="width:100%">Entrar</button>
-    <div id="loginMsg" class="login-msg"></div>
-    <div class="hint">Primera instalación: usuario <b>admin</b>. La contraseña inicial viene de la variable Render <b>ADMIN_PASSWORD</b>.</div>
+  <div id="loginScreen" class="login-screen">
+    <form id="loginForm" class="login-card">
+      <div class="login-logo">◈</div>
+      <h1>Masive OS</h1>
+      <p>Acceso privado al sistema operativo web para dashboards, nube, archivos, meteo y radio.</p>
+      <div class="field">
+        <label for="password">Contraseña</label>
+        <input id="password" class="input" type="password" autocomplete="current-password" placeholder="Introduce la contraseña" required />
+      </div>
+      <button class="primary" style="width:100%" type="submit">Entrar</button>
+      <div id="loginMsg" class="msg"></div>
+    </form>
   </div>
-</div>
-<div id="desktop" class="desktop hidden">
-  <div class="topbar">
-    <div class="brand"><div class="brand-badge">OS</div><div><span id="osTitle">EA1FJZ Cloud OS</span><small id="osSubtitle">Sistema operativo web</small></div></div>
-    <div id="taskbar" class="top-center"></div>
-    <div class="top-right"><span class="status-dot"></span><span id="healthText">Conectando...</span><span id="clock"></span><button id="logoutBtn" class="btn" style="padding:6px 9px">Salir</button></div>
+
+  <div id="appShell" class="hidden">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-badge">M</div>
+        <span id="systemTitle">Masive OS</span>
+      </div>
+      <div class="top-center">
+        <span class="top-pill" id="healthPill">Servidor: comprobando…</span>
+        <span class="top-pill">Render / Cloud OS</span>
+        <span class="top-pill" id="clockPill">--:--</span>
+      </div>
+      <div class="top-actions">
+        <button id="newIconTopBtn" class="top-btn">+ Icono</button>
+        <button id="settingsTopBtn" class="top-btn">Configuración</button>
+        <button id="logoutBtn" class="top-btn">Salir</button>
+      </div>
+    </div>
+
+    <main id="desktop" class="desktop"></main>
+
+    <div id="dock" class="dock">
+      <button class="dock-btn" data-module="browser" title="Navegador">🌐</button>
+      <button class="dock-btn" data-module="files" title="Archivos">📁</button>
+      <button class="dock-btn" data-module="cloud" title="Nube">☁️</button>
+      <button class="dock-btn" data-module="meteo" title="Meteo & Radio">📡</button>
+      <button class="dock-btn" data-module="remote" title="Ayuda remota">🖥️</button>
+      <button class="dock-btn" data-module="settings" title="Configuración">⚙️</button>
+    </div>
   </div>
-  <div id="icons" class="icons"></div>
-  <div class="dock">
-    <div class="dock-btn" data-app="browser" title="Navegador">🌐</div>
-    <div class="dock-btn" data-app="files" title="Archivos">📁</div>
-    <div class="dock-btn" data-app="meteo" title="Meteo & Radio">📡</div>
-    <div class="dock-btn" data-app="cloud" title="Nube">☁️</div>
-    <div class="dock-btn" data-app="remote" title="Ayuda remota">🖥️</div>
-    <div class="dock-btn" data-app="settings" title="Configuración">⚙️</div>
-  </div>
-</div>
-<div id="toast" class="toast"></div>
+
+  <div id="modalHost"></div>
+
 <script>
-const $ = id => document.getElementById(id);
-let config = {}, icons = [], zTop = 200, windows = new Map(), drag = null, currentUser = null;
-async function api(url, opts={}){
-  const r = await fetch(url, {headers:{'Content-Type':'application/json', ...(opts.headers||{})}, credentials:'same-origin', ...opts});
-  if(!r.ok){ let msg='Error'; try{ msg=(await r.json()).error||msg; }catch{ msg=await r.text(); } throw new Error(msg); }
-  const ct=r.headers.get('content-type')||''; return ct.includes('json') ? r.json() : r.text();
-}
-function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
-function esc(s){ return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
-function applyConfig(){
-  $('osTitle').textContent=config.os_title||'EA1FJZ Cloud OS'; $('osSubtitle').textContent=config.os_subtitle||'';
-  document.documentElement.style.setProperty('--accent', config.accent || '#2f7df6');
-  if(config.wallpaper){ $('desktop').style.background = config.wallpaper.startsWith('url(') || config.wallpaper.startsWith('linear') ? config.wallpaper : `url('${config.wallpaper}') center/cover no-repeat`; }
-}
-async function boot(){
-  try{ const s=await api('/api/session'); currentUser=s.user; $('login').classList.add('hidden'); $('desktop').classList.remove('hidden'); await loadAll(); }
-  catch{ $('login').classList.remove('hidden'); $('desktop').classList.add('hidden'); }
-}
-async function loadAll(){ config=await api('/api/config'); applyConfig(); await loadIcons(); health(); }
-async function loadIcons(){ icons=await api('/api/icons'); renderIcons(); }
-function renderIcons(){
-  $('icons').innerHTML='';
-  icons.forEach(ic=>{
-    const d=document.createElement('div'); d.className='desk-icon'; d.style.left=(ic.x||40)+'px'; d.style.top=(ic.y||110)+'px'; d.dataset.id=ic.id;
-    d.innerHTML=`<div class="emoji">${esc(ic.icon||'◻')}</div><span>${esc(ic.title)}</span>`;
-    d.addEventListener('dblclick',()=>openIcon(ic));
-    d.addEventListener('contextmenu',e=>{e.preventDefault(); editIcon(ic);});
-    makeIconDraggable(d,ic); $('icons').appendChild(d);
+(() => {
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+  const api = async (url, options={}) => {
+    const res = await fetch(url, {
+      credentials: 'include',
+      headers: options.body && !(options.body instanceof FormData) ? {'Content-Type':'application/json'} : undefined,
+      ...options
+    });
+    let data = null;
+    const txt = await res.text();
+    try{ data = txt ? JSON.parse(txt) : null; }catch{ data = txt; }
+    if(!res.ok){
+      const msg = data && data.error ? data.error : `Error ${res.status}`;
+      throw new Error(msg);
+    }
+    return data;
+  };
+
+  let config = {};
+  let icons = [];
+  let zTop = 200;
+  let activeIconId = null;
+  let windows = new Map();
+
+  const desktop = $('#desktop');
+  const modalHost = $('#modalHost');
+
+  function setMsg(el, text, type=''){
+    el.textContent = text || '';
+    el.className = 'msg' + (type ? ' ' + type : '');
+  }
+
+  function tickClock(){
+    const d = new Date();
+    $('#clockPill').textContent = d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'}) + ' · ' + d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  }
+  setInterval(tickClock, 1000); tickClock();
+
+  async function boot(){
+    try{
+      const session = await api('/api/session');
+      if(session.authenticated || session.ok){
+        await enterOS();
+      }
+    }catch{}
+  }
+
+  $('#loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = $('#loginMsg');
+    setMsg(msg, 'Comprobando contraseña…');
+    try{
+      await api('/api/login', {method:'POST', body: JSON.stringify({password: $('#password').value})});
+      setMsg(msg, 'Acceso correcto.', 'ok');
+      await enterOS();
+    }catch(err){
+      setMsg(msg, err.message || 'Contraseña incorrecta', 'bad');
+    }
   });
-}
-function makeIconDraggable(el,ic){
-  let start=null;
-  el.addEventListener('pointerdown',e=>{ if(e.button!==0) return; start={x:e.clientX,y:e.clientY,l:parseInt(el.style.left),t:parseInt(el.style.top),moved:false}; el.setPointerCapture(e.pointerId); });
-  el.addEventListener('pointermove',e=>{ if(!start) return; const dx=e.clientX-start.x, dy=e.clientY-start.y; if(Math.abs(dx)+Math.abs(dy)>4) start.moved=true; el.style.left=Math.max(0,start.l+dx)+'px'; el.style.top=Math.max(0,start.t+dy)+'px'; });
-  el.addEventListener('pointerup',async e=>{ if(!start) return; if(start.moved){ ic.x=parseInt(el.style.left); ic.y=parseInt(el.style.top); try{ await api('/api/icons/'+ic.id,{method:'PUT',body:JSON.stringify(ic)}); }catch(err){toast(err.message)} } start=null; });
-}
-function openIcon(ic){
-  if(ic.type==='internal') return openInternal(ic.target, ic.title, ic.icon);
-  if(ic.type==='browser') return openBrowser(ic.target || '');
-  openUrl(ic.target, ic.title, ic.icon);
-}
-function openInternal(name,title,icon){
-  const map={files:appFiles,meteo:appMeteo,cloud:appCloud,remote:appRemote,settings:appSettings,browser:()=>openBrowser('')};
-  (map[name]||appSettings)();
-}
-function openUrl(url,title='Web',icon='🌐'){ const w=createWindow(title,icon,{width:980,height:640}); w.body.classList.add('no-pad'); w.body.innerHTML=`<iframe src="${esc(url)}" referrerpolicy="no-referrer"></iframe>`; }
-function createWindow(title, icon='◻', opts={}){
-  const id='w'+Math.random().toString(36).slice(2); const w=document.createElement('div'); w.className='window';
-  w.style.left=(opts.left ?? (80+windows.size*28))+'px'; w.style.top=(opts.top ?? (70+windows.size*24))+'px'; w.style.width=(opts.width||860)+'px'; w.style.height=(opts.height||560)+'px'; w.style.zIndex=++zTop;
-  w.innerHTML=`<div class="titlebar"><div class="traffic"><span class="dot close"></span><span class="dot min"></span><span class="dot max"></span></div><div class="wtitle">${esc(icon)} ${esc(title)}</div><div></div></div><div class="wbody"></div>`;
-  $('desktop').appendChild(w); const body=w.querySelector('.wbody');
-  const task=document.createElement('div'); task.className='task-pill is-visible'; task.innerHTML=`${esc(icon)} <span>${esc(title)}</span>`; task.onclick=()=>{ w.classList.remove('hidden'); focusWindow(w); }; $('taskbar').appendChild(task);
-  w.querySelector('.close').onclick=()=>{ task.remove(); w.remove(); windows.delete(id); };
-  w.querySelector('.min').onclick=()=>w.classList.add('hidden');
-  w.querySelector('.max').addEventListener('click',()=>{ w.classList.toggle('max'); focusWindow(w); });
-  w.addEventListener('pointerdown',()=>focusWindow(w)); makeWindowDraggable(w); windows.set(id,{el:w,task,body,title}); return {id,el:w,body};
-}
-function focusWindow(w){ w.style.zIndex=++zTop; }
-function makeWindowDraggable(w){
-  const tb=w.querySelector('.titlebar'); tb.addEventListener('pointerdown',e=>{ if(e.target.classList.contains('dot')) return; focusWindow(w); const r=w.getBoundingClientRect(); drag={w,x:e.clientX,y:e.clientY,l:r.left,t:r.top}; tb.setPointerCapture(e.pointerId); });
-  tb.addEventListener('pointermove',e=>{ if(!drag||drag.w!==w||w.classList.contains('max')) return; w.style.left=Math.max(0,drag.l+e.clientX-drag.x)+'px'; w.style.top=Math.max(44,drag.t+e.clientY-drag.y)+'px'; });
-  tb.addEventListener('pointerup',()=>drag=null);
-}
-function openBrowser(initial=''){
-  const w=createWindow('Navegador','🌐',{width:1040,height:650});
-  w.body.innerHTML=`<div class="grid" style="height:100%;grid-template-rows:auto 1fr"><div class="toolbar"><input id="url_${w.id}" class="input" placeholder="Dirección web o búsqueda" value="${esc(initial)}" style="flex:1"><button class="btn primary" id="go_${w.id}">Abrir</button><button class="btn" id="ext_${w.id}">Pestaña externa</button></div><iframe id="frame_${w.id}" style="width:100%;height:100%;border:0;background:#fff;border-radius:16px"></iframe></div>`;
-  const input=$('url_'+w.id), frame=$('frame_'+w.id); const norm=()=>{let v=input.value.trim(); if(!v) return 'about:blank'; if(!/^https?:\/\//i.test(v)) v='https://www.google.com/search?q='+encodeURIComponent(v); return v;};
-  $('go_'+w.id).onclick=()=>frame.src=norm(); $('ext_'+w.id).onclick=()=>window.open(norm(),'_blank'); input.addEventListener('keydown',e=>{if(e.key==='Enter') $('go_'+w.id).click();}); if(initial) $('go_'+w.id).click();
-}
-async function appFiles(){
-  const w=createWindow('Gestor de archivos','📁',{width:920,height:620});
-  async function render(){ const rows=await api('/api/files'); w.body.innerHTML=`<div class="grid"><div class="card"><h3>Archivos persistentes</h3><p class="muted small">Se guardan en el disco persistente del servidor. En Render debe estar montado en /var/data.</p><div class="toolbar"><input id="up_${w.id}" class="input" type="file" style="max-width:420px"><button id="upl_${w.id}" class="btn primary">Subir archivo</button><button id="ref_${w.id}" class="btn">Actualizar</button></div></div><div class="card"><table class="table"><thead><tr><th>Nombre</th><th>Tamaño</th><th>Fecha</th><th>Acción</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.original_name)}</td><td>${Math.round(r.size_bytes/1024)} KB</td><td>${new Date(r.created_at).toLocaleString('es-ES')}</td><td><button class="btn" onclick="window.open('/api/files/download/${r.id}','_blank')">Descargar</button> <button class="btn danger" data-del="${r.id}">Borrar</button></td></tr>`).join('')||'<tr><td colspan="4" class="muted">Sin archivos.</td></tr>'}</tbody></table></div></div>`;
-    $('upl_'+w.id).onclick=async()=>{ const f=$('up_'+w.id).files[0]; if(!f) return toast('Selecciona un archivo.'); const fd=new FormData(); fd.append('file',f); const r=await fetch('/api/files/upload',{method:'POST',body:fd,credentials:'same-origin'}); if(!r.ok) return toast('Error al subir.'); toast('Archivo subido.'); render();};
-    $('ref_'+w.id).onclick=render; w.body.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{ if(confirm('¿Borrar archivo?')){ await api('/api/files/'+b.dataset.del,{method:'DELETE'}); render(); }});
-  } render().catch(e=>toast(e.message));
-}
-function appMeteo(){
-  const w=createWindow('Meteo & Radio Center','📡',{width:1030,height:660});
-  w.body.innerHTML=`<div class="grid"><div class="card"><h3>EA1FJZ Observatory</h3><p class="muted">Centro de acceso rápido a meteorología, radio, propagación, astronomía y mapas.</p></div><div class="app-list">
-  ${tile('🌦️','Open-Meteo','Datos meteorológicos','url',config.meteo_url||'https://open-meteo.com/')}
-  ${tile('🌬️','Windy','Mapa viento/lluvia','url',config.windy_url||'https://www.windy.com/')}
-  ${tile('🛰️','DSN Now','Deep Space Network','url',config.dsn_url||'https://eyes.nasa.gov/apps/dsn-now/dsn.html')}
-  ${tile('⚠️','MeteoAlarm','Alertas Europa','url',config.meteoalarm_url||'https://meteoalarm.org/en/live/region/ES')}
-  ${tile('📻','Propagación HF','Módulo preparado para integrar','note','')}
-  ${tile('🌌','Astronomía','Módulo preparado para integrar','note','')}
-  </div></div>`; bindTiles(w.body);
-}
-function tile(icon,title,desc,type,target){return `<div class="app-tile" data-type="${type}" data-target="${esc(target)}" data-title="${esc(title)}" data-icon="${esc(icon)}"><div class="big">${icon}</div><b>${esc(title)}</b><div class="muted small">${esc(desc)}</div></div>`}
-function bindTiles(root){ root.querySelectorAll('.app-tile').forEach(t=>t.onclick=()=>{ if(t.dataset.type==='url') openUrl(t.dataset.target,t.dataset.title,t.dataset.icon); else toast('Módulo preparado para integrar en la siguiente fase.'); }); }
-async function appCloud(){
-  const w=createWindow('Centro de servicios en la nube','☁️',{width:900,height:620});
-  async function render(){ const rows=await api('/api/cloud/accounts'); w.body.innerHTML=`<div class="grid two"><div class="card"><h3>Nueva cuenta</h3><div class="field"><label>Proveedor</label><select id="cp_${w.id}" class="input"><option>GitHub</option><option>Render</option><option>OneDrive</option><option>SharePoint</option><option>Dropbox</option><option>SFTP</option></select></div><div class="field"><label>Nombre visible</label><input id="cn_${w.id}" class="input" placeholder="Ej: GitHub DirtAnalysis"></div><div class="field"><label>Configuración JSON / token / notas</label><textarea id="cj_${w.id}" class="input" rows="5" placeholder='{"repo":"usuario/repo","token":"..."}'></textarea></div><button id="cs_${w.id}" class="btn primary">Guardar cuenta</button><p class="hint">V0.1 guarda la configuración. La conexión real a cada proveedor se activará por módulos en fases posteriores.</p></div><div class="card"><h3>Cuentas configuradas</h3><table class="table"><thead><tr><th>Proveedor</th><th>Nombre</th><th>Estado</th><th></th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.provider)}</td><td>${esc(r.display_name)}</td><td><span class="badge">${r.enabled?'ON':'OFF'}</span></td><td><button class="btn danger" data-del="${r.id}">Borrar</button></td></tr>`).join('')||'<tr><td colspan="4" class="muted">Sin cuentas.</td></tr>'}</tbody></table></div></div>`;
-    $('cs_'+w.id).onclick=async()=>{ let cfg={raw:$('cj_'+w.id).value}; try{ cfg=JSON.parse($('cj_'+w.id).value||'{}'); }catch{} await api('/api/cloud/accounts',{method:'POST',body:JSON.stringify({provider:$('cp_'+w.id).value,display_name:$('cn_'+w.id).value,config:cfg})}); toast('Cuenta guardada.'); render();};
-    w.body.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{ await api('/api/cloud/accounts/'+b.dataset.del,{method:'DELETE'}); render(); });
-  } render().catch(e=>toast(e.message));
-}
-async function appRemote(){
-  const w=createWindow('Ayuda remota','🖥️',{width:900,height:620});
-  async function render(){ const rows=await api('/api/remote/connections'); w.body.innerHTML=`<div class="grid two"><div class="card"><h3>Nueva conexión</h3><div class="form-row"><div class="field"><label>Nombre</label><input id="rn_${w.id}" class="input" placeholder="PC cabina / Equipo laboratorio"></div><div class="field"><label>Protocolo</label><select id="rp_${w.id}" class="input"><option value="external">Lanzador externo</option><option value="guacamole">Guacamole</option><option value="novnc">noVNC</option><option value="rdp">RDP documentado</option></select></div></div><div class="form-row"><div class="field"><label>Host/IP</label><input id="rh_${w.id}" class="input"></div><div class="field"><label>Puerto</label><input id="rpo_${w.id}" class="input" placeholder="3389 / 5900"></div></div><div class="field"><label>URL de lanzamiento</label><input id="ru_${w.id}" class="input" placeholder="https://guacamole... o anydesk://..."></div><div class="field"><label>Notas</label><textarea id="rnotes_${w.id}" class="input" rows="4"></textarea></div><button id="rs_${w.id}" class="btn primary">Guardar conexión</button><p class="hint">La versión V0.1 no abre RDP directamente por seguridad del navegador. Deja preparado el gestor para Guacamole/noVNC o enlaces externos.</p></div><div class="card"><h3>Conexiones</h3><table class="table"><thead><tr><th>Nombre</th><th>Protocolo</th><th>Destino</th><th></th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.protocol)}</td><td>${esc(r.host)} ${esc(r.port)}</td><td>${r.launch_url?`<button class="btn" onclick="window.open('${esc(r.launch_url)}','_blank')">Abrir</button>`:''} <button class="btn danger" data-del="${r.id}">Borrar</button></td></tr>`).join('')||'<tr><td colspan="4" class="muted">Sin conexiones.</td></tr>'}</tbody></table></div></div>`;
-    $('rs_'+w.id).onclick=async()=>{ await api('/api/remote/connections',{method:'POST',body:JSON.stringify({name:$('rn_'+w.id).value,protocol:$('rp_'+w.id).value,host:$('rh_'+w.id).value,port:$('rpo_'+w.id).value,launch_url:$('ru_'+w.id).value,notes:$('rnotes_'+w.id).value})}); toast('Conexión guardada.'); render();};
-    w.body.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{ await api('/api/remote/connections/'+b.dataset.del,{method:'DELETE'}); render(); });
-  } render().catch(e=>toast(e.message));
-}
-function appSettings(){
-  const w=createWindow('Configuración general','⚙️',{width:980,height:650});
-  w.body.innerHTML=`<div class="grid"><div class="card"><h3>Personalización del sistema</h3><div class="grid two"><div class="field"><label>Título</label><input id="st_${w.id}" class="input" value="${esc(config.os_title||'')}"></div><div class="field"><label>Subtítulo</label><input id="ss_${w.id}" class="input" value="${esc(config.os_subtitle||'')}"></div><div class="field"><label>Color principal</label><input id="sa_${w.id}" class="input" type="color" value="${esc(config.accent||'#2f7df6')}"></div><div class="field"><label>Fondo de pantalla CSS</label><input id="sw_${w.id}" class="input" value="${esc(config.wallpaper||'')}"></div></div><div class="toolbar"><button id="savecfg_${w.id}" class="btn primary">Guardar configuración</button><button id="addic_${w.id}" class="btn ok">Crear icono</button><button id="backup_${w.id}" class="btn">Descargar backup DB</button></div></div><div class="grid two"><div class="card"><h3>Cambiar contraseña</h3><div class="field"><label>Contraseña actual</label><input id="pc_${w.id}" type="password" class="input"></div><div class="field"><label>Nueva contraseña</label><input id="pn_${w.id}" type="password" class="input"></div><button id="pass_${w.id}" class="btn primary">Cambiar contraseña</button></div><div class="card"><h3>Estado del servidor</h3><div id="health_${w.id}" class="muted">Consultando...</div><button id="healthb_${w.id}" class="btn" style="margin-top:10px">Actualizar estado</button></div></div></div>`;
-  $('savecfg_'+w.id).onclick=async()=>{ await api('/api/config',{method:'POST',body:JSON.stringify({os_title:$('st_'+w.id).value,os_subtitle:$('ss_'+w.id).value,accent:$('sa_'+w.id).value,wallpaper:$('sw_'+w.id).value})}); config=await api('/api/config'); applyConfig(); toast('Configuración guardada.'); };
-  $('addic_'+w.id).onclick=()=>editIcon(null);
-  $('backup_'+w.id).onclick=()=>window.open('/api/db-backup','_blank');
-  $('pass_'+w.id).onclick=async()=>{ await api('/api/change-password',{method:'POST',body:JSON.stringify({currentPassword:$('pc_'+w.id).value,newPassword:$('pn_'+w.id).value})}); toast('Contraseña cambiada.'); };
-  async function h(){ const r=await api('/api/health'); $('health_'+w.id).innerHTML=`<div><b>DB:</b> ${esc(r.dbPath)}</div><div><b>Uploads:</b> ${esc(r.uploadsPath)}</div><div><b>Escritura:</b> ${r.writable?'OK':'NO'}</div><div><b>Hora:</b> ${new Date(r.time).toLocaleString('es-ES')}</div>`; }
-  $('healthb_'+w.id).onclick=h; h().catch(e=>$('health_'+w.id).textContent=e.message);
-}
-function editIcon(ic){
-  const w=createWindow(ic?'Editar icono':'Crear icono','🧩',{width:520,height:470}); const isNew=!ic; ic=ic||{title:'Nuevo acceso',icon:'⭐',type:'url',target:'',x:70,y:120};
-  w.body.innerHTML=`<div class="grid"><div class="field"><label>Título</label><input id="it_${w.id}" class="input" value="${esc(ic.title)}"></div><div class="form-row"><div class="field"><label>Icono</label><input id="ii_${w.id}" class="input" value="${esc(ic.icon)}"></div><div class="field"><label>Tipo</label><select id="ity_${w.id}" class="input"><option value="url">URL</option><option value="browser">Navegador</option><option value="internal">Interno</option></select></div></div><div class="field"><label>Destino</label><input id="itar_${w.id}" class="input" value="${esc(ic.target)}" placeholder="URL o módulo: files, meteo, cloud, remote, settings"></div><div class="toolbar"><button id="is_${w.id}" class="btn primary">Guardar</button>${isNew?'':`<button id="id_${w.id}" class="btn danger">Eliminar</button>`}</div><p class="hint">Clic derecho sobre un icono del escritorio para editarlo. Arrastra los iconos para guardar su posición.</p></div>`;
-  $('ity_'+w.id).value=ic.type||'url';
-  $('is_'+w.id).onclick=async()=>{ const payload={...ic,title:$('it_'+w.id).value,icon:$('ii_'+w.id).value,type:$('ity_'+w.id).value,target:$('itar_'+w.id).value}; if(isNew) await api('/api/icons',{method:'POST',body:JSON.stringify(payload)}); else await api('/api/icons/'+ic.id,{method:'PUT',body:JSON.stringify(payload)}); await loadIcons(); toast('Icono guardado.'); w.el.querySelector('.close').click(); };
-  if(!isNew) $('id_'+w.id).onclick=async()=>{ if(confirm('¿Eliminar icono?')){ await api('/api/icons/'+ic.id,{method:'DELETE'}); await loadIcons(); w.el.querySelector('.close').click(); }};
-}
-async function health(){ try{ const h=await api('/api/health'); $('healthText').textContent=h.writable?'Servidor OK':'Servidor sin escritura'; }catch{ $('healthText').textContent='Sin conexión'; } }
-setInterval(()=>{$('clock').textContent=new Date().toLocaleString('es-ES',{hour:'2-digit',minute:'2-digit',second:'2-digit'});},1000); setInterval(health,30000);
-$('loginBtn').onclick=async()=>{ try{ await api('/api/login',{method:'POST',body:JSON.stringify({username:$('loginUser').value,password:$('loginPass').value})}); await boot(); }catch(e){ $('loginMsg').textContent=e.message; }};
-$('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter') $('loginBtn').click();});
-$('logoutBtn').onclick=async()=>{ await api('/api/logout',{method:'POST'}); location.reload(); };
-document.querySelectorAll('.dock-btn').forEach(b=>b.onclick=()=>openInternal(b.dataset.app,b.title,b.textContent));
-boot();
+
+  $('#logoutBtn').addEventListener('click', async () => {
+    try{ await api('/api/logout', {method:'POST'}); }catch{}
+    location.reload();
+  });
+
+  async function enterOS(){
+    $('#loginScreen').classList.add('hidden');
+    $('#appShell').classList.remove('hidden');
+    await loadAll();
+    await checkHealth();
+  }
+
+  async function loadAll(){
+    config = await api('/api/config');
+    icons = await api('/api/icons');
+    applyConfig();
+    renderIcons();
+  }
+
+  function applyConfig(){
+    $('#systemTitle').textContent = config.title || 'Masive OS';
+    document.title = config.title || 'Masive OS';
+    if(config.wallpaper){
+      document.body.classList.add('custom-wallpaper');
+      document.body.style.backgroundImage = `linear-gradient(rgba(2,6,23,.22),rgba(2,6,23,.22)), url("${config.wallpaper}")`;
+    }else{
+      document.body.classList.remove('custom-wallpaper');
+      document.body.style.backgroundImage = '';
+    }
+  }
+
+  async function checkHealth(){
+    try{
+      const h = await api('/api/health');
+      $('#healthPill').innerHTML = `Servidor: <span class="status-ok">OK</span> · ${h.persistent ? 'Persistente' : 'Local'}`;
+    }catch{
+      $('#healthPill').innerHTML = `Servidor: <span class="status-bad">Error</span>`;
+    }
+  }
+
+  function renderIcons(){
+    desktop.innerHTML = '';
+    icons.forEach(icon => {
+      const el = document.createElement('div');
+      el.className = 'icon';
+      el.dataset.id = icon.id;
+      el.style.left = (Number(icon.x)||40) + 'px';
+      el.style.top = (Number(icon.y)||40) + 'px';
+      el.innerHTML = `<div class="icon-symbol">${escapeHtml(icon.icon || '🔗')}</div><div class="icon-title">${escapeHtml(icon.title || 'Icono')}</div>`;
+      desktop.appendChild(el);
+
+      let clickTimer = null;
+      el.addEventListener('click', () => {
+        $$('.icon').forEach(i => i.classList.remove('is-selected'));
+        el.classList.add('is-selected');
+        activeIconId = icon.id;
+      });
+      el.addEventListener('dblclick', () => openIcon(icon));
+      el.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showIconModal(icon);
+      });
+      makeIconDraggable(el, icon);
+    });
+  }
+
+  function makeIconDraggable(el, icon){
+    let startX=0,startY=0,origX=0,origY=0,moving=false, saveTimer=null;
+    el.addEventListener('pointerdown', (e) => {
+      if(e.button !== 0) return;
+      moving = true;
+      startX = e.clientX; startY = e.clientY;
+      origX = parseFloat(el.style.left)||0; origY = parseFloat(el.style.top)||0;
+      el.setPointerCapture(e.pointerId);
+    });
+    el.addEventListener('pointermove', (e) => {
+      if(!moving) return;
+      const nx = Math.max(0, Math.min(window.innerWidth - 104, origX + e.clientX - startX));
+      const ny = Math.max(0, Math.min(window.innerHeight - 170, origY + e.clientY - startY));
+      el.style.left = nx + 'px'; el.style.top = ny + 'px';
+    });
+    el.addEventListener('pointerup', async () => {
+      if(!moving) return;
+      moving=false;
+      icon.x = Math.round(parseFloat(el.style.left)||0);
+      icon.y = Math.round(parseFloat(el.style.top)||0);
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveIcon(icon), 250);
+    });
+  }
+
+  async function saveIcon(icon){
+    try{
+      await api('/api/icons/' + encodeURIComponent(icon.id), {method:'PUT', body: JSON.stringify(icon)});
+    }catch(err){
+      console.warn('No se pudo guardar posición del icono', err);
+    }
+  }
+
+  function openIcon(icon){
+    if(icon.type === 'module'){
+      openModule(icon.target, icon.title, icon.icon);
+    }else if(icon.type === 'browser'){
+      openBrowser(icon.target || 'https://www.google.com', icon.title || 'Navegador');
+    }else if(icon.type === 'external'){
+      window.open(icon.target, '_blank', 'noopener,noreferrer');
+    }else{
+      openBrowser(icon.target || 'about:blank', icon.title || 'Acceso');
+    }
+  }
+
+  $$('#dock .dock-btn').forEach(btn => btn.addEventListener('click', () => openModule(btn.dataset.module)));
+  $('#settingsTopBtn').addEventListener('click', () => openModule('settings'));
+  $('#newIconTopBtn').addEventListener('click', () => showIconModal(null));
+
+  function openModule(module, title=null, icon=null){
+    const data = {
+      browser: ['Navegador','🌐'],
+      files: ['Archivos','📁'],
+      cloud: ['Centro de nube','☁️'],
+      meteo: ['Meteo & Radio','📡'],
+      remote: ['Ayuda remota','🖥️'],
+      settings: ['Configuración','⚙️']
+    };
+    const [t,i] = data[module] || [title || module, icon || '◈'];
+    const id = module + '_' + Date.now();
+    const win = createWindow(id, title || t, icon || i, 920, 590);
+    if(module === 'browser') renderBrowser(win.body, 'https://www.google.com');
+    if(module === 'files') renderFiles(win.body);
+    if(module === 'cloud') renderCloud(win.body);
+    if(module === 'meteo') renderMeteo(win.body);
+    if(module === 'remote') renderRemote(win.body);
+    if(module === 'settings') renderSettings(win.body);
+  }
+
+  function openBrowser(url, title='Navegador'){
+    const win = createWindow('browser_' + Date.now(), title, '🌐', 980, 640);
+    renderBrowser(win.body, url);
+  }
+
+  function createWindow(id, title, icon='◈', w=860, h=560){
+    const win = document.createElement('section');
+    win.className = 'window';
+    win.dataset.id = id;
+    win.style.width = w + 'px';
+    win.style.height = h + 'px';
+    win.style.left = Math.max(12, 110 + (windows.size * 28) % 280) + 'px';
+    win.style.top = Math.max(52, 70 + (windows.size * 24) % 180) + 'px';
+    win.style.zIndex = ++zTop;
+    win.innerHTML = `
+      <div class="titlebar">
+        <div class="traffic">
+          <button class="dot close" title="Cerrar"></button>
+          <button class="dot min" title="Minimizar"></button>
+          <button class="dot max" title="Maximizar"></button>
+        </div>
+        <div class="win-title"><span>${escapeHtml(icon)}</span><span>${escapeHtml(title)}</span></div>
+        <div style="width:54px"></div>
+      </div>
+      <div class="win-body"></div>
+      <div class="resize-handle"></div>
+    `;
+    desktop.appendChild(win);
+    const body = $('.win-body', win);
+    const titlebar = $('.titlebar', win);
+
+    const ref = {el: win, body, id, title};
+    windows.set(id, ref);
+
+    win.addEventListener('pointerdown', () => win.style.zIndex = ++zTop);
+    $('.close', win).addEventListener('click', () => { windows.delete(id); win.remove(); });
+    $('.min', win).addEventListener('click', () => win.classList.add('minimized'));
+    $('.max', win).addEventListener('click', () => win.classList.toggle('maximized'));
+    makeWindowDraggable(win, titlebar);
+    makeWindowResizable(win, $('.resize-handle', win));
+    return ref;
+  }
+
+  function makeWindowDraggable(win, handle){
+    let moving=false,startX=0,startY=0,origX=0,origY=0;
+    handle.addEventListener('pointerdown', (e) => {
+      if(e.target.classList.contains('dot')) return;
+      moving=true; startX=e.clientX; startY=e.clientY;
+      origX=parseFloat(win.style.left)||0; origY=parseFloat(win.style.top)||0;
+      win.style.zIndex=++zTop;
+      handle.setPointerCapture(e.pointerId);
+    });
+    handle.addEventListener('pointermove', (e) => {
+      if(!moving || win.classList.contains('maximized')) return;
+      win.style.left = Math.max(0, Math.min(window.innerWidth - 180, origX + e.clientX - startX)) + 'px';
+      win.style.top = Math.max(44, Math.min(window.innerHeight - 110, origY + e.clientY - startY)) + 'px';
+    });
+    handle.addEventListener('pointerup', () => moving=false);
+  }
+
+  function makeWindowResizable(win, handle){
+    let resizing=false,startX=0,startY=0,origW=0,origH=0;
+    handle.addEventListener('pointerdown', (e) => {
+      resizing=true; startX=e.clientX; startY=e.clientY;
+      origW=win.offsetWidth; origH=win.offsetHeight;
+      win.style.zIndex=++zTop;
+      handle.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    handle.addEventListener('pointermove', (e) => {
+      if(!resizing || win.classList.contains('maximized')) return;
+      win.style.width = Math.max(360, origW + e.clientX - startX) + 'px';
+      win.style.height = Math.max(260, origH + e.clientY - startY) + 'px';
+    });
+    handle.addEventListener('pointerup', () => resizing=false);
+  }
+
+  function renderBrowser(root, url='https://www.google.com'){
+    root.innerHTML = `
+      <div class="browser-bar">
+        <input class="input browser-url" value="${escapeAttr(url)}" placeholder="https://..." />
+        <button class="secondary browser-go">Ir</button>
+        <button class="secondary browser-external">Abrir externo</button>
+      </div>
+      <iframe class="browser-frame" src="${escapeAttr(url)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+      <div class="note" style="margin-top:10px">Algunas webs bloquean la apertura dentro de ventanas internas. En ese caso usa “Abrir externo”.</div>
+    `;
+    const input = $('.browser-url', root);
+    const frame = $('.browser-frame', root);
+    const normalize = v => /^https?:\/\//i.test(v) ? v : 'https://' + v;
+    $('.browser-go', root).addEventListener('click', () => frame.src = normalize(input.value.trim()));
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') $('.browser-go', root).click(); });
+    $('.browser-external', root).addEventListener('click', () => window.open(normalize(input.value.trim()), '_blank', 'noopener,noreferrer'));
+  }
+
+  async function renderFiles(root){
+    root.innerHTML = `
+      <div class="panel-grid">
+        <div class="card">
+          <h3>Gestor de archivos</h3>
+          <p>Base preparada para archivos persistentes en Render. En esta versión no-deps la subida avanzada está pendiente para no romper el deploy.</p>
+        </div>
+        <div class="card">
+          <h3>Copia de seguridad</h3>
+          <p>Exporta la configuración actual del sistema en JSON.</p>
+          <div style="margin-top:12px"><button class="primary backup-btn">Descargar backup</button></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3>Archivos registrados</h3>
+        <table class="table"><thead><tr><th>Nombre</th><th>Tamaño</th><th>Acción</th></tr></thead><tbody class="files-body"><tr><td colspan="3">Cargando…</td></tr></tbody></table>
+      </div>
+    `;
+    $('.backup-btn', root).addEventListener('click', async () => {
+      const data = await api('/api/backup');
+      downloadText('masive_os_backup_' + new Date().toISOString().slice(0,10) + '.json', JSON.stringify(data, null, 2));
+    });
+    try{
+      const files = await api('/api/files');
+      $('.files-body', root).innerHTML = files.length ? files.map(f => `
+        <tr><td>${escapeHtml(f.original_name || f.name || '')}</td><td>${escapeHtml(String(f.size_bytes || f.size || ''))}</td><td><a class="secondary" href="/api/files/download/${encodeURIComponent(f.id)}">Descargar</a></td></tr>
+      `).join('') : '<tr><td colspan="3">No hay archivos registrados todavía.</td></tr>';
+    }catch(err){
+      $('.files-body', root).innerHTML = `<tr><td colspan="3">${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  async function renderCloud(root){
+    root.innerHTML = `
+      <div class="card">
+        <h3>Centro de servicios en la nube</h3>
+        <p>Configurador inicial para GitHub, Render, SharePoint, OneDrive u otros servicios. En esta fase guardamos cuentas y accesos; la conexión real por API se añadirá por proveedor.</p>
+      </div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="card">
+          <h3>Añadir cuenta</h3>
+          <div class="field"><label>Proveedor</label><select class="input cloud-provider"><option>GitHub</option><option>Render</option><option>OneDrive</option><option>SharePoint</option><option>Dropbox</option><option>Custom API</option></select></div>
+          <div class="field"><label>Nombre visible</label><input class="input cloud-name" placeholder="Ej: GitHub MasiveOS"></div>
+          <button class="primary cloud-add">Guardar cuenta</button>
+          <div class="msg cloud-msg"></div>
+        </div>
+        <div class="card">
+          <h3>Cuentas configuradas</h3>
+          <table class="table"><thead><tr><th>Proveedor</th><th>Nombre</th><th>Estado</th></tr></thead><tbody class="cloud-body"><tr><td colspan="3">Cargando…</td></tr></tbody></table>
+        </div>
+      </div>
+    `;
+    const load = async () => {
+      const rows = await api('/api/cloud/accounts');
+      $('.cloud-body', root).innerHTML = rows.length ? rows.map(r => `<tr><td>${escapeHtml(r.provider)}</td><td>${escapeHtml(r.display_name)}</td><td>${r.enabled ? 'Activo' : 'OFF'}</td></tr>`).join('') : '<tr><td colspan="3">No hay cuentas configuradas.</td></tr>';
+    };
+    await load();
+    $('.cloud-add', root).addEventListener('click', async () => {
+      const msg = $('.cloud-msg', root);
+      try{
+        await api('/api/cloud/accounts', {method:'POST', body:JSON.stringify({
+          provider: $('.cloud-provider', root).value,
+          display_name: $('.cloud-name', root).value || 'Cuenta nube'
+        })});
+        setMsg(msg, 'Cuenta guardada.', 'ok');
+        $('.cloud-name', root).value = '';
+        await load();
+      }catch(err){ setMsg(msg, err.message, 'bad'); }
+    });
+  }
+
+  function renderMeteo(root){
+    root.innerHTML = `
+      <div class="panel-grid">
+        <div class="card"><h3>EA1FJZ Observatory</h3><p>Módulo reservado para integrar el sistema meteorológico y radio real.</p><div style="margin-top:12px"><button class="secondary open-meteo">Abrir Open-Meteo</button></div></div>
+        <div class="card"><h3>Radio HF</h3><p>Propagación, mapas, datos solares y enlaces radio.</p><div style="margin-top:12px"><button class="secondary open-dsn">DSN Now</button></div></div>
+        <div class="card"><h3>Windy</h3><p>Acceso rápido a mapas meteorológicos.</p><div style="margin-top:12px"><button class="secondary open-windy">Abrir Windy</button></div></div>
+      </div>
+      <div class="note" style="margin-top:12px">Paso siguiente: insertar aquí tu panel EA1FJZ Observatory existente como app nativa.</div>
+    `;
+    $('.open-meteo', root).addEventListener('click', () => openBrowser('https://open-meteo.com/', 'Open-Meteo'));
+    $('.open-dsn', root).addEventListener('click', () => openBrowser('https://eyes.nasa.gov/apps/dsn-now/dsn.html', 'DSN Now'));
+    $('.open-windy', root).addEventListener('click', () => openBrowser('https://www.windy.com/', 'Windy'));
+  }
+
+  async function renderRemote(root){
+    root.innerHTML = `
+      <div class="card"><h3>Ayuda remota</h3><p>Gestor inicial de conexiones. Para escritorio remoto real desde navegador necesitaremos integrar Guacamole, noVNC o enlaces a una herramienta externa.</p></div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="card">
+          <h3>Añadir equipo</h3>
+          <div class="field"><label>Nombre</label><input class="input remote-name" placeholder="Ej: PC línea 1"></div>
+          <div class="field"><label>Protocolo</label><select class="input remote-protocol"><option value="external">Herramienta externa</option><option value="rdp">RDP futuro</option><option value="vnc">VNC futuro</option><option value="ssh">SSH futuro</option></select></div>
+          <div class="field"><label>Host/IP</label><input class="input remote-host" placeholder="192.168.x.x o nombre equipo"></div>
+          <button class="primary remote-add">Guardar equipo</button>
+          <div class="msg remote-msg"></div>
+        </div>
+        <div class="card">
+          <h3>Equipos configurados</h3>
+          <table class="table"><thead><tr><th>Nombre</th><th>Protocolo</th><th>Host</th></tr></thead><tbody class="remote-body"><tr><td colspan="3">Cargando…</td></tr></tbody></table>
+        </div>
+      </div>
+    `;
+    const load = async () => {
+      const rows = await api('/api/remote/connections');
+      $('.remote-body', root).innerHTML = rows.length ? rows.map(r => `<tr><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.protocol)}</td><td>${escapeHtml(r.host)}</td></tr>`).join('') : '<tr><td colspan="3">No hay equipos configurados.</td></tr>';
+    };
+    await load();
+    $('.remote-add', root).addEventListener('click', async () => {
+      const msg = $('.remote-msg', root);
+      try{
+        await api('/api/remote/connections', {method:'POST', body:JSON.stringify({
+          name: $('.remote-name', root).value || 'Equipo remoto',
+          protocol: $('.remote-protocol', root).value,
+          host: $('.remote-host', root).value
+        })});
+        setMsg(msg, 'Equipo guardado.', 'ok');
+        $('.remote-name', root).value = '';
+        $('.remote-host', root).value = '';
+        await load();
+      }catch(err){ setMsg(msg, err.message, 'bad'); }
+    });
+  }
+
+  function renderSettings(root){
+    root.innerHTML = `
+      <div class="panel-grid">
+        <div class="card">
+          <h3>Configuración general</h3>
+          <div class="field"><label>Título del sistema</label><input class="input cfg-title" value="${escapeAttr(config.title || '')}"></div>
+          <div class="field"><label>Subtítulo</label><input class="input cfg-subtitle" value="${escapeAttr(config.subtitle || '')}"></div>
+          <div class="field"><label>Fondo de pantalla URL/base64</label><input class="input cfg-wallpaper" value="${escapeAttr(config.wallpaper || '')}" placeholder="https://... o data:image/..."></div>
+          <button class="primary cfg-save">Guardar configuración</button>
+          <div class="msg cfg-msg"></div>
+        </div>
+        <div class="card">
+          <h3>Iconos / Apps</h3>
+          <p>Crear accesos directos a webs, módulos internos o enlaces externos. También puedes editar un icono con clic derecho sobre el escritorio.</p>
+          <div style="margin-top:12px" class="row">
+            <button class="primary add-icon">Crear icono</button>
+            <button class="secondary refresh-icons">Recargar iconos</button>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3>Listado de iconos</h3>
+        <table class="table"><thead><tr><th>Icono</th><th>Título</th><th>Tipo</th><th>Destino</th><th>Acciones</th></tr></thead><tbody class="icons-table-body"></tbody></table>
+      </div>
+    `;
+    const renderList = () => {
+      $('.icons-table-body', root).innerHTML = icons.map(i => `
+        <tr>
+          <td style="font-size:22px">${escapeHtml(i.icon || '')}</td>
+          <td>${escapeHtml(i.title || '')}</td>
+          <td>${escapeHtml(i.type || '')}</td>
+          <td>${escapeHtml(i.target || '')}</td>
+          <td>
+            <button class="secondary edit-icon" data-id="${escapeAttr(i.id)}">Editar</button>
+            <button class="danger del-icon" data-id="${escapeAttr(i.id)}">Borrar</button>
+          </td>
+        </tr>
+      `).join('');
+      $$('.edit-icon', root).forEach(b => b.addEventListener('click', () => showIconModal(icons.find(i => i.id === b.dataset.id))));
+      $$('.del-icon', root).forEach(b => b.addEventListener('click', async () => {
+        const icon = icons.find(i => i.id === b.dataset.id);
+        if(!confirm('¿Eliminar el icono "' + (icon?.title || '') + '"?')) return;
+        await api('/api/icons/' + encodeURIComponent(b.dataset.id), {method:'DELETE'});
+        icons = await api('/api/icons');
+        renderIcons();
+        renderList();
+      }));
+    };
+    renderList();
+    $('.add-icon', root).addEventListener('click', () => showIconModal(null));
+    $('.refresh-icons', root).addEventListener('click', async () => { icons = await api('/api/icons'); renderIcons(); renderList(); });
+    $('.cfg-save', root).addEventListener('click', async () => {
+      const msg = $('.cfg-msg', root);
+      try{
+        config = await api('/api/config', {method:'POST', body:JSON.stringify({
+          title: $('.cfg-title', root).value,
+          subtitle: $('.cfg-subtitle', root).value,
+          wallpaper: $('.cfg-wallpaper', root).value
+        })});
+        applyConfig();
+        setMsg(msg, 'Configuración guardada.', 'ok');
+      }catch(err){ setMsg(msg, err.message, 'bad'); }
+    });
+  }
+
+  function showIconModal(icon){
+    const isEdit = !!icon;
+    const data = icon || {title:'', icon:'🔗', type:'link', target:'', x:80, y:80};
+    modalHost.innerHTML = `
+      <div class="modal-backdrop">
+        <div class="modal">
+          <h2>${isEdit ? 'Editar icono' : 'Crear icono'}</h2>
+          <p>Configura el acceso del escritorio. Los cambios quedan guardados en la base persistente del servidor.</p>
+          <div class="grid2">
+            <div class="field"><label>Título</label><input class="input m-title" value="${escapeAttr(data.title)}"></div>
+            <div class="field"><label>Emoji/Icono</label><input class="input m-icon" value="${escapeAttr(data.icon || '🔗')}"></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Tipo</label>
+              <select class="input m-type">
+                <option value="link">Web en ventana</option>
+                <option value="browser">Navegador</option>
+                <option value="external">Abrir externo</option>
+                <option value="module">Módulo interno</option>
+              </select>
+            </div>
+            <div class="field"><label>Destino</label>
+              <select class="input m-target-select hidden">
+                <option value="browser">browser</option>
+                <option value="files">files</option>
+                <option value="cloud">cloud</option>
+                <option value="meteo">meteo</option>
+                <option value="remote">remote</option>
+                <option value="settings">settings</option>
+              </select>
+              <input class="input m-target" value="${escapeAttr(data.target || '')}" placeholder="https://... o módulo">
+            </div>
+          </div>
+          <div class="kv">
+            <b>Web en ventana</b><span>Abre la URL dentro de una ventana iframe.</span>
+            <b>Abrir externo</b><span>Abre la URL en una pestaña nueva.</span>
+            <b>Módulo interno</b><span>Usa destino: files, cloud, meteo, remote, settings o browser.</span>
+          </div>
+          <div class="msg m-msg"></div>
+          <div class="form-actions">
+            ${isEdit ? '<button class="danger m-delete">Eliminar</button>' : ''}
+            <button class="secondary m-cancel">Cancelar</button>
+            <button class="primary m-save">${isEdit ? 'Guardar cambios' : 'Crear icono'}</button>
+          </div>
+        </div>
+      </div>
+    `;
+    $('.m-type').value = data.type || 'link';
+    const syncTarget = () => {
+      const type = $('.m-type').value;
+      const input = $('.m-target');
+      const sel = $('.m-target-select');
+      if(type === 'module'){
+        sel.classList.remove('hidden');
+        input.classList.add('hidden');
+        sel.value = ['browser','files','cloud','meteo','remote','settings'].includes(data.target) ? data.target : 'files';
+      }else{
+        sel.classList.add('hidden');
+        input.classList.remove('hidden');
+      }
+    };
+    syncTarget();
+    $('.m-type').addEventListener('change', syncTarget);
+    $('.m-cancel').addEventListener('click', () => modalHost.innerHTML = '');
+    $('.modal-backdrop').addEventListener('click', e => { if(e.target.classList.contains('modal-backdrop')) modalHost.innerHTML=''; });
+    if(isEdit){
+      $('.m-delete')?.addEventListener('click', async () => {
+        if(!confirm('¿Eliminar este icono?')) return;
+        await api('/api/icons/' + encodeURIComponent(icon.id), {method:'DELETE'});
+        modalHost.innerHTML = '';
+        icons = await api('/api/icons');
+        renderIcons();
+      });
+    }
+    $('.m-save').addEventListener('click', async () => {
+      const msg = $('.m-msg');
+      const type = $('.m-type').value;
+      const payload = {
+        title: $('.m-title').value || 'Nuevo icono',
+        icon: $('.m-icon').value || '🔗',
+        type,
+        target: type === 'module' ? $('.m-target-select').value : $('.m-target').value,
+        x: Number(data.x || 80),
+        y: Number(data.y || 80)
+      };
+      try{
+        if(isEdit){
+          await api('/api/icons/' + encodeURIComponent(icon.id), {method:'PUT', body:JSON.stringify({...icon, ...payload})});
+        }else{
+          await api('/api/icons', {method:'POST', body:JSON.stringify(payload)});
+        }
+        modalHost.innerHTML = '';
+        icons = await api('/api/icons');
+        renderIcons();
+      }catch(err){ setMsg(msg, err.message, 'bad'); }
+    });
+  }
+
+  function downloadText(filename, text){
+    const blob = new Blob([text], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  function escapeHtml(v){
+    return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function escapeAttr(v){ return escapeHtml(v).replace(/`/g,'&#96;'); }
+
+  boot();
+})();
 </script>
 </body>
 </html>
