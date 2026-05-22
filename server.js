@@ -731,27 +731,107 @@ function basicAuthHeader(account) {
   return "Basic " + Buffer.from(raw, "utf8").toString("base64");
 }
 
+function md5Hex(value) {
+  return crypto.createHash("md5").update(value).digest("hex");
+}
+
+function parseDigestChallenge(header) {
+  const raw = String(header || "").replace(/^Digest\s+/i, "");
+  const out = {};
+  const re = /(\w+)=("([^"]*)"|([^,\s]+))/g;
+  let m;
+  while ((m = re.exec(raw))) {
+    out[m[1]] = m[3] !== undefined ? m[3] : m[4];
+  }
+  return out;
+}
+
+function buildDigestAuthHeader({ account, method, url, challenge }) {
+  const parsedUrl = new URL(url);
+  const uri = parsedUrl.pathname + parsedUrl.search;
+  const username = account.username || "";
+  const password = account.password || "";
+  const realm = challenge.realm || "";
+  const nonce = challenge.nonce || "";
+  const qopRaw = challenge.qop || "";
+  const qop = qopRaw.split(",").map(x => x.trim()).includes("auth") ? "auth" : "";
+  const algorithm = (challenge.algorithm || "MD5").toUpperCase();
+  const opaque = challenge.opaque;
+  const nc = "00000001";
+  const cnonce = crypto.randomBytes(8).toString("hex");
+
+  let ha1 = md5Hex(`${username}:${realm}:${password}`);
+  if (algorithm === "MD5-SESS") {
+    ha1 = md5Hex(`${ha1}:${nonce}:${cnonce}`);
+  }
+
+  const ha2 = md5Hex(`${method}:${uri}`);
+  const response = qop
+    ? md5Hex(`${ha1}:${nonce}:${nc}:${cnonce}:${qop}:${ha2}`)
+    : md5Hex(`${ha1}:${nonce}:${ha2}`);
+
+  const safe = (s) => String(s || "").replace(/"/g, '\\"');
+  const parts = [
+    `username="${safe(username)}"`,
+    `realm="${safe(realm)}"`,
+    `nonce="${safe(nonce)}"`,
+    `uri="${safe(uri)}"`,
+    `response="${response}"`,
+    `algorithm=${algorithm}`
+  ];
+
+  if (opaque) parts.push(`opaque="${safe(opaque)}"`);
+  if (qop) {
+    parts.push(`qop=${qop}`);
+    parts.push(`nc=${nc}`);
+    parts.push(`cnonce="${cnonce}"`);
+  }
+
+  return "Digest " + parts.join(", ");
+}
+
 async function webdavRequest(account, method, remotePath, opts = {}) {
   const url = buildWebdavUrl(account, remotePath);
-  const headers = {
-    "Authorization": basicAuthHeader(account),
-    ...(opts.headers || {})
+  const baseHeaders = { ...(opts.headers || {}) };
+
+  let headers = {
+    ...baseHeaders,
+    "Authorization": basicAuthHeader(account)
   };
 
-  const r = await fetch(url, {
+  let r = await fetch(url, {
     method,
     headers,
     body: opts.body
   });
 
+  // Algunos WebDAV no aceptan Basic y exigen Digest.
+  if (r.status === 401) {
+    const www = r.headers.get("www-authenticate") || "";
+    if (/Digest/i.test(www)) {
+      const challenge = parseDigestChallenge(www);
+      headers = {
+        ...baseHeaders,
+        "Authorization": buildDigestAuthHeader({ account, method, url, challenge })
+      };
+
+      r = await fetch(url, {
+        method,
+        headers,
+        body: opts.body
+      });
+    }
+  }
+
   if (!r.ok && ![207, 201, 204].includes(r.status)) {
+    const authInfo = r.headers.get("www-authenticate") || "";
     const text = await r.text().catch(() => "");
-    throw new Error(`WebDAV ${method} ${r.status}: ${text.slice(0, 300)}`);
+    const detail = authInfo ? ` · Auth requerido: ${authInfo.slice(0, 160)}` : "";
+    throw new Error(`WebDAV ${method} ${r.status}: ${text.slice(0, 300)}${detail}`);
   }
 
   return r;
 }
-
 function parseWebdavList(xml, currentPath) {
   const responses = String(xml || "").match(/<[^>]*:?response[\s\S]*?<\/[^>]*:?response>/gi) || [];
   const current = normalizeDavPath(currentPath || "/");
