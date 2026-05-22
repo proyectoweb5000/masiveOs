@@ -794,32 +794,60 @@ async function webdavRequest(account, method, remotePath, opts = {}) {
   const url = buildWebdavUrl(account, remotePath);
   const baseHeaders = { ...(opts.headers || {}) };
 
+  const timeoutMs = Number(account.timeout_ms || 20000);
+  let controller = new AbortController();
+  let timer = setTimeout(() => controller.abort(), timeoutMs);
+
   let headers = {
     ...baseHeaders,
     "Authorization": basicAuthHeader(account)
   };
 
-  let r = await fetch(url, {
-    method,
-    headers,
-    body: opts.body
-  });
+  let r;
 
-  // Algunos WebDAV no aceptan Basic y exigen Digest.
+  try {
+    r = await fetch(url, {
+      method,
+      headers,
+      body: opts.body,
+      signal: controller.signal
+    });
+  } catch (err) {
+    if (err.name === "AbortError") {
+      throw new Error(`WebDAV ${method} timeout tras ${Math.round(timeoutMs / 1000)} s. Revisa URL, ruta raíz o si el servidor está respondiendo.`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+
   if (r.status === 401) {
     const www = r.headers.get("www-authenticate") || "";
     if (/Digest/i.test(www)) {
       const challenge = parseDigestChallenge(www);
+      controller = new AbortController();
+      timer = setTimeout(() => controller.abort(), timeoutMs);
+
       headers = {
         ...baseHeaders,
         "Authorization": buildDigestAuthHeader({ account, method, url, challenge })
       };
 
-      r = await fetch(url, {
-        method,
-        headers,
-        body: opts.body
-      });
+      try {
+        r = await fetch(url, {
+          method,
+          headers,
+          body: opts.body,
+          signal: controller.signal
+        });
+      } catch (err) {
+        if (err.name === "AbortError") {
+          throw new Error(`WebDAV ${method} timeout Digest tras ${Math.round(timeoutMs / 1000)} s.`);
+        }
+        throw err;
+      } finally {
+        clearTimeout(timer);
+      }
     }
   }
 
@@ -832,6 +860,7 @@ async function webdavRequest(account, method, remotePath, opts = {}) {
 
   return r;
 }
+
 function parseWebdavList(xml, currentPath) {
   const responses = String(xml || "").match(/<[^>]*:?response[\s\S]*?<\/[^>]*:?response>/gi) || [];
   const current = normalizeDavPath(currentPath || "/");
