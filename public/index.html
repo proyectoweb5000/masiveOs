@@ -1434,7 +1434,154 @@
       .grid2{grid-template-columns:1fr}
       .dock{left:10px;right:10px;transform:none;justify-content:flex-start}
     }
-  </style>
+  
+    /* ===== WebDAV Windows 11 professional layout ===== */
+    .webdav-wrap.webdav-win11{
+      grid-template-columns:320px minmax(0,1fr) !important;
+      gap:14px;
+      min-height:620px;
+    }
+    .webdav-win11 .webdav-panel{
+      background:rgba(248,250,252,.94) !important;
+      color:#111827 !important;
+      border:1px solid rgba(148,163,184,.28) !important;
+      border-radius:18px !important;
+      box-shadow:0 18px 45px rgba(15,23,42,.18);
+    }
+    .webdav-win11 .webdav-main{
+      border-radius:18px !important;
+      border:1px solid rgba(148,163,184,.28) !important;
+      box-shadow:0 18px 45px rgba(15,23,42,.16);
+      background:#f8fafc !important;
+    }
+    .webdav-win11 .webdav-toolbar{
+      background:rgba(255,255,255,.92)!important;
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(148,163,184,.28)!important;
+      min-height:64px;
+    }
+    .webdav-win11 .webdav-path{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      color:#0f172a;
+      background:#eef2f7;
+      padding:9px 13px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.28);
+      max-width:55%;
+    }
+    .webdav-win11 .webdav-content{
+      background:#f8fafc!important;
+      padding:16px;
+    }
+    .webdav-win11 .webdav-grid{
+      display:block!important;
+      border:1px solid rgba(148,163,184,.24);
+      border-radius:16px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .webdav-win11 .webdav-list-head,
+    .webdav-win11 .webdav-item{
+      display:grid!important;
+      grid-template-columns:44px minmax(260px,1.4fr) 120px 190px 170px;
+      align-items:center;
+      gap:10px;
+      min-height:auto!important;
+      border-radius:0!important;
+      border:0!important;
+      border-bottom:1px solid rgba(148,163,184,.18)!important;
+      padding:9px 12px!important;
+      text-align:left!important;
+      color:#0f172a!important;
+      background:#fff;
+    }
+    .webdav-win11 .webdav-list-head{
+      position:sticky;
+      top:0;
+      z-index:5;
+      background:#f1f5f9;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:#64748b!important;
+      font-weight:950;
+    }
+    .webdav-win11 .webdav-item:hover{ background:#eff6ff!important; }
+    .webdav-win11 .webdav-item.is-selected{ background:#dbeafe!important; }
+    .webdav-win11 .webdav-ico{
+      width:34px!important;
+      height:34px!important;
+      border-radius:10px!important;
+      font-size:21px!important;
+      box-shadow:none!important;
+    }
+    .webdav-win11 .webdav-name{
+      font-size:13px!important;
+      font-weight:800!important;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      word-break:normal!important;
+    }
+    .webdav-win11 .webdav-meta{
+      font-size:12px!important;
+      color:#64748b!important;
+      font-weight:700!important;
+    }
+    .webdav-win11 .webdav-account{
+      background:#fff!important;
+      color:#0f172a!important;
+      border:1px solid rgba(148,163,184,.26)!important;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:8px;
+      align-items:center;
+    }
+    .webdav-win11 .webdav-account.is-active,
+    .webdav-win11 .webdav-account:hover{
+      background:#eff6ff!important;
+      border-color:#93c5fd!important;
+    }
+    .webdav-win11 .webdav-account-actions{
+      display:flex;
+      gap:5px;
+      align-items:center;
+    }
+    .webdav-win11 .mini-btn{
+      border:1px solid rgba(148,163,184,.32);
+      background:#fff;
+      color:#0f172a;
+      border-radius:9px;
+      padding:5px 7px;
+      font-size:11px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .webdav-win11 .mini-btn.danger{
+      color:#b91c1c;
+      border-color:rgba(248,113,113,.35);
+    }
+    .webdav-win11 .webdav-provider{
+      background:#fff!important;
+      color:#0f172a!important;
+      border-color:rgba(148,163,184,.26)!important;
+    }
+    .webdav-win11 .webdav-status{
+      color:#1e3a8a!important;
+      background:#eff6ff!important;
+      border-left-color:#3b82f6!important;
+    }
+    @media(max-width:1100px){
+      .webdav-wrap.webdav-win11{grid-template-columns:1fr!important}
+      .webdav-win11 .webdav-list-head,
+      .webdav-win11 .webdav-item{grid-template-columns:38px minmax(180px,1fr) 90px!important}
+      .webdav-win11 .col-mod,.webdav-win11 .col-actions{display:none!important}
+    }
+
+</style>
 </head>
 <body class="theme-massive">
   <div id="loginScreen" class="login-screen">
@@ -2707,7 +2854,7 @@
 
   async function renderWebdavDrives(root){
     root.innerHTML = `
-      <div class="webdav-wrap">
+      <div class="webdav-wrap webdav-win11">
         <aside class="webdav-panel">
           <h3 style="margin:0 0 8px">WebDAV Drives</h3>
           <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.4">Módulo de nubes por WebDAV dentro de Masive OS. Configura DIGI, pCloud WebDAV, Nextcloud, Koofr o cualquier puente WebDAV para Dropbox, Google Drive y OneDrive.</p>
@@ -2770,13 +2917,7 @@
           <div class="webdav-content"><div class="finder-empty"><b>🌐</b><div>Selecciona o configura un disco WebDAV</div></div></div>
         </section>
 
-        <aside class="webdav-preview">
-          <div class="webdav-preview-head">
-            <h3 style="margin:0 0 4px">Vista previa</h3>
-            <div style="color:var(--muted);font-size:12px">Imágenes, PDF, TXT, CSV y JSON internos. Word/Excel/PPT: descarga o vista externa si el navegador lo permite.</div>
-          </div>
-          <div class="webdav-preview-body"><div class="finder-empty"><b>👁️</b><div>Selecciona un archivo</div></div></div>
-        </aside>
+        
       </div>
     `;
 
@@ -2830,12 +2971,18 @@
     const loadAccounts = async () => {
       accounts = await api('/api/webdav/accounts').catch(() => []);
       $('.webdav-accounts', root).innerHTML = accounts.length ? accounts.map(a => `
-        <button class="webdav-account ${active && active.id === a.id ? 'is-active' : ''}" data-id="${escapeAttr(a.id)}">
-          <b>${providerIcon(a.provider)} ${escapeHtml(a.name || a.provider)}</b>
-          <span>${escapeHtml(a.provider)} · ${escapeHtml(a.mode || 'rw')} · ${escapeHtml(a.root || '/')}</span>
-        </button>
+        <div class="webdav-account ${active && active.id === a.id ? 'is-active' : ''}" data-id="${escapeAttr(a.id)}">
+          <button class="webdav-account-open" data-id="${escapeAttr(a.id)}" style="border:0;background:transparent;text-align:left;color:inherit;min-width:0;cursor:pointer">
+            <b>${providerIcon(a.provider)} ${escapeHtml(a.name || a.provider)}</b>
+            <span>${escapeHtml(a.provider)} · ${escapeHtml(a.mode || 'rw')} · ${escapeHtml(a.root || '/')}</span>
+          </button>
+          <div class="webdav-account-actions">
+            <button class="mini-btn webdav-account-edit" data-id="${escapeAttr(a.id)}">Editar</button>
+            <button class="mini-btn danger webdav-account-delete" data-id="${escapeAttr(a.id)}">Eliminar</button>
+          </div>
+        </div>
       `).join('') : '<div class="note">No hay discos WebDAV configurados todavía.</div>';
-      $$('.webdav-account', root).forEach(btn => btn.addEventListener('click', async () => {
+      $$('.webdav-account-open', root).forEach(btn => btn.addEventListener('click', async () => {
         active = accounts.find(a => a.id === btn.dataset.id);
         currentPath = active.root || '/';
         history = [];
@@ -2845,6 +2992,37 @@
           setMsg('Error listando WebDAV: ' + err.message);
         }
         loadAccounts();
+      }));
+
+      $$('.webdav-account-edit', root).forEach(btn => btn.addEventListener('click', () => {
+        const a = accounts.find(x => x.id === btn.dataset.id);
+        if(!a) return;
+        active = a;
+        form.id.value = a.id || '';
+        form.provider.value = a.provider || 'custom';
+        form.name.value = a.name || '';
+        form.url.value = a.base_url || '';
+        form.user.value = a.username || '';
+        form.pass.value = a.password || '';
+        form.root.value = a.root || '/';
+        form.mode.value = a.mode || 'rw';
+        setMsg('Editando unidad WebDAV: ' + (a.name || a.provider));
+      }));
+
+      $$('.webdav-account-delete', root).forEach(btn => btn.addEventListener('click', async () => {
+        const a = accounts.find(x => x.id === btn.dataset.id);
+        if(!a) return;
+        if(!confirm('¿Eliminar la unidad WebDAV "' + (a.name || a.provider) + '"?')) return;
+        await api('/api/webdav/accounts/' + encodeURIComponent(a.id), {method:'DELETE'});
+        if(active && active.id === a.id){
+          active = null;
+          items = [];
+          $('.webdav-path', root).textContent = 'Selecciona un disco WebDAV';
+          $('.webdav-content', root).innerHTML = '<div class="finder-empty"><b>🌐</b><div>Selecciona o configura un disco WebDAV</div></div>';
+        }
+        clearForm();
+        await loadAccounts();
+        setMsg('Unidad WebDAV eliminada.');
       }));
     };
 
@@ -2861,20 +3039,34 @@
     const renderItems = () => {
       $('.webdav-path', root).textContent = active ? `${active.name || active.provider}: ${currentPath}` : 'Selecciona un disco WebDAV';
       const box = $('.webdav-content', root);
-      if(!items.length){ box.innerHTML = '<div class="finder-empty"><b>📂</b><div>Carpeta vacía o sin acceso</div></div>'; return; }
-      box.innerHTML = `<div class="webdav-grid">` + items.map((it, idx) => `
-        <div class="webdav-item" data-index="${idx}">
-          <div class="webdav-ico">${fileIcon(it)}</div>
-          <div class="webdav-name">${escapeHtml(it.name || '')}</div>
-          <div class="webdav-meta">${escapeHtml(it.type || '')} ${escapeHtml(fmtSize(it.size))}</div>
-        </div>
-      `).join('') + '</div>';
+      if(!items.length){
+        box.innerHTML = '<div class="finder-empty"><b>📂</b><div>Carpeta vacía o sin acceso</div></div>';
+        return;
+      }
+
+      box.innerHTML = `
+        <div class="webdav-grid">
+          <div class="webdav-list-head">
+            <div></div><div>Nombre</div><div>Tamaño</div><div class="col-mod">Modificado</div><div class="col-actions">Acciones</div>
+          </div>
+          ${items.map((it, idx) => `
+            <div class="webdav-item" data-index="${idx}">
+              <div class="webdav-ico">${fileIcon(it)}</div>
+              <div class="webdav-name" title="${escapeAttr(it.name || '')}">${escapeHtml(it.name || '')}</div>
+              <div class="webdav-meta">${it.type === 'folder' ? 'Carpeta' : escapeHtml(fmtSize(it.size))}</div>
+              <div class="webdav-meta col-mod">${escapeHtml((it.modified || '').replace('T',' ').slice(0,22))}</div>
+              <div class="row col-actions">
+                ${it.type === 'folder' ? '<button class="secondary webdav-open-row">Abrir</button>' : '<button class="secondary webdav-open-row">Ver</button>'}
+                <button class="danger webdav-delete-row">Borrar</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>`;
 
       $$('.webdav-item', root).forEach(el => {
         el.addEventListener('click', () => {
           $$('.webdav-item', root).forEach(x => x.classList.remove('is-selected'));
           el.classList.add('is-selected');
-          renderPreview(items[Number(el.dataset.index)]);
         });
         el.addEventListener('dblclick', async () => {
           const it = items[Number(el.dataset.index)];
@@ -2886,15 +3078,28 @@
             openWebdavFile(it);
           }
         });
-        el.addEventListener('contextmenu', async (e) => {
-          e.preventDefault();
-          const it = items[Number(el.dataset.index)];
-          if(confirm('¿Borrar "' + it.name + '" del WebDAV?')){
-            await api('/api/webdav/delete', {method:'POST', body:JSON.stringify({account_id:active.id,path:it.path})});
-            await listWebdav();
-          }
-        });
       });
+
+      $$('.webdav-open-row', root).forEach(btn => btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const it = items[Number(btn.closest('.webdav-item').dataset.index)];
+        if(it.type === 'folder'){
+          history.push(currentPath);
+          currentPath = it.path || '/';
+          await listWebdav();
+        }else{
+          openWebdavFile(it);
+        }
+      }));
+
+      $$('.webdav-delete-row', root).forEach(btn => btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const it = items[Number(btn.closest('.webdav-item').dataset.index)];
+        if(confirm('¿Borrar "' + it.name + '" del WebDAV?')){
+          await api('/api/webdav/delete', {method:'POST', body:JSON.stringify({account_id:active.id,path:it.path})});
+          await listWebdav();
+        }
+      }));
     };
 
     const listWebdav = async () => {
