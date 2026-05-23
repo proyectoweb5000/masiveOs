@@ -1538,6 +1538,88 @@ async function handleApi(req, res, pathname) {
     }
   }
 
+  if (pathname === "/api/webdav/diagnose" && req.method === "POST") {
+    const data = await readJson(req);
+    const account = getWebdavAccount(data.account_id);
+    if (!account) return sendJson(res, 404, { ok: false, error: "Cuenta WebDAV no encontrada" });
+
+    const result = {
+      ok: false,
+      provider: account.provider,
+      name: account.name,
+      base_url: account.base_url,
+      root: account.root || "/",
+      url_tested: null,
+      steps: [],
+      summary: ""
+    };
+
+    try {
+      const url = buildWebdavUrl(account, account.root || "/");
+      result.url_tested = url;
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 15000);
+      let r;
+      try {
+        r = await fetch(url, {
+          method: "OPTIONS",
+          headers: { "Authorization": basicAuthHeader(account) },
+          signal: controller.signal
+        });
+      } finally {
+        clearTimeout(timer);
+      }
+
+      result.steps.push({
+        method: "OPTIONS",
+        status: r.status,
+        ok: r.ok,
+        allow: r.headers.get("allow") || "",
+        dav: r.headers.get("dav") || "",
+        www_authenticate: r.headers.get("www-authenticate") || ""
+      });
+
+      const controller2 = new AbortController();
+      const timer2 = setTimeout(() => controller2.abort(), 15000);
+      try {
+        const body = `<?xml version="1.0" encoding="utf-8" ?><propfind xmlns="DAV:"><prop><resourcetype/><getcontentlength/><getlastmodified/></prop></propfind>`;
+        const p = await fetch(url, {
+          method: "PROPFIND",
+          headers: {
+            "Authorization": basicAuthHeader(account),
+            "Depth": "1",
+            "Content-Type": "application/xml; charset=utf-8"
+          },
+          body,
+          signal: controller2.signal
+        });
+        const txt = await p.text().catch(() => "");
+        result.steps.push({
+          method: "PROPFIND_BASIC",
+          status: p.status,
+          ok: p.ok || p.status === 207,
+          content_type: p.headers.get("content-type") || "",
+          www_authenticate: p.headers.get("www-authenticate") || "",
+          sample: txt.slice(0, 300)
+        });
+      } finally {
+        clearTimeout(timer2);
+      }
+
+      result.ok = result.steps.some(s => s.method === "PROPFIND_BASIC" && s.ok);
+      result.summary = result.ok
+        ? "PROPFIND responde correctamente."
+        : "El servidor responde, pero PROPFIND no devuelve 207/OK. Revisa URL raíz o credenciales.";
+
+      return sendJson(res, 200, result);
+    } catch (err) {
+      result.error = err.name === "AbortError" ? "Timeout en diagnóstico WebDAV" : err.message;
+      result.summary = result.error;
+      return sendJson(res, 200, result);
+    }
+  }
+
   if (pathname === "/api/webdav/test" && req.method === "POST") {
     const data = await readJson(req);
     const account = getWebdavAccount(data.account_id);
