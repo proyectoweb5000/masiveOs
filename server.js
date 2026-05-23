@@ -924,10 +924,19 @@ function parseWebdavList(xml, currentPath, account = {}) {
 
     const hasCollection = isWebdavCollection(block);
     const hrefLooksDir = /\/$/.test(String(hrefRaw));
-    const isDir = hasCollection || hrefLooksDir;
 
-    const size = Number(xmlTag(block, "getcontentlength") || 0);
+    const sizeText = xmlTag(block, "getcontentlength");
+    const size = Number(sizeText || 0);
     const modified = xmlTag(block, "getlastmodified");
+    const contentType = xmlTag(block, "getcontenttype").toLowerCase();
+
+    // Compatibilidad DIGI/servidores WebDAV no estándar:
+    // a veces una carpeta llega sin <collection/> y sin barra final.
+    // En explorador, si no tiene extensión y no trae tamaño útil, se trata como carpeta.
+    const hasExtension = /\.[a-z0-9]{1,8}$/i.test(name);
+    const contentLooksDir = /directory|folder|collection/.test(contentType);
+    const sizeLooksFolder = !hasExtension && (!sizeText || size === 0);
+    const isDir = hasCollection || hrefLooksDir || contentLooksDir || sizeLooksFolder;
 
     if (!name) continue;
 
