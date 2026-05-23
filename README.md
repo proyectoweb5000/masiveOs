@@ -1,22 +1,16 @@
-# EA1FJZ Cloud OS V0.1.1 Render No-Deps
+# MasiveOS / EA1FJZ Cloud OS V0.1.2
 
-Versión de arranque robusto para Render sin dependencias externas de npm.
+Versión Render sin dependencias externas de npm.
 
-## Render
+## Cambios V0.1.2
 
-Build Command:
+- Explorador de archivos tipo Windows: carpetas, listado, ruta, subir archivos a carpeta actual, crear carpeta, borrar y vista previa dentro de MasiveOS.
+- Endpoint seguro `/api/fs/list`, `/api/fs/view`, `/api/fs/text`, `/api/fs/mkdir` y borrado seguro limitado al directorio persistente de uploads.
+- Nuevo tema visual `Windows stile` con ventanas tipo Windows 11.
+- Ajuste de resolución/escala de interfaz desde Configuración general.
+- Corrección de login/sesión y lectura de respuestas API.
 
-```bash
-npm install
-```
-
-Start Command:
-
-```bash
-npm start
-```
-
-Variables:
+## Variables Render recomendadas
 
 ```text
 ADMIN_PASSWORD=tu_contraseña
@@ -24,13 +18,23 @@ DATABASE_PATH=/var/data/ea1fjz_cloud_os.json
 UPLOADS_PATH=/var/data/uploads
 ```
 
-Disco persistente:
+## Render
+
+Build Command:
+
+```text
+npm install
+```
+
+Start Command:
+
+```text
+npm start
+```
+
+Persistent Disk:
 
 ```text
 Mount Path: /var/data
 Size: 1 GB
 ```
-
-Usuario inicial: `admin`.
-
-Esta versión usa persistencia JSON para eliminar el problema de dependencias en el primer despliegue. La capa SQL se reintroducirá después, cuando el servicio base ya esté estable en Render.
