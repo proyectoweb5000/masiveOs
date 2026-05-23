@@ -2911,6 +2911,7 @@
               <button class="secondary webdav-refresh">Actualizar</button>
               <button class="secondary webdav-mkdir">Nueva carpeta</button>
               <button class="primary webdav-upload">Subir</button>
+              <button class="secondary webdav-paste">Pegar</button>
               <input class="hidden webdav-upload-input" type="file">
             </div>
           </div>
@@ -2921,7 +2922,7 @@
       </div>
     `;
 
-    let accounts = [], active = null, currentPath = '/', history = [], items = [];
+    let accounts = [], active = null, currentPath = '/', history = [], items = [], webdavClipboard = null;
     const setMsg = (t) => $('.webdav-msg', root).textContent = t;
     const form = {
       id: $('.webdav-id', root),
@@ -3057,6 +3058,9 @@
               <div class="webdav-meta col-mod">${escapeHtml((it.modified || '').replace('T',' ').slice(0,22))}</div>
               <div class="row col-actions">
                 ${it.type === 'folder' ? '<button class="secondary webdav-open-row">Abrir</button>' : '<button class="secondary webdav-open-row">Ver</button>'}
+                ${it.type !== 'folder' && /\.(txt|csv|json|log|md|html?|css|js)$/i.test(it.name || '') ? '<button class="secondary webdav-edit-row">Editar</button>' : ''}
+                <button class="secondary webdav-copy-row">Copiar</button>
+                <button class="secondary webdav-cut-row">Cortar</button>
                 <button class="danger webdav-delete-row">Borrar</button>
               </div>
             </div>
@@ -3094,6 +3098,27 @@
         }
       }));
 
+
+      $$('.webdav-edit-row', root).forEach(btn => btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const it = items[Number(btn.closest('.webdav-item').dataset.index)];
+        await openWebdavTextEditor(it);
+      }));
+
+      $$('.webdav-copy-row', root).forEach(btn => btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const it = items[Number(btn.closest('.webdav-item').dataset.index)];
+        webdavClipboard = {mode:'copy', item: it};
+        setMsg('Copiado al portapapeles WebDAV: ' + it.name);
+      }));
+
+      $$('.webdav-cut-row', root).forEach(btn => btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const it = items[Number(btn.closest('.webdav-item').dataset.index)];
+        webdavClipboard = {mode:'move', item: it};
+        setMsg('Preparado para mover: ' + it.name + '. Entra en la carpeta destino y pulsa Pegar.');
+      }));
+
       $$('.webdav-delete-row', root).forEach(btn => btn.addEventListener('click', async (e) => {
         e.stopPropagation();
         const it = items[Number(btn.closest('.webdav-item').dataset.index)];
@@ -3128,8 +3153,41 @@
 
     const openWebdavFile = (it) => {
       const dl = `/api/webdav/download?account_id=${encodeURIComponent(active.id)}&path=${encodeURIComponent(it.path || '')}`;
-      if(/\.(png|jpe?g|gif|webp|svg|pdf|txt|csv|json|log|md)$/i.test(it.name || '')) openBrowser(dl, it.name);
+      if(/\.(png|jpe?g|gif|webp|svg|pdf|txt|csv|json|log|md|html?)$/i.test(it.name || '')) openBrowser(dl, it.name);
       else window.open(dl, '_blank');
+    };
+
+    const openWebdavTextEditor = async (it) => {
+      if(!active || !it || it.type === 'folder') return;
+      setMsg('Abriendo editor de texto para ' + it.name + '...');
+      const data = await apiWithTimeout('/api/webdav/download-text?account_id=' + encodeURIComponent(active.id) + '&path=' + encodeURIComponent(it.path || ''), {}, 25000);
+      const modal = document.createElement('div');
+      modal.className = 'modal-backdrop';
+      modal.innerHTML = `
+        <div class="modal" style="width:min(980px,calc(100vw - 30px));height:min(760px,calc(100vh - 30px));display:flex;flex-direction:column">
+          <h2>Editar WebDAV</h2>
+          <p>${escapeHtml(it.path || it.name || '')}</p>
+          <textarea class="input webdav-text-editor" style="flex:1;min-height:420px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px;line-height:1.45;resize:none;background:#0f172a;color:#e5e7eb"></textarea>
+          <div class="form-actions">
+            <button class="secondary webdav-editor-close">Cerrar</button>
+            <button class="primary webdav-editor-save">Guardar cambios</button>
+          </div>
+          <div class="msg webdav-editor-msg"></div>
+        </div>`;
+      document.body.appendChild(modal);
+      const ta = $('.webdav-text-editor', modal);
+      ta.value = data.text || '';
+      $('.webdav-editor-close', modal).addEventListener('click', () => modal.remove());
+      $('.webdav-editor-save', modal).addEventListener('click', async () => {
+        const msg = $('.webdav-editor-msg', modal);
+        setMsg(msg, 'Guardando en WebDAV...');
+        try{
+          await apiWithTimeout('/api/webdav/save-text', {method:'POST', body:JSON.stringify({account_id:active.id,path:it.path,text:ta.value})}, 25000);
+          setMsg(msg, 'Guardado correctamente.', 'ok');
+          await listWebdav();
+        }catch(err){ setMsg(msg, err.message, 'bad'); }
+      });
+      setMsg('Editor abierto.');
     };
 
     $$('.webdav-provider', root).forEach(btn => btn.addEventListener('click', () => fillPreset(btn.dataset.provider)));
@@ -3153,6 +3211,30 @@
       }
     });
     $('.webdav-clear', root).addEventListener('click', clearForm);
+
+    $('.webdav-paste', root).addEventListener('click', async () => {
+      try{
+        if(!active){ setMsg('Selecciona un disco WebDAV.'); return; }
+        if(!webdavClipboard || !webdavClipboard.item){ setMsg('No hay nada para pegar. Usa Copiar o Cortar primero.'); return; }
+        const name = webdavClipboard.item.name || 'archivo';
+        let targetName = name;
+        if(items.some(x => String(x.name || '').toLowerCase() === String(targetName).toLowerCase())){
+          targetName = prompt('Ya existe un elemento con ese nombre. Nuevo nombre:', name) || '';
+          if(!targetName) return;
+        }
+        setMsg((webdavClipboard.mode === 'move' ? 'Moviendo' : 'Copiando') + ' en WebDAV...');
+        await apiWithTimeout('/api/webdav/' + (webdavClipboard.mode === 'move' ? 'move' : 'copy'), {method:'POST', body:JSON.stringify({
+          account_id: active.id,
+          from: webdavClipboard.item.path,
+          to_dir: currentPath,
+          name: targetName
+        })}, 30000);
+        if(webdavClipboard.mode === 'move') webdavClipboard = null;
+        await listWebdav();
+        setMsg('Pegado completado.');
+      }catch(err){ setMsg(err.message); }
+    });
+
     $('.webdav-refresh', root).addEventListener('click', () => listWebdav().catch(err => setMsg(err.message)));
     $('.webdav-back', root).addEventListener('click', async () => { const prev = history.pop(); if(prev !== undefined){ currentPath = prev; await listWebdav(); } });
     $('.webdav-mkdir', root).addEventListener('click', async () => {
