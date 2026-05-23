@@ -1581,6 +1581,165 @@
       .webdav-win11 .col-mod,.webdav-win11 .col-actions{display:none!important}
     }
 
+    /* ===== WebDAV readability + Explorer integration ===== */
+    .webdav-win11 .field label,
+    .webdav-win11 .finder-side-title{
+      color:#64748b !important;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+    .webdav-win11 .input,
+    .webdav-win11 select,
+    .webdav-win11 textarea{
+      background:#ffffff !important;
+      color:#0f172a !important;
+      border:1px solid rgba(148,163,184,.28) !important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
+    }
+    .webdav-win11 .input::placeholder{color:#94a3b8!important;opacity:1}
+    .webdav-win11 .webdav-panel h3{color:#0f172a!important;font-size:15px;font-weight:900}
+    .webdav-win11 .webdav-panel p{color:#475569!important}
+    .webdav-toggle-row{
+      display:flex;align-items:center;gap:10px;margin:8px 0 4px;padding:10px 12px;
+      background:#fff;border:1px solid rgba(148,163,184,.24);border-radius:12px;
+    }
+    .webdav-toggle-row input{width:17px;height:17px;accent-color:#4f46e5}
+    .webdav-toggle-row span{font-size:13px;font-weight:800;color:#0f172a}
+    .webdav-toggle-row small{display:block;color:#64748b;font-size:11px;margin-top:2px}
+    .webdav-account-pin{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:#4338ca;background:#eef2ff;border:1px solid rgba(99,102,241,.2);padding:2px 7px;border-radius:999px;margin-top:5px}
+    .webdav-win11 .webdav-account-open{padding-right:4px}
+    .webdav-win11 .mini-btn.files{color:#1d4ed8;border-color:rgba(59,130,246,.28)}
+    .finder-side-sub{padding-left:10px;font-size:12px;color:var(--muted);margin:2px 0 10px}
+    .finder-side-item.is-webdav{padding-left:16px}
+    .finder-side-item .side-badge{margin-left:auto;font-size:10px;padding:2px 6px;border-radius:999px;background:#e0e7ff;color:#3730a3;font-weight:800}
+
+
+    /* ===== V5 Explorador Windows 11 + discos WebDAV ===== */
+    .window:has(.finder-wrap){
+      background:rgba(243,246,251,.98)!important;
+      border-color:rgba(148,163,184,.34)!important;
+    }
+    .window:has(.finder-wrap) .titlebar{
+      background:linear-gradient(180deg,#f8fafc,#edf2f8)!important;
+      border-bottom:1px solid rgba(148,163,184,.28)!important;
+    }
+    .finder-wrap{
+      grid-template-columns:270px minmax(0,1fr)!important;
+      background:#ffffff!important;
+      border:1px solid rgba(148,163,184,.30)!important;
+      border-radius:18px!important;
+      box-shadow:0 18px 44px rgba(15,23,42,.10)!important;
+    }
+    .finder-sidebar{
+      background:linear-gradient(180deg,#f6f8fc,#eef3f9)!important;
+      border-right:1px solid rgba(148,163,184,.26)!important;
+      padding:14px 11px!important;
+    }
+    .finder-side-title{
+      color:#64748b!important;
+      font-size:11px!important;
+      font-weight:950!important;
+      letter-spacing:.08em!important;
+      margin-top:4px;
+    }
+    .finder-side-item{
+      color:#0f172a!important;
+      background:transparent!important;
+      border:1px solid transparent!important;
+      border-radius:12px!important;
+      min-height:37px;
+      transition:background .12s ease,border-color .12s ease;
+    }
+    .finder-side-item:hover{background:#eaf2ff!important;border-color:rgba(96,165,250,.18)!important}
+    .finder-side-item.is-active{background:#dbeafe!important;border-color:#93c5fd!important;color:#0f172a!important}
+    .finder-side-item.is-drive{
+      display:grid!important;
+      grid-template-columns:30px minmax(0,1fr) auto;
+      gap:8px;
+      align-items:center;
+      padding:10px 10px!important;
+      min-height:54px!important;
+    }
+    .drive-glyph{
+      width:30px;height:30px;border-radius:9px;
+      display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(180deg,#ffffff,#dbeafe);
+      border:1px solid rgba(59,130,246,.24);
+      box-shadow:0 6px 12px rgba(37,99,235,.10);
+      font-size:17px;
+    }
+    .drive-label{min-width:0;display:block;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .drive-sub{display:block;font-size:10px;color:#64748b;font-weight:800;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .drive-letter-pill{font-size:10px;font-weight:950;color:#3730a3;background:#e0e7ff;border:1px solid rgba(99,102,241,.20);border-radius:999px;padding:3px 7px}
+    .finder-main{background:#ffffff!important;color:#0f172a!important}
+    .finder-toolbar{
+      min-height:66px!important;
+      background:linear-gradient(180deg,#ffffff,#f8fafc)!important;
+      border-bottom:1px solid rgba(148,163,184,.24)!important;
+      padding:12px 14px!important;
+    }
+    .finder-breadcrumb{
+      background:#f1f5f9!important;
+      border:1px solid rgba(148,163,184,.24)!important;
+      border-radius:999px!important;
+      padding:8px 13px!important;
+      color:#0f172a!important;
+      max-width:48%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .finder-actions .secondary,
+    .finder-actions .primary{
+      border-radius:12px!important;
+      min-height:38px;
+      box-shadow:0 6px 14px rgba(15,23,42,.06);
+    }
+    .finder-actions .secondary{background:#fff!important;color:#0f172a!important;border:1px solid rgba(148,163,184,.30)!important}
+    .finder-content{background:#ffffff!important;padding:16px!important}
+    .finder-list{
+      border:1px solid rgba(148,163,184,.22);
+      border-radius:16px;
+      overflow:auto;
+      background:#fff;
+    }
+    .finder-list-row{
+      grid-template-columns:42px minmax(260px,1.6fr) 120px 160px 180px!important;
+      min-width:850px!important;
+      color:#0f172a!important;
+      border-bottom:1px solid rgba(148,163,184,.16)!important;
+      border-radius:0!important;
+      padding:10px 12px!important;
+    }
+    .finder-list-row.header{
+      background:#f1f5f9!important;
+      color:#64748b!important;
+      font-size:11px!important;
+      letter-spacing:.06em!important;
+    }
+    .finder-list-row:hover{background:#eff6ff!important}
+    .finder-list-row.is-selected{background:#dbeafe!important}
+    .finder-grid{grid-template-columns:repeat(auto-fill,minmax(138px,1fr))!important;gap:16px!important}
+    .finder-item{
+      color:#0f172a!important;
+      background:#fff!important;
+      border:1px solid rgba(148,163,184,.18)!important;
+      box-shadow:0 8px 22px rgba(15,23,42,.06)!important;
+    }
+    .finder-item:hover,.finder-item.is-selected{background:#eff6ff!important;border-color:#93c5fd!important}
+    .finder-icon{
+      background:linear-gradient(180deg,#dbeafe,#bfdbfe)!important;
+      border-color:rgba(59,130,246,.24)!important;
+      color:#0f172a!important;
+    }
+    .finder-name{color:#0f172a!important}
+    .finder-meta{color:#64748b!important}
+    .webdav-drive-letter-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .webdav-account-pin.drive{
+      background:#e0f2fe;border-color:rgba(14,165,233,.25);color:#075985;
+    }
+
 </style>
 </head>
 <body class="theme-massive">
@@ -1847,7 +2006,7 @@
   $('#settingsTopBtn').addEventListener('click', () => openModule('settings'));
   $('#newIconTopBtn').addEventListener('click', () => showIconModal(null));
 
-  function openModule(module, title=null, icon=null){
+  function openModule(module, title=null, icon=null, options=null){
     const data = {
       browser: ['Navegador','🌐'],
       files: ['Archivos','📁'],
@@ -1865,12 +2024,12 @@
     const id = module + '_' + Date.now();
     const win = createWindow(id, title || t, icon || i, 920, 590);
     if(module === 'browser') renderBrowser(win.body, 'https://www.google.com');
-    if(module === 'files') renderFiles(win.body);
+    if(module === 'files') renderFiles(win.body, options || {});
     if(module === 'dashboards') renderDashboards(win.body);
     if(module === 'search') renderSearch(win.body);
     if(module === 'writer') renderWriter(win.body);
     if(module === 'ftp') renderFtp(win.body);
-    if(module === 'drives') renderWebdavDrives(win.body);
+    if(module === 'drives') renderWebdavDrives(win.body, options || {});
     if(module === 'cloud') renderCloud(win.body);
     if(module === 'meteo') renderMeteo(win.body);
     if(module === 'remote') renderRemote(win.body);
@@ -1996,7 +2155,7 @@
     $('.browser-external', root).addEventListener('click', () => window.open(normalizeBrowserInput(input.value), '_blank', 'noopener,noreferrer'));
   }
 
-  async function renderFiles(root){
+  async function renderFiles(root, options = {}){
     root.innerHTML = `
       <div class="finder-wrap">
         <aside class="finder-sidebar">
@@ -2006,6 +2165,8 @@
           <button class="finder-side-item" data-folder="/Meteo Radio">📡 Meteo Radio</button>
           <button class="finder-side-item" data-folder="/Documentos">📄 Documentos</button>
           <button class="finder-side-item" data-folder="/Backups">💾 Backups</button>
+          <div class="finder-side-title">Unidades WebDAV</div>
+          <div class="finder-side-webdav"><div class="finder-side-sub">No hay accesos anclados</div></div>
           <div class="finder-side-title">Acciones</div>
           <button class="finder-side-item finder-new-folder">📁 Nueva carpeta</button>
           <button class="finder-side-item finder-upload-side">⬆️ Subir archivo</button>
@@ -2019,8 +2180,9 @@
             <div class="finder-actions">
               <input class="input finder-search" placeholder="Buscar en archivos...">
               <button class="secondary finder-back">← Atrás</button>
-              <button class="secondary finder-view-toggle">Vista: iconos</button>
               <button class="secondary finder-up">Subir</button>
+              <button class="secondary finder-view-toggle">Vista: iconos</button>
+              <button class="secondary finder-refresh">Actualizar</button>
               <button class="secondary finder-new-folder-top">Nueva carpeta</button>
               <button class="primary finder-upload-top">Subir archivo</button>
               <input class="finder-file-input hidden" type="file">
@@ -2033,19 +2195,27 @@
       </div>
     `;
 
+    let currentMode = 'local';
     let currentFolder = '/';
-    let folderHistory = [];
+    let currentWebdavPath = '/';
+    let currentWebdav = null;
+    let navHistory = [];
     let files = [];
     let folders = [];
+    let webdavAccounts = [];
+    let webdavItems = [];
     let viewMode = localStorage.getItem('masive_finder_view') || 'grid';
     let search = '';
+    let initializedFromOptions = false;
 
     const fileInput = $('.finder-file-input', root);
     const itemsBox = $('.finder-items', root);
     const pathLabel = $('.finder-path', root);
+    const webdavSideBox = $('.finder-side-webdav', root);
 
     const fmtSize = n => {
       n = Number(n || 0);
+      if(!n) return '';
       if(n < 1024) return n + ' B';
       if(n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
       return (n/(1024*1024)).toFixed(2) + ' MB';
@@ -2063,13 +2233,29 @@
       if(name.endsWith('.js') || name.endsWith('.json') || name.endsWith('.css')) return '🧩';
       return '📄';
     };
+    const iconForWebdav = (f) => {
+      if(f.type === 'folder') return '📁';
+      const name = (f.name || '').toLowerCase();
+      if(/\.(png|jpe?g|gif|webp|svg)$/i.test(name)) return '🖼️';
+      if(name.endsWith('.pdf')) return '📕';
+      if(/\.(xls|xlsx|csv)$/i.test(name)) return '📊';
+      if(/\.(txt|json|log|md)$/i.test(name)) return '📝';
+      if(/\.(zip|rar|7z)$/i.test(name)) return '📦';
+      if(/\.(html?|css|js)$/i.test(name)) return '🌐';
+      return '📄';
+    };
 
     const normalizeFolder = f => {
       if(!f || f === '/') return '/';
       let out = '/' + String(f).replace(/^\/+|\/+$/g,'');
       return out === '/' ? '/' : out;
     };
-
+    const normalizeWebdavPath = normalizeFolder;
+    const joinWebdavPath = (base, name) => {
+      const b = normalizeWebdavPath(base || '/').replace(/\/+$/,'');
+      const n = String(name || '').replace(/^\/+/, '');
+      return ('/' + [b, n].join('/').replace(/^\/+|\/+$/g,'').replace(/\/+/g, '/')).replace(/\/+$/, '') || '/';
+    };
     const parentFolder = f => {
       f = normalizeFolder(f);
       if(f === '/') return '/';
@@ -2077,15 +2263,20 @@
       parts.pop();
       return parts.length ? '/' + parts.join('/') : '/';
     };
+    const friendlyPath = () => {
+      if(currentMode === 'webdav' && currentWebdav){
+        return `${currentWebdav.name || currentWebdav.provider} (${currentWebdav.drive_letter || 'Z'}:)${currentWebdavPath === '/' ? '' : currentWebdavPath}`;
+      }
+      return currentFolder === '/' ? 'Inicio' : 'Inicio' + currentFolder;
+    };
 
-    const friendlyPath = f => f === '/' ? 'Inicio' : 'Inicio' + f;
-
-    const load = async () => {
-      const data = await api('/api/files');
-      files = Array.isArray(data) ? data : (data.files || []);
-      folders = await api('/api/folders').catch(() => []);
-      ensureDefaultFolders();
-      render();
+    const pushState = () => {
+      navHistory.push({
+        mode: currentMode,
+        folder: currentFolder,
+        webdavPath: currentWebdavPath,
+        webdavId: currentWebdav ? currentWebdav.id : null
+      });
     };
 
     const ensureDefaultFolders = () => {
@@ -2095,68 +2286,150 @@
       });
     };
 
-    const setFolder = (folder, pushHistory=true) => {
-      const next = normalizeFolder(folder);
-      if(pushHistory && next !== currentFolder) folderHistory.push(currentFolder);
-      currentFolder = next;
-      $$('.finder-side-item[data-folder]', root).forEach(b => b.classList.toggle('is-active', normalizeFolder(b.dataset.folder) === currentFolder));
-      render();
-    };
-
-    const goBackFolder = () => {
-      const prev = folderHistory.pop();
-      if(prev !== undefined) setFolder(prev, false);
-    };
-
     const filterMatches = obj => {
       if(!search) return true;
       const q = search.toLowerCase();
       return String(obj.name || obj.original_name || '').toLowerCase().includes(q);
     };
 
-    const render = () => {
-      pathLabel.textContent = friendlyPath(currentFolder);
-      $('.finder-view-toggle', root).textContent = viewMode === 'grid' ? 'Vista: iconos' : 'Vista: lista';
-      const childFolders = folders
-        .filter(f => normalizeFolder(f.parent || parentFolder(f.path)) === currentFolder && normalizeFolder(f.path) !== currentFolder)
-        .filter(filterMatches)
-        .sort((a,b) => String(a.name).localeCompare(String(b.name),'es'));
-      const childFiles = files
-        .filter(f => normalizeFolder(f.folder || '/') === currentFolder)
-        .filter(filterMatches)
-        .sort((a,b) => String(a.original_name || a.name).localeCompare(String(b.original_name || b.name),'es'));
+    const renderSidebar = () => {
+      const pinned = (webdavAccounts || []).filter(a => a.show_in_files !== false);
+      webdavSideBox.innerHTML = pinned.length ? pinned.map((a,idx) => {
+        const letter = a.drive_letter || String.fromCharCode(90 - Math.min(idx,7));
+        return `
+        <button class="finder-side-item is-webdav is-drive ${currentMode === 'webdav' && currentWebdav && currentWebdav.id === a.id ? 'is-active' : ''}" data-webdav-id="${escapeAttr(a.id)}">
+          <span class="drive-glyph">💽</span>
+          <span><span class="drive-label">${escapeHtml(a.name || a.provider)}</span><span class="drive-sub">Unidad WebDAV</span></span>
+          <span class="drive-letter-pill">${escapeHtml(letter)}:</span>
+        </button>`;
+      }).join('') : '<div class="finder-side-sub">Activa un acceso desde el módulo WebDAV</div>';
+      $$('[data-webdav-id]', webdavSideBox).forEach(btn => btn.addEventListener('click', async () => {
+        await activateWebdav(btn.dataset.webdavId, null, true);
+      }));
+    };
 
-      if(viewMode === 'list'){
-        itemsBox.className = 'finder-list finder-items';
-        itemsBox.innerHTML = `<div class="finder-list-row header"><div></div><div>Nombre</div><div>Tamaño</div><div>Tipo</div><div>Fecha</div></div>` +
-          childFolders.map(f => `
-            <div class="finder-list-row finder-row" data-kind="folder" data-id="${escapeAttr(f.id || f.path)}">
-              <div class="finder-small-icon">📁</div><div class="finder-row-name">${escapeHtml(f.name)}</div><div>—</div><div>Carpeta</div><div>—</div>
-            </div>
-          `).join('') +
-          childFiles.map(f => `
-            <div class="finder-list-row finder-row" data-kind="file" data-id="${escapeAttr(f.id)}">
-              <div class="finder-small-icon">${iconForFile(f)}</div><div class="finder-row-name">${escapeHtml(f.original_name || f.name)}</div><div>${fmtSize(f.size_bytes || f.size)}</div><div>${escapeHtml(f.mime_type || '')}</div><div>${escapeHtml((f.created_at || '').replace('T',' ').slice(0,16))}</div>
-            </div>
-          `).join('');
-      }else{
-        itemsBox.className = 'finder-grid finder-items';
-        itemsBox.innerHTML =
-          childFolders.map(f => `
-            <div class="finder-item" data-kind="folder" data-id="${escapeAttr(f.id || f.path)}">
-              <div class="finder-icon">📁</div><div class="finder-name">${escapeHtml(f.name)}</div><div class="finder-meta">Carpeta</div>
-            </div>
-          `).join('') +
-          childFiles.map(f => `
-            <div class="finder-item" data-kind="file" data-id="${escapeAttr(f.id)}">
-              <div class="finder-icon">${iconForFile(f)}</div><div class="finder-name">${escapeHtml(f.original_name || f.name)}</div><div class="finder-meta">${fmtSize(f.size_bytes || f.size)}</div>
-            </div>
-          `).join('');
+    const setLocalFolder = (folder, pushHistory=true) => {
+      const next = normalizeFolder(folder);
+      if(pushHistory && (currentMode !== 'local' || next !== currentFolder)) pushState();
+      currentMode = 'local';
+      currentFolder = next;
+      currentWebdav = null;
+      currentWebdavPath = '/';
+      render();
+    };
+
+    const activateWebdav = async (accountId, path=null, pushHistory=true) => {
+      const account = webdavAccounts.find(a => a.id === accountId);
+      if(!account) return;
+      if(pushHistory && (currentMode !== 'webdav' || !currentWebdav || currentWebdav.id !== accountId || normalizeWebdavPath(path || account.root || '/') !== currentWebdavPath)) pushState();
+      currentMode = 'webdav';
+      currentWebdav = account;
+      currentWebdavPath = normalizeWebdavPath(path || currentWebdavPath || account.root || '/');
+      await listWebdavCurrent();
+    };
+
+    const loadLocal = async () => {
+      const data = await api('/api/files');
+      files = Array.isArray(data) ? data : (data.files || []);
+      folders = await api('/api/folders').catch(() => []);
+      ensureDefaultFolders();
+    };
+
+    const loadAll = async () => {
+      await loadLocal();
+      webdavAccounts = await api('/api/webdav/accounts').catch(() => []);
+      renderSidebar();
+      if(!initializedFromOptions){
+        initializedFromOptions = true;
+        if(options && options.webdavAccountId){
+          const account = webdavAccounts.find(a => a.id === options.webdavAccountId);
+          if(account){
+            currentMode = 'webdav';
+            currentWebdav = account;
+            currentWebdavPath = normalizeWebdavPath(options.webdavPath || account.root || '/');
+            await listWebdavCurrent();
+            return;
+          }
+        }
       }
+      render();
+    };
 
-      if(!childFolders.length && !childFiles.length){
-        itemsBox.className = 'finder-empty finder-items';
-        itemsBox.innerHTML = `<b>📂</b><div>No hay elementos en esta carpeta</div><div class="small">Sube archivos o crea una carpeta nueva.</div>`;
+    const render = () => {
+      pathLabel.textContent = friendlyPath();
+      $('.finder-view-toggle', root).textContent = viewMode === 'grid' ? 'Vista: iconos' : 'Vista: lista';
+      $$('.finder-side-item[data-folder]', root).forEach(b => b.classList.toggle('is-active', currentMode === 'local' && normalizeFolder(b.dataset.folder) === currentFolder));
+      renderSidebar();
+      const actionLabel = currentMode === 'webdav' ? 'Subir a WebDAV' : 'Subir archivo';
+      $('.finder-upload-top', root).textContent = actionLabel;
+      $('.finder-up', root).textContent = currentMode === 'webdav' ? 'Subir nivel' : 'Subir';
+
+      if(currentMode === 'webdav'){
+        const childItems = (webdavItems || []).filter(filterMatches).sort((a,b) => {
+          if((a.type === 'folder') !== (b.type === 'folder')) return a.type === 'folder' ? -1 : 1;
+          return String(a.name).localeCompare(String(b.name),'es');
+        });
+        if(viewMode === 'list'){
+          itemsBox.className = 'finder-list finder-items';
+          itemsBox.innerHTML = `<div class="finder-list-row header"><div></div><div>Nombre</div><div>Tamaño</div><div>Tipo</div><div>Fecha</div></div>` + childItems.map(f => `
+            <div class="finder-list-row finder-row" data-kind="webdav-${f.type}" data-id="${escapeAttr(f.path || f.name)}">
+              <div class="finder-small-icon">${iconForWebdav(f)}</div><div class="finder-row-name">${escapeHtml(f.name)}</div><div>${f.type === 'folder' ? '—' : fmtSize(f.size)}</div><div>${escapeHtml(f.type === 'folder' ? 'Carpeta WebDAV' : 'Archivo WebDAV')}</div><div>${escapeHtml(String(f.modified || '').replace('T',' ').slice(0,16))}</div>
+            </div>
+          `).join('');
+        }else{
+          itemsBox.className = 'finder-grid finder-items';
+          itemsBox.innerHTML = childItems.map(f => `
+            <div class="finder-item" data-kind="webdav-${f.type}" data-id="${escapeAttr(f.path || f.name)}">
+              <div class="finder-icon">${iconForWebdav(f)}</div><div class="finder-name">${escapeHtml(f.name)}</div><div class="finder-meta">${f.type === 'folder' ? 'Carpeta WebDAV' : fmtSize(f.size)}</div>
+            </div>
+          `).join('');
+        }
+        if(!childItems.length){
+          itemsBox.className = 'finder-empty finder-items';
+          itemsBox.innerHTML = `<b>🌐</b><div>No hay elementos en esta ruta WebDAV</div><div class="small">Puedes crear carpetas o subir archivos.</div>`;
+        }
+      }else{
+        const childFolders = folders
+          .filter(f => normalizeFolder(f.parent || parentFolder(f.path)) === currentFolder && normalizeFolder(f.path) !== currentFolder)
+          .filter(filterMatches)
+          .sort((a,b) => String(a.name).localeCompare(String(b.name),'es'));
+        const childFiles = files
+          .filter(f => normalizeFolder(f.folder || '/') === currentFolder)
+          .filter(filterMatches)
+          .sort((a,b) => String(a.original_name || a.name).localeCompare(String(b.original_name || b.name),'es'));
+
+        if(viewMode === 'list'){
+          itemsBox.className = 'finder-list finder-items';
+          itemsBox.innerHTML = `<div class="finder-list-row header"><div></div><div>Nombre</div><div>Tamaño</div><div>Tipo</div><div>Fecha</div></div>` +
+            childFolders.map(f => `
+              <div class="finder-list-row finder-row" data-kind="folder" data-id="${escapeAttr(f.id || f.path)}">
+                <div class="finder-small-icon">📁</div><div class="finder-row-name">${escapeHtml(f.name)}</div><div>—</div><div>Carpeta</div><div>—</div>
+              </div>
+            `).join('') +
+            childFiles.map(f => `
+              <div class="finder-list-row finder-row" data-kind="file" data-id="${escapeAttr(f.id)}">
+                <div class="finder-small-icon">${iconForFile(f)}</div><div class="finder-row-name">${escapeHtml(f.original_name || f.name)}</div><div>${fmtSize(f.size_bytes || f.size)}</div><div>${escapeHtml(f.mime_type || '')}</div><div>${escapeHtml((f.created_at || '').replace('T',' ').slice(0,16))}</div>
+              </div>
+            `).join('');
+        }else{
+          itemsBox.className = 'finder-grid finder-items';
+          itemsBox.innerHTML =
+            childFolders.map(f => `
+              <div class="finder-item" data-kind="folder" data-id="${escapeAttr(f.id || f.path)}">
+                <div class="finder-icon">📁</div><div class="finder-name">${escapeHtml(f.name)}</div><div class="finder-meta">Carpeta</div>
+              </div>
+            `).join('') +
+            childFiles.map(f => `
+              <div class="finder-item" data-kind="file" data-id="${escapeAttr(f.id)}">
+                <div class="finder-icon">${iconForFile(f)}</div><div class="finder-name">${escapeHtml(f.original_name || f.name)}</div><div class="finder-meta">${fmtSize(f.size_bytes || f.size)}</div>
+              </div>
+            `).join('');
+        }
+
+        if(!childFolders.length && !childFiles.length){
+          itemsBox.className = 'finder-empty finder-items';
+          itemsBox.innerHTML = `<b>📂</b><div>No hay elementos en esta carpeta</div><div class="small">Sube archivos o crea una carpeta nueva.</div>`;
+        }
       }
 
       $$('.finder-row,.finder-item', root).forEach(el => {
@@ -2172,29 +2445,126 @@
       });
     };
 
-    const openFinderItem = (kind, id) => {
+    const listWebdavCurrent = async () => {
+      if(!currentWebdav) return;
+      const data = await apiWithTimeout('/api/webdav/list', {method:'POST', body:JSON.stringify({account_id: currentWebdav.id, path: currentWebdavPath})}, 25000);
+      webdavItems = (data.items || []).map(it => {
+        it = it || {};
+        const name = String(it.name || '').trim();
+        const typeRaw = String(it.type || '').toLowerCase();
+        const sizeRaw = it.size ?? '';
+        const size = Number(sizeRaw || 0);
+        const hasExtension = /\.[a-z0-9]{1,8}$/i.test(name);
+        const forceFolder = ['folder','dir','directory','collection'].includes(typeRaw) || (!hasExtension && (size === 0 || sizeRaw === '' || sizeRaw === null || sizeRaw === undefined));
+        return {...it, type: forceFolder ? 'folder' : 'file', path: it.path || joinWebdavPath(currentWebdavPath, name)};
+      });
+      render();
+    };
+
+    const goBackFolder = async () => {
+      const prev = navHistory.pop();
+      if(!prev) return;
+      currentMode = prev.mode;
+      currentFolder = prev.folder || '/';
+      currentWebdavPath = prev.webdavPath || '/';
+      currentWebdav = prev.webdavId ? webdavAccounts.find(a => a.id === prev.webdavId) : null;
+      if(currentMode === 'webdav' && currentWebdav) await listWebdavCurrent();
+      else render();
+    };
+
+    const goUpCurrent = async () => {
+      if(currentMode === 'webdav'){
+        const parent = parentFolder(currentWebdavPath || '/');
+        if(parent !== currentWebdavPath){
+          pushState();
+          currentWebdavPath = parent;
+          await listWebdavCurrent();
+        }
+      }else{
+        const parent = parentFolder(currentFolder);
+        if(parent !== currentFolder) setLocalFolder(parent, true);
+      }
+    };
+
+    const refreshCurrent = async () => {
+      if(currentMode === 'webdav') await listWebdavCurrent();
+      else { await loadLocal(); render(); }
+    };
+
+    const openWebdavFile = (it) => {
+      const dl = '/api/webdav/download?account_id=' + encodeURIComponent(currentWebdav.id) + '&path=' + encodeURIComponent(it.path || '');
+      if(/\.(png|jpe?g|gif|webp|svg|pdf|txt|csv|json|log|md|html?)$/i.test(it.name || '')) openBrowser(dl, it.name);
+      else window.open(dl, '_blank');
+    };
+
+    const openWebdavTextEditor = async (it) => {
+      const data = await apiWithTimeout('/api/webdav/download-text?account_id=' + encodeURIComponent(currentWebdav.id) + '&path=' + encodeURIComponent(it.path || ''), {}, 25000);
+      const modal = document.createElement('div');
+      modal.className = 'modal-backdrop';
+      modal.innerHTML = `
+        <div class="modal" style="width:min(980px,calc(100vw - 30px));height:min(760px,calc(100vh - 30px));display:flex;flex-direction:column">
+          <h2>Editar WebDAV</h2>
+          <p>${escapeHtml(it.path || it.name || '')}</p>
+          <textarea class="input webdav-text-editor" style="flex:1;min-height:420px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px;line-height:1.45;resize:none;background:#0f172a;color:#e5e7eb"></textarea>
+          <div class="form-actions">
+            <button class="secondary webdav-editor-close">Cerrar</button>
+            <button class="primary webdav-editor-save">Guardar cambios</button>
+          </div>
+          <div class="msg webdav-editor-msg"></div>
+        </div>`;
+      document.body.appendChild(modal);
+      const ta = $('.webdav-text-editor', modal);
+      ta.value = data.text || '';
+      $('.webdav-editor-close', modal).addEventListener('click', () => modal.remove());
+      $('.webdav-editor-save', modal).addEventListener('click', async () => {
+        const msg = $('.webdav-editor-msg', modal);
+        msg.textContent = 'Guardando...';
+        try{
+          await apiWithTimeout('/api/webdav/save-text', {method:'POST', body:JSON.stringify({account_id:currentWebdav.id,path:it.path,text:ta.value})}, 25000);
+          msg.textContent = 'Guardado correctamente.';
+          await listWebdavCurrent();
+        }catch(err){ msg.textContent = err.message; }
+      });
+    };
+
+    const openFinderItem = async (kind, id) => {
       if(kind === 'folder'){
         const folder = folders.find(f => String(f.id || f.path) === String(id));
-        if(folder) setFolder(folder.path);
+        if(folder) setLocalFolder(folder.path);
         return;
       }
-      const f = files.find(x => String(x.id) === String(id));
-      if(!f) return;
-      const url = '/api/files/download/' + encodeURIComponent(f.id);
-      const name = f.original_name || f.name || 'Archivo';
-      const mime = f.mime_type || '';
-      if(mime.startsWith('image/') || mime.includes('pdf') || mime.includes('text') || name.toLowerCase().endsWith('.html') || name.toLowerCase().endsWith('.htm')){
-        openBrowser(url, name);
-      }else{
-        window.open(url, '_blank');
+      if(kind === 'file'){
+        const f = files.find(x => String(x.id) === String(id));
+        if(!f) return;
+        const url = '/api/files/download/' + encodeURIComponent(f.id);
+        const name = f.original_name || f.name || 'Archivo';
+        const mime = f.mime_type || '';
+        if(mime.startsWith('image/') || mime.includes('pdf') || mime.includes('text') || name.toLowerCase().endsWith('.html') || name.toLowerCase().endsWith('.htm')) openBrowser(url, name);
+        else window.open(url, '_blank');
+        return;
+      }
+      if(kind === 'webdav-folder'){
+        const f = webdavItems.find(x => String(x.path || x.name) === String(id));
+        if(f){ pushState(); currentWebdavPath = f.path || id; await listWebdavCurrent(); }
+        return;
+      }
+      if(kind === 'webdav-file'){
+        const f = webdavItems.find(x => String(x.path || x.name) === String(id));
+        if(f) openWebdavFile(f);
       }
     };
 
     const createFolder = async () => {
       const name = prompt('Nombre de la nueva carpeta');
       if(!name) return;
-      await api('/api/folders', {method:'POST', body:JSON.stringify({name, parent: currentFolder})});
-      await load();
+      if(currentMode === 'webdav'){
+        await api('/api/webdav/mkdir', {method:'POST', body:JSON.stringify({account_id: currentWebdav.id, path: currentWebdavPath, name})});
+        await listWebdavCurrent();
+      }else{
+        await api('/api/folders', {method:'POST', body:JSON.stringify({name, parent: currentFolder})});
+        await loadLocal();
+        render();
+      }
     };
 
     const uploadCurrent = () => fileInput.click();
@@ -2202,19 +2572,26 @@
     fileInput.addEventListener('change', async () => {
       const file = fileInput.files && fileInput.files[0];
       if(!file) return;
-      if(file.size > 12 * 1024 * 1024){ alert('Archivo demasiado grande. Máximo 12 MB.'); return; }
+      const maxMb = currentMode === 'webdav' ? 30 : 12;
+      if(file.size > maxMb * 1024 * 1024){ alert('Archivo demasiado grande. Máximo ' + maxMb + ' MB.'); return; }
       const reader = new FileReader();
       reader.onload = async () => {
         const base64 = String(reader.result || '').split(',')[1] || '';
-        await api('/api/files/upload-json', {method:'POST', body:JSON.stringify({
-          name: file.name,
-          mime_type: file.type || 'application/octet-stream',
-          size_bytes: file.size,
-          folder: currentFolder,
-          data_base64: base64
-        })});
+        if(currentMode === 'webdav'){
+          await api('/api/webdav/upload', {method:'POST', body:JSON.stringify({account_id: currentWebdav.id, path: currentWebdavPath, name: file.name, data_base64: base64})});
+          await listWebdavCurrent();
+        }else{
+          await api('/api/files/upload-json', {method:'POST', body:JSON.stringify({
+            name: file.name,
+            mime_type: file.type || 'application/octet-stream',
+            size_bytes: file.size,
+            folder: currentFolder,
+            data_base64: base64
+          })});
+          await loadLocal();
+          render();
+        }
         fileInput.value = '';
-        await load();
       };
       reader.readAsDataURL(file);
     });
@@ -2223,19 +2600,29 @@
       $$('.finder-context').forEach(m => m.remove());
       const menu = document.createElement('div');
       menu.className = 'finder-context';
-      menu.style.left = Math.min(x, window.innerWidth - 220) + 'px';
-      menu.style.top = Math.min(y, window.innerHeight - 220) + 'px';
-      menu.innerHTML = kind === 'folder' ? `
-        <button data-act="open">Abrir carpeta</button>
-        <button data-act="delete" class="danger-item">Eliminar carpeta</button>
-      ` : `
-        <button data-act="open">Abrir</button>
-        <button data-act="download">Descargar</button>
-        <button data-act="dash">Crear icono dashboard</button>
-        <button data-act="delete" class="danger-item">Eliminar archivo</button>
-      `;
+      menu.style.left = Math.min(x, window.innerWidth - 240) + 'px';
+      menu.style.top = Math.min(y, window.innerHeight - 260) + 'px';
+      const isWebdav = String(kind).startsWith('webdav-');
+      menu.innerHTML = isWebdav
+        ? (kind === 'webdav-folder' ? `
+            <button data-act="open">Abrir carpeta</button>
+            <button data-act="delete" class="danger-item">Eliminar carpeta</button>
+          ` : `
+            <button data-act="open">Abrir</button>
+            <button data-act="download">Descargar</button>
+            <button data-act="edit">Editar texto</button>
+            <button data-act="delete" class="danger-item">Eliminar archivo</button>
+          `)
+        : (kind === 'folder' ? `
+            <button data-act="open">Abrir carpeta</button>
+            <button data-act="delete" class="danger-item">Eliminar carpeta</button>
+          ` : `
+            <button data-act="open">Abrir</button>
+            <button data-act="download">Descargar</button>
+            <button data-act="dash">Crear icono dashboard</button>
+            <button data-act="delete" class="danger-item">Eliminar archivo</button>
+          `);
       document.body.appendChild(menu);
-
       const close = () => menu.remove();
       setTimeout(() => document.addEventListener('click', close, {once:true}), 0);
 
@@ -2243,64 +2630,82 @@
         const act = e.target.dataset.act;
         if(!act) return;
         e.stopPropagation();
+        if(act === 'open') await openFinderItem(kind,id);
 
-        if(act === 'open') openFinderItem(kind,id);
-
-        if(kind === 'file' && act === 'download'){
-          window.open('/api/files/download/' + encodeURIComponent(id), '_blank');
+        if(isWebdav){
+          const it = webdavItems.find(x => String(x.path || x.name) === String(id));
+          if(!it) return;
+          if(act === 'download') window.open('/api/webdav/download?account_id=' + encodeURIComponent(currentWebdav.id) + '&path=' + encodeURIComponent(it.path || ''), '_blank');
+          if(act === 'edit'){
+            if(/\.(txt|csv|json|log|md|html?|css|js)$/i.test(it.name || '')) await openWebdavTextEditor(it);
+            else alert('La edición integrada está disponible para archivos de texto.');
+          }
+          if(act === 'delete'){
+            if(confirm('¿Eliminar "' + (it.name || '') + '"?')){
+              await api('/api/webdav/delete', {method:'POST', body:JSON.stringify({account_id: currentWebdav.id, path: it.path, type: it.type === 'folder' ? 'dir' : 'file'})});
+              await listWebdavCurrent();
+            }
+          }
+          return;
         }
 
+        if(kind === 'file' && act === 'download') window.open('/api/files/download/' + encodeURIComponent(id), '_blank');
         if(kind === 'file' && act === 'dash'){
           const f = files.find(x => String(x.id) === String(id));
           if(f){
             await api('/api/icons', {method:'POST', body:JSON.stringify({
               title: (f.original_name || f.name || 'Dashboard').replace(/\.(html|htm)$/i,''),
-              icon: '📊',
-              type: 'link',
+              icon: '📊', type: 'link',
               target: '/api/files/download/' + encodeURIComponent(f.id),
-              x: 120 + Math.floor(Math.random()*360),
-              y: 180 + Math.floor(Math.random()*220)
+              x: 120 + Math.floor(Math.random()*360), y: 180 + Math.floor(Math.random()*220)
             })});
             icons = await api('/api/icons');
             renderIcons();
           }
         }
-
         if(act === 'delete'){
           if(kind === 'file'){
             const f = files.find(x => String(x.id) === String(id));
             if(confirm('¿Eliminar "' + (f?.original_name || f?.name || '') + '"?')){
               await api('/api/files/' + encodeURIComponent(id), {method:'DELETE'});
-              await load();
+              await loadLocal(); render();
             }
           }else{
             const f = folders.find(x => String(x.id || x.path) === String(id));
             if(confirm('¿Eliminar la carpeta "' + (f?.name || '') + '"? Los archivos que contenga pasarán a Inicio.')){
               await api('/api/folders/' + encodeURIComponent(f.id || f.path), {method:'DELETE'});
-              await load();
+              await loadLocal(); render();
             }
           }
         }
-
-        close();
       });
     };
 
-    $$('.finder-side-item[data-folder]', root).forEach(b => b.addEventListener('click', () => setFolder(b.dataset.folder)));
-    $('.finder-back', root).addEventListener('click', goBackFolder);
-    $('.finder-search', root).addEventListener('input', e => { search = e.target.value.trim(); render(); });
-    $('.finder-view-toggle', root).addEventListener('click', () => { viewMode = viewMode === 'grid' ? 'list' : 'grid'; localStorage.setItem('masive_finder_view', viewMode); render(); });
-    $('.finder-up', root).addEventListener('click', () => setFolder(parentFolder(currentFolder)));
+    $$('.finder-side-item[data-folder]', root).forEach(btn => btn.addEventListener('click', () => setLocalFolder(btn.dataset.folder)));
     $('.finder-new-folder', root).addEventListener('click', createFolder);
     $('.finder-new-folder-top', root).addEventListener('click', createFolder);
     $('.finder-upload-side', root).addEventListener('click', uploadCurrent);
     $('.finder-upload-top', root).addEventListener('click', uploadCurrent);
+    $('.finder-back', root).addEventListener('click', () => goBackFolder().catch ? goBackFolder().catch(console.error) : null);
+    $('.finder-up', root).addEventListener('click', () => goUpCurrent().catch ? goUpCurrent().catch(console.error) : null);
+    $('.finder-refresh', root).addEventListener('click', () => refreshCurrent().catch(console.error));
+    $('.finder-view-toggle', root).addEventListener('click', () => {
+      viewMode = viewMode === 'grid' ? 'list' : 'grid';
+      localStorage.setItem('masive_finder_view', viewMode);
+      render();
+    });
+    $('.finder-search', root).addEventListener('input', (e) => { search = e.target.value.trim(); render(); });
     $('.finder-backup-side', root).addEventListener('click', async () => {
-      const data = await api('/api/backup');
-      downloadText('masive_os_backup_' + new Date().toISOString().slice(0,10) + '.json', JSON.stringify(data, null, 2));
+      try{
+        const health = await api('/api/health');
+        const blob = new Blob([JSON.stringify(health, null, 2)], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'masiveos_health.json'; a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }catch(err){ alert(err.message); }
     });
 
-    await load();
+    await loadAll();
   }
 
   async function renderDashboards(root){
@@ -2852,7 +3257,7 @@
     await loadAccounts();
   }
 
-  async function renderWebdavDrives(root){
+  async function renderWebdavDrives(root, options = {}){
     root.innerHTML = `
       <div class="webdav-wrap webdav-win11">
         <aside class="webdav-panel">
@@ -2891,6 +3296,11 @@
             <div class="field"><label>Raíz</label><input class="input webdav-root" value="/"></div>
             <div class="field"><label>Modo</label><select class="input webdav-mode"><option value="rw">Lectura y escritura</option><option value="ro">Solo lectura</option></select></div>
           </div>
+          <label class="webdav-toggle-row">
+            <input type="checkbox" class="webdav-show-files" checked>
+            <div><span>Mostrar acceso en el Explorador</span><small>La unidad aparecerá dentro del módulo Archivos con estilo de explorador propio.</small></div>
+          </label>
+          <div class="field"><label>Letra en Explorador</label><select class="input webdav-drive-letter"><option value="Z">Z:</option><option value="Y">Y:</option><option value="X">X:</option><option value="W">W:</option><option value="V">V:</option><option value="U">U:</option><option value="T">T:</option><option value="S">S:</option></select></div>
           <div class="row">
             <button class="primary webdav-save">Guardar disco</button>
             <button class="secondary webdav-test">Probar</button>
@@ -2932,7 +3342,9 @@
       user: $('.webdav-user', root),
       pass: $('.webdav-pass', root),
       root: $('.webdav-root', root),
-      mode: $('.webdav-mode', root)
+      mode: $('.webdav-mode', root),
+      showInFiles: $('.webdav-show-files', root),
+      driveLetter: $('.webdav-drive-letter', root)
     };
 
     const providerIcon = p => ({digi:'🟢',pcloud:'☁️',dropbox:'📦',googledrive:'🔺',onedrive:'🔷',nextcloud:'☁️',koofr:'🗄️',custom:'🌐'}[p] || '🌐');
@@ -2975,7 +3387,7 @@
     };
 
     const clearForm = () => {
-      form.id.value=''; form.provider.value='digi'; form.name.value=''; form.url.value=''; form.user.value=''; form.pass.value=''; form.root.value='/'; form.mode.value='rw';
+      form.id.value=''; form.provider.value='digi'; form.name.value=''; form.url.value=''; form.user.value=''; form.pass.value=''; form.root.value='/'; form.mode.value='rw'; form.showInFiles.checked = true; form.driveLetter.value='Z';
     };
 
     const fillPreset = (provider) => {
@@ -3001,8 +3413,10 @@
           <button class="webdav-account-open" data-id="${escapeAttr(a.id)}" style="border:0;background:transparent;text-align:left;color:inherit;min-width:0;cursor:pointer">
             <b>${providerIcon(a.provider)} ${escapeHtml(a.name || a.provider)}</b>
             <span>${escapeHtml(a.provider)} · ${escapeHtml(a.mode || 'rw')} · ${escapeHtml(a.root || '/')}</span>
+            ${a.show_in_files !== false ? '<div class="webdav-account-pin drive">💽 Explorador ' + escapeHtml(a.drive_letter || 'Z') + ':</div>' : ''}
           </button>
           <div class="webdav-account-actions">
+            <button class="mini-btn files webdav-account-files" data-id="${escapeAttr(a.id)}">Explorador</button>
             <button class="mini-btn webdav-account-edit" data-id="${escapeAttr(a.id)}">Editar</button>
             <button class="mini-btn danger webdav-account-delete" data-id="${escapeAttr(a.id)}">Eliminar</button>
           </div>
@@ -3020,6 +3434,12 @@
         loadAccounts();
       }));
 
+      $$('.webdav-account-files', root).forEach(btn => btn.addEventListener('click', () => {
+        const a = accounts.find(x => x.id === btn.dataset.id);
+        if(!a) return;
+        openModule('files', 'Archivos', '📁', {webdavAccountId: a.id, webdavPath: a.root || '/'});
+      }));
+
       $$('.webdav-account-edit', root).forEach(btn => btn.addEventListener('click', () => {
         const a = accounts.find(x => x.id === btn.dataset.id);
         if(!a) return;
@@ -3032,6 +3452,8 @@
         form.pass.value = a.password || '';
         form.root.value = a.root || '/';
         form.mode.value = a.mode || 'rw';
+        form.showInFiles.checked = a.show_in_files !== false;
+        form.driveLetter.value = a.drive_letter || 'Z';
         setMsg('Editando unidad WebDAV: ' + (a.name || a.provider));
       }));
 
@@ -3053,7 +3475,7 @@
     };
 
     const saveAccount = async () => {
-      const payload = {provider:form.provider.value,name:form.name.value||form.provider.value,base_url:form.url.value,username:form.user.value,password:form.pass.value,root:form.root.value||'/',mode:form.mode.value};
+      const payload = {provider:form.provider.value,name:form.name.value||form.provider.value,base_url:form.url.value,username:form.user.value,password:form.pass.value,root:form.root.value||'/',mode:form.mode.value,show_in_files: !!form.showInFiles.checked,drive_letter: form.driveLetter.value || 'Z'};
       if(!payload.base_url || !payload.username){ setMsg('Introduce URL WebDAV y usuario.'); return; }
       if(form.id.value) active = await api('/api/webdav/accounts/' + encodeURIComponent(form.id.value), {method:'PUT', body:JSON.stringify(payload)});
       else active = await api('/api/webdav/accounts', {method:'POST', body:JSON.stringify(payload)});
