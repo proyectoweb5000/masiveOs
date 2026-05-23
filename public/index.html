@@ -2949,6 +2949,31 @@
     };
     const fmtSize = n => { n = Number(n || 0); if(!n) return ''; if(n < 1024) return n + ' B'; if(n < 1024*1024) return (n/1024).toFixed(1) + ' KB'; return (n/(1024*1024)).toFixed(2) + ' MB'; };
 
+    // Algunos WebDAV, incluido DIGI, devuelven carpetas como si fueran documentos:
+    // sin <collection/>, sin barra final y con tamaño vacío. Forzamos el criterio
+    // de explorador: elemento sin extensión + tamaño 0/vacío = carpeta navegable.
+    const normalizeWebdavItem = (it) => {
+      it = it || {};
+      const name = String(it.name || '').trim();
+      const typeRaw = String(it.type || '').toLowerCase();
+      const mime = String(it.mimeType || it.mime_type || it.contentType || it.content_type || '').toLowerCase();
+      const sizeRaw = it.size ?? it.size_bytes ?? '';
+      const size = Number(sizeRaw || 0);
+      const hasExtension = /\.[a-z0-9]{1,8}$/i.test(name);
+      const serverSaysFolder = ['folder','dir','directory','collection'].includes(typeRaw) || /folder|directory|collection/.test(mime);
+      const looksLikeFolder = !hasExtension && (size === 0 || sizeRaw === '' || sizeRaw === null || sizeRaw === undefined);
+      if(serverSaysFolder || looksLikeFolder){
+        return {...it, type:'folder', size:0, path: it.path || it.id || joinWebdavPath(currentPath, name)};
+      }
+      return {...it, type:'file'};
+    };
+
+    const joinWebdavPath = (base, name) => {
+      const b = String(base || '/').replace(/\/+$/,'');
+      const n = String(name || '').replace(/^\/+/, '');
+      return ('/' + [b, n].join('/').replace(/^\/+|\/+$/g,'').replace(/\/+/, '/')).replace(/\/+$/, '') || '/';
+    };
+
     const clearForm = () => {
       form.id.value=''; form.provider.value='digi'; form.name.value=''; form.url.value=''; form.user.value=''; form.pass.value=''; form.root.value='/'; form.mode.value='rw';
     };
@@ -3051,7 +3076,7 @@
             <div></div><div>Nombre</div><div>Tamaño</div><div class="col-mod">Modificado</div><div class="col-actions">Acciones</div>
           </div>
           ${items.map((it, idx) => `
-            <div class="webdav-item" data-index="${idx}">
+            <div class="webdav-item" data-index="${idx}" title="Doble clic para abrir/ver">
               <div class="webdav-ico">${fileIcon(it)}</div>
               <div class="webdav-name" title="${escapeAttr(it.name || '')}">${escapeHtml(it.name || '')}</div>
               <div class="webdav-meta">${it.type === 'folder' ? 'Carpeta' : escapeHtml(fmtSize(it.size))}</div>
@@ -3133,7 +3158,7 @@
       if(!active){ setMsg('Selecciona un disco WebDAV.'); return; }
       setMsg('Listando archivos WebDAV...');
       const data = await apiWithTimeout('/api/webdav/list', {method:'POST', body:JSON.stringify({account_id: active.id, path: currentPath})}, 25000);
-      items = data.items || [];
+      items = (data.items || []).map(normalizeWebdavItem);
       renderItems();
       if($('.webdav-preview-body', root)) renderPreview(null);
       setMsg('Listado cargado.');
