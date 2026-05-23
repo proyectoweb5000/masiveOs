@@ -1613,6 +1613,7 @@ async function handleApi(req, res, pathname) {
         root: data.root || "/",
         mode: data.mode || "rw",
         show_in_files: data.show_in_files !== false,
+        drive_letter: String(data.drive_letter || 'Z').slice(0,1).toUpperCase(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -1644,6 +1645,7 @@ async function handleApi(req, res, pathname) {
         root: data.root !== undefined ? data.root : state.webdavAccounts[idx].root,
         mode: data.mode || state.webdavAccounts[idx].mode,
         show_in_files: data.show_in_files !== undefined ? !!data.show_in_files : (state.webdavAccounts[idx].show_in_files !== false),
+        drive_letter: data.drive_letter !== undefined ? String(data.drive_letter || 'Z').slice(0,1).toUpperCase() : (state.webdavAccounts[idx].drive_letter || 'Z'),
         updated_at: new Date().toISOString()
       };
 
