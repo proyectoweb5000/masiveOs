@@ -1247,6 +1247,39 @@ async function handleApi(req, res, pathname) {
     return fs.createReadStream(filePath).pipe(res);
   }
 
+
+  if (pathname === "/api/files/read-text" && req.method === "GET") {
+    const fullUrl = new URL(req.url, `http://${req.headers.host}`);
+    const id = fullUrl.searchParams.get("id");
+    const file = state.files.find(f => f.id === id);
+    if (!file) return sendJson(res, 404, { ok: false, error: "Archivo no encontrado" });
+    const name = file.original_name || file.name || "";
+    if (!/\.(txt|csv|json|log|md|html?|css|js)$/i.test(name)) return sendJson(res, 400, { ok: false, error: "No es un archivo de texto editable" });
+    const filePath = path.join(UPLOADS_PATH, file.stored_name || file.name);
+    if (!fs.existsSync(filePath)) return sendJson(res, 404, { ok: false, error: "Archivo físico no encontrado" });
+    const text = fs.readFileSync(filePath, "utf8");
+    return sendJson(res, 200, { ok: true, id, name, text });
+  }
+
+  if (pathname === "/api/files/save-text" && req.method === "POST") {
+    const data = await readJson(req);
+    const id = data.id;
+    const idxFile = state.files.findIndex(f => f.id === id);
+    if (idxFile === -1) return sendJson(res, 404, { ok: false, error: "Archivo no encontrado" });
+    const file = state.files[idxFile];
+    const name = file.original_name || file.name || "";
+    if (!/\.(txt|csv|json|log|md|html?|css|js)$/i.test(name)) return sendJson(res, 400, { ok: false, error: "No es un archivo de texto editable" });
+    const text = String(data.text || "");
+    const buffer = Buffer.from(text, "utf8");
+    if (buffer.length > 5 * 1024 * 1024) return sendJson(res, 413, { ok: false, error: "Texto demasiado grande. Máximo 5 MB." });
+    const filePath = path.join(UPLOADS_PATH, file.stored_name || file.name);
+    fs.writeFileSync(filePath, buffer);
+    state.files[idxFile].size_bytes = buffer.length;
+    state.files[idxFile].updated_at = new Date().toISOString();
+    saveState(state);
+    return sendJson(res, 200, { ok: true, id, size_bytes: buffer.length });
+  }
+
   if (pathname.startsWith("/api/files/") && req.method === "DELETE") {
     const id = decodeURIComponent(pathname.split("/").pop());
     const idx = state.files.findIndex(f => f.id === id);
@@ -1756,6 +1789,24 @@ async function handleApi(req, res, pathname) {
     if (!account) return sendJson(res, 404, { ok: false, error: "Cuenta WebDAV no encontrada" });
     const items = await webdavList(account, data.path || account.root || "/");
     return sendJson(res, 200, { ok: true, items });
+  }
+
+
+  if (pathname === "/api/webdav/folder-thumbnail" && req.method === "GET") {
+    const fullUrl = new URL(req.url, `http://${req.headers.host}`);
+    const account = getWebdavAccount(fullUrl.searchParams.get("account_id"));
+    const folderPath = fullUrl.searchParams.get("path") || "/";
+    if (!account) return sendJson(res, 404, { ok:false, error:"Cuenta WebDAV no encontrada" });
+    const list = await webdavList(account, folderPath);
+    const img = (list || []).find(x => x.type !== "folder" && /\.(png|jpe?g|gif|webp|svg)$/i.test(x.name || ""));
+    if (!img) return sendText(res, 404, "No thumbnail");
+    const buffer = await webdavDownload(account, img.path || joinDavPath(folderPath, img.name));
+    res.writeHead(200, {
+      "Content-Type": getMime(img.name || "image.jpg"),
+      "Content-Disposition": `inline; filename="${encodeURIComponent(img.name || "thumbnail")}"`,
+      "Cache-Control": "no-store"
+    });
+    return res.end(buffer);
   }
 
   if (pathname === "/api/webdav/download" && req.method === "GET") {
