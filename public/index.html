@@ -1519,6 +1519,22 @@
   const desktop = $('#desktop');
   const modalHost = $('#modalHost');
 
+  async function apiWithTimeout(url, options = {}, timeoutMs = 25000){
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try{
+      return await api(url, {...options, signal: controller.signal});
+    }catch(err){
+      if(err.name === 'AbortError'){
+        throw new Error('Timeout de navegador tras ' + Math.round(timeoutMs/1000) + ' s. El servidor no respondió a tiempo.');
+      }
+      throw err;
+    }finally{
+      clearTimeout(timer);
+    }
+  }
+
+
   function setMsg(el, text, type=''){
     el.textContent = text || '';
     el.className = 'msg' + (type ? ' ' + type : '');
@@ -2731,6 +2747,7 @@
           <div class="row">
             <button class="primary webdav-save">Guardar disco</button>
             <button class="secondary webdav-test">Probar</button>
+            <button class="secondary webdav-diagnose">Diagnóstico</button>
             <button class="secondary webdav-clear">Limpiar</button>
           </div>
           <div class="webdav-status webdav-msg">Primer disco recomendado: configura DIGI con la URL WebDAV, usuario y contraseña.</div>
@@ -2822,7 +2839,11 @@
         active = accounts.find(a => a.id === btn.dataset.id);
         currentPath = active.root || '/';
         history = [];
-        await listWebdav();
+        try{
+          await listWebdav();
+        }catch(err){
+          setMsg('Error listando WebDAV: ' + err.message);
+        }
         loadAccounts();
       }));
     };
@@ -2879,7 +2900,7 @@
     const listWebdav = async () => {
       if(!active){ setMsg('Selecciona un disco WebDAV.'); return; }
       setMsg('Listando archivos WebDAV...');
-      const data = await api('/api/webdav/list', {method:'POST', body:JSON.stringify({account_id: active.id, path: currentPath})});
+      const data = await apiWithTimeout('/api/webdav/list', {method:'POST', body:JSON.stringify({account_id: active.id, path: currentPath})}, 25000);
       items = data.items || [];
       renderItems();
       renderPreview(null);
@@ -2908,9 +2929,20 @@
     $('.webdav-test', root).addEventListener('click', async () => {
       try{
         await saveAccount();
-        const r = await api('/api/webdav/test', {method:'POST', body:JSON.stringify({account_id:active.id})});
+        const r = await apiWithTimeout('/api/webdav/test', {method:'POST', body:JSON.stringify({account_id:active.id})}, 25000);
         setMsg(r.ok ? 'Conexión WebDAV OK.' : 'Error: ' + (r.error || 'sin detalle'));
       }catch(err){ setMsg(err.message); }
+    });
+    $('.webdav-diagnose', root).addEventListener('click', async () => {
+      try{
+        await saveAccount();
+        setMsg('Ejecutando diagnóstico WebDAV...');
+        const r = await apiWithTimeout('/api/webdav/diagnose', {method:'POST', body:JSON.stringify({account_id:active.id})}, 30000);
+        setMsg('Diagnóstico: ' + (r.summary || JSON.stringify(r)));
+        alert('Diagnóstico WebDAV:\n\n' + JSON.stringify(r, null, 2));
+      }catch(err){
+        setMsg('Diagnóstico error: ' + err.message);
+      }
     });
     $('.webdav-clear', root).addEventListener('click', clearForm);
     $('.webdav-refresh', root).addEventListener('click', () => listWebdav().catch(err => setMsg(err.message)));
