@@ -694,7 +694,9 @@ function xmlTag(block, tag) {
 }
 
 function isWebdavCollection(block) {
-  return /<[^>]*:?collection\s*\/?>/i.test(String(block || ""));
+  const s = String(block || "");
+  return /<[^>]*:?resourcetype[^>]*>[\s\S]*?<[^>]*:?collection\s*\/?\s*>[\s\S]*?<\/[^>]*:?resourcetype>/i.test(s)
+    || /<[^>]*:?collection\s*\/?\s*>/i.test(s);
 }
 
 function normalizeDavPath(p) {
@@ -864,19 +866,34 @@ async function webdavRequest(account, method, remotePath, opts = {}) {
 function parseWebdavList(xml, currentPath) {
   const responses = String(xml || "").match(/<[^>]*:?response[\s\S]*?<\/[^>]*:?response>/gi) || [];
   const current = normalizeDavPath(currentPath || "/");
+  const currentLast = current.split("/").filter(Boolean).pop() || "";
   const out = [];
 
   for (const block of responses) {
     const hrefRaw = xmlTag(block, "href");
-    let name = decodeURIComponent(String(hrefRaw || "").split("?")[0].replace(/\/+$/, "").split("/").pop() || "");
-    const isDir = isWebdavCollection(block);
+    if (!hrefRaw) continue;
+
+    let decodedHref = "";
+    try {
+      decodedHref = decodeURIComponent(String(hrefRaw).split("?")[0]);
+    } catch {
+      decodedHref = String(hrefRaw).split("?")[0];
+    }
+
+    const hrefNoSlash = decodedHref.replace(/\/+$/, "");
+    let name = hrefNoSlash.split("/").pop() || "";
+
+    const hasCollection = isWebdavCollection(block);
+    const hrefLooksDir = /\/$/.test(String(hrefRaw));
+    const isDir = hasCollection || hrefLooksDir;
+
     const size = Number(xmlTag(block, "getcontentlength") || 0);
     const modified = xmlTag(block, "getlastmodified");
 
     if (!name) continue;
 
-    const lastCurrent = current.split("/").filter(Boolean).pop();
-    if (lastCurrent && name === lastCurrent) continue;
+    if (currentLast && name === currentLast) continue;
+    if (current === "/" && (decodedHref === "/" || decodedHref.replace(/\/+$/, "") === "")) continue;
 
     const pathValue = joinDavPath(current, name);
 
@@ -890,9 +907,21 @@ function parseWebdavList(xml, currentPath) {
     });
   }
 
-  return out.sort((a, b) => (a.type === b.type ? a.name.localeCompare(b.name, "es") : a.type === "folder" ? -1 : 1));
-}
+  const seen = new Set();
+  const unique = [];
+  for (const item of out) {
+    const key = item.path + "|" + item.type;
+    if (!seen.has(key)) {
+      seen.add(key);
+      unique.push(item);
+    }
+  }
 
+  return unique.sort((a, b) => {
+    if (a.type !== b.type) return a.type === "folder" ? -1 : 1;
+    return a.name.localeCompare(b.name, "es", { numeric: true, sensitivity: "base" });
+  });
+}
 async function webdavList(account, remotePath) {
   const pathValue = normalizeDavPath(remotePath || account.root || "/");
   const body = `<?xml version="1.0" encoding="utf-8" ?><propfind xmlns="DAV:"><allprop/></propfind>`;
