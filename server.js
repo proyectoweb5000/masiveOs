@@ -695,8 +695,10 @@ function xmlTag(block, tag) {
 
 function isWebdavCollection(block) {
   const s = String(block || "");
+  const contentType = xmlTag(s, "getcontenttype").toLowerCase();
   return /<[^>]*:?resourcetype[^>]*>[\s\S]*?<[^>]*:?collection\s*\/?\s*>[\s\S]*?<\/[^>]*:?resourcetype>/i.test(s)
-    || /<[^>]*:?collection\s*\/?\s*>/i.test(s);
+    || /<[^>]*:?collection\s*\/?\s*>/i.test(s)
+    || /directory|collection|folder/.test(contentType);
 }
 
 function normalizeDavPath(p) {
@@ -1005,6 +1007,38 @@ async function webdavMkdir(account, remotePath) {
 async function webdavDelete(account, remotePath) {
   if (account.mode === "ro") throw new Error("Cuenta en solo lectura");
   const r = await webdavRequest(account, "DELETE", remotePath);
+  return { ok: true, status: r.status };
+}
+
+
+function buildWebdavAbsoluteUrl(account, remotePath) {
+  return buildWebdavUrl(account, remotePath);
+}
+
+async function webdavCopy(account, fromPath, toPath) {
+  if (account.mode === "ro") throw new Error("Cuenta en solo lectura");
+  const destination = buildWebdavAbsoluteUrl(account, toPath);
+  const r = await webdavRequest(account, "COPY", fromPath, {
+    headers: { "Destination": destination, "Overwrite": "F", "Depth": "infinity" }
+  });
+  return { ok: true, status: r.status };
+}
+
+async function webdavMove(account, fromPath, toPath) {
+  if (account.mode === "ro") throw new Error("Cuenta en solo lectura");
+  const destination = buildWebdavAbsoluteUrl(account, toPath);
+  const r = await webdavRequest(account, "MOVE", fromPath, {
+    headers: { "Destination": destination, "Overwrite": "F" }
+  });
+  return { ok: true, status: r.status };
+}
+
+async function webdavSaveText(account, remotePath, text) {
+  if (account.mode === "ro") throw new Error("Cuenta en solo lectura");
+  const r = await webdavRequest(account, "PUT", remotePath, {
+    headers: { "Content-Type": "text/plain; charset=utf-8" },
+    body: Buffer.from(String(text ?? ""), "utf8")
+  });
   return { ok: true, status: r.status };
 }
 
@@ -1763,6 +1797,37 @@ async function handleApi(req, res, pathname) {
 
     const result = await webdavDelete(account, data.path);
     return sendJson(res, 200, { ok: true, result });
+  }
+
+
+  if (pathname === "/api/webdav/download-text" && req.method === "GET") {
+    const fullUrl = new URL(req.url, `http://${req.headers.host}`);
+    const account = getWebdavAccount(fullUrl.searchParams.get("account_id"));
+    const remotePath = fullUrl.searchParams.get("path");
+    if (!account) return sendJson(res, 404, { ok: false, error: "Cuenta WebDAV no encontrada" });
+    const buffer = await webdavDownload(account, remotePath);
+    if (buffer.length > 2 * 1024 * 1024) return sendJson(res, 413, { ok: false, error: "Archivo demasiado grande para editar como texto. Máximo 2 MB." });
+    return sendJson(res, 200, { ok: true, text: buffer.toString("utf8") });
+  }
+
+  if (pathname === "/api/webdav/save-text" && req.method === "POST") {
+    const data = await readJson(req);
+    const account = getWebdavAccount(data.account_id);
+    if (!account) return sendJson(res, 404, { ok: false, error: "Cuenta WebDAV no encontrada" });
+    const result = await webdavSaveText(account, data.path, data.text || "");
+    return sendJson(res, 200, { ok: true, result });
+  }
+
+  if ((pathname === "/api/webdav/copy" || pathname === "/api/webdav/move") && req.method === "POST") {
+    const data = await readJson(req);
+    const account = getWebdavAccount(data.account_id);
+    if (!account) return sendJson(res, 404, { ok: false, error: "Cuenta WebDAV no encontrada" });
+    const fromPath = normalizeDavPath(data.from || "");
+    const toDir = normalizeDavPath(data.to_dir || account.root || "/");
+    const name = safeFolderName(data.name || path.basename(fromPath) || "elemento");
+    const toPath = joinDavPath(toDir, name);
+    const result = pathname.endsWith("/move") ? await webdavMove(account, fromPath, toPath) : await webdavCopy(account, fromPath, toPath);
+    return sendJson(res, 200, { ok: true, result, to: toPath });
   }
 
   if (pathname === "/api/password" && req.method === "POST") {
