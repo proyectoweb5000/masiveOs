@@ -1612,6 +1612,7 @@ async function handleApi(req, res, pathname) {
         password: data.password || "",
         root: data.root || "/",
         mode: data.mode || "rw",
+        show_in_files: data.show_in_files !== false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -1642,6 +1643,7 @@ async function handleApi(req, res, pathname) {
         password: data.password !== undefined ? data.password : state.webdavAccounts[idx].password,
         root: data.root !== undefined ? data.root : state.webdavAccounts[idx].root,
         mode: data.mode || state.webdavAccounts[idx].mode,
+        show_in_files: data.show_in_files !== undefined ? !!data.show_in_files : (state.webdavAccounts[idx].show_in_files !== false),
         updated_at: new Date().toISOString()
       };
 
