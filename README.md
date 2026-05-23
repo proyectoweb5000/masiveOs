@@ -1,40 +1,44 @@
-# MasiveOS / EA1FJZ Cloud OS V0.1.2
+# MasiveOS V0.1.3 - rollback estable + resolución + WebDAV
 
-Versión Render sin dependencias externas de npm.
+Versión basada en la rama anterior estable sin dependencias externas de npm.
 
-## Cambios V0.1.2
+## Cambios
 
-- Explorador de archivos tipo Windows: carpetas, listado, ruta, subir archivos a carpeta actual, crear carpeta, borrar y vista previa dentro de MasiveOS.
-- Endpoint seguro `/api/fs/list`, `/api/fs/view`, `/api/fs/text`, `/api/fs/mkdir` y borrado seguro limitado al directorio persistente de uploads.
-- Nuevo tema visual `Windows stile` con ventanas tipo Windows 11.
-- Ajuste de resolución/escala de interfaz desde Configuración general.
-- Corrección de login/sesión y lectura de respuestas API.
+- Se descarta el tema Windows stile.
+- Se mantiene el aspecto anterior.
+- Se añade ajuste de resolución / escala desde Configuración general.
+- Se añade explorador WebDAV dentro del Gestor de archivos.
+- Las carpetas WebDAV se abren dentro de MasiveOS, no como URL directa del navegador.
+- Los archivos WebDAV se visualizan mediante proxy seguro `/api/webdav/view`.
+- También se añade exploración local de `/var/data/uploads` con carpetas, subida y vista previa.
 
-## Variables Render recomendadas
+## Render
+
+Variables recomendadas:
 
 ```text
-ADMIN_PASSWORD=tu_contraseña
+ADMIN_PASSWORD=tu contraseña
 DATABASE_PATH=/var/data/ea1fjz_cloud_os.json
 UPLOADS_PATH=/var/data/uploads
 ```
 
-## Render
-
-Build Command:
+Comandos:
 
 ```text
-npm install
+Build Command: npm install
+Start Command: npm start
 ```
 
-Start Command:
+## WebDAV
 
-```text
-npm start
+En la app Nube, crea una cuenta con proveedor `WebDAV` y configuración JSON:
+
+```json
+{
+  "url": "https://servidor/remote.php/dav/files/usuario",
+  "username": "usuario",
+  "password": "contraseña_o_token"
+}
 ```
 
-Persistent Disk:
-
-```text
-Mount Path: /var/data
-Size: 1 GB
-```
+Después abre `Gestor archivos > WebDAV`, selecciona la cuenta y entra en carpetas.

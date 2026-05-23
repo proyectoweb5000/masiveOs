@@ -1,7 +1,7 @@
 {
-  "name": "ea1fjz-cloud-os",
-  "version": "0.1.1",
-  "description": "EA1FJZ Cloud OS - versión Render sin dependencias externas para arranque robusto.",
+  "name": "masiveos",
+  "version": "0.1.3",
+  "description": "MasiveOS V0.1.3 rollback estable con escala de interfaz y explorador WebDAV.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
